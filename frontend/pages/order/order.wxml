@@ -1,0 +1,46 @@
+<!-- pages/order/order.wxml - 新订单提交表单 -->
+<view class="container">
+  <form bindsubmit="submitOrder">
+    <view class="form-group">
+      <text class="label">重量 (kg):</text>
+      <input class="input" type="number" placeholder="请输入重量" bindinput="bindWeightInput" value="{{weight}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">体积 (m³):</text>
+      <input class="input" type="number" placeholder="请输入体积" bindinput="bindVolumeInput" value="{{volume}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">起点:</text>
+      <input class="input" placeholder="请输入起点" bindinput="bindOriginInput" value="{{origin}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">终点 (第一站):</text>
+      <input class="input" placeholder="请输入终点第一站" bindinput="bindDestinationFirstInput" value="{{destinationFirst}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">终点 (第二站):</text>
+      <input class="input" placeholder="请输入终点第二站" bindinput="bindDestinationSecondInput" value="{{destinationSecond}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">客户姓名:</text>
+      <input class="input" placeholder="请输入客户姓名" bindinput="bindCustomerNameInput" value="{{customerName}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">客户电话:</text>
+      <input class="input" type="number" placeholder="请输入客户电话" bindinput="bindCustomerPhoneInput" value="{{customerPhone}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">备注:</text>
+      <textarea class="textarea" placeholder="请输入备注" bindinput="bindRemarkInput" value="{{remark}}" />
+    </view>
+
+    <button class="submit-btn" form-type="submit">提交订单</button>
+  </form>
+</view>

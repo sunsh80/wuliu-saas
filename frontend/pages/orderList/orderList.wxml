@@ -1,0 +1,31 @@
+<!-- pages/orderList/orderList.wxml -->
+<view class="container">
+  <!-- 提交新订单按钮 -->
+  <button class="submit-order-btn" bindtap="navigateToSubmitOrder">提交新订单</button>
+
+  <!-- 订单列表 -->
+  <view class="order-list">
+    <block wx:for="{{orders}}" wx:key="id">
+      <view class="order-item" bindtap="navigateToOrderDetail" data-id="{{item.id}}">
+        <view class="order-header">
+          <text class="order-number">订单号: {{item.order_number}}</text>
+          <text class="order-status">状态: {{item.status}}</text>
+        </view>
+        <view class="order-details">
+          <text class="detail">重量: {{item.weight}}kg</text>
+          <text class="detail">体积: {{item.volume}}m³</text>
+          <text class="detail">起点: {{item.origin}}</text>
+          <text class="detail">终点: {{item.destination_first}}</text>
+          <text class="detail">客户: {{item.customer_name}}</text>
+          <text class="detail">电话: {{item.customer_phone}}</text>
+        </view>
+      </view>
+    </block>
+
+    <block wx:if="{{orders.length === 0 && !loading}}">
+      <view class="empty-list">暂无订单</view>
+    </block>
+  </view>
+
+  <button class="refresh-btn" bindtap="onRefresh" loading="{{loading}}">刷新</button>
+</view>

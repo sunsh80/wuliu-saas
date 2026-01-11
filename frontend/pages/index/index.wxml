@@ -1,0 +1,12 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <text class="title">欢迎使用物流小程序</text>
+  <text class="subtitle">便捷下单，高效配送</text>
+
+  <view class="button-group">
+    <button class="nav-btn" bindtap="goToOrder">订单提交</button>
+    <button class="nav-btn" bindtap="goToLogs">查看日志</button>
+    <!-- 新增登录按钮 -->
+    <button class="nav-btn" bindtap="goToLogin">用户登录</button>
+  </view>
+</view>

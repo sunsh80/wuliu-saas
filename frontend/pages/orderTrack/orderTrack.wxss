@@ -1,0 +1,157 @@
+/* pages/orderTrack/orderTrack.wxss */
+
+/* 页面容器 */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5; /* 页面背景色 */
+  min-height: 100vh; /* 确保至少占满全屏高度 */
+}
+
+/* 订单信息区域 */
+.order-info {
+  background-color: #ffffff; /* 白色背景 */
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
+}
+
+/* 信息项的标签样式 */
+.label {
+  display: block;
+  font-weight: bold;
+  color: #333333; /* 标签文字颜色 */
+  margin-bottom: 8rpx;
+  font-size: 28rpx; /* 标签文字大小 */
+}
+
+/* 信息项的值样式 */
+.value {
+  display: block;
+  margin-bottom: 15rpx;
+  color: #666666; /* 值文字颜色 */
+  font-size: 28rpx; /* 值文字大小 */
+  word-break: break-all; /* 长文本换行 */
+}
+
+/* 区块标题样式 */
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333; /* 标题文字颜色 */
+  margin-bottom: 15rpx;
+  display: block;
+}
+
+/* 已分配租户信息区域 */
+.assigned-section {
+  background-color: #e6f4ea; /* 绿色背景表示已分配 */
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.assigned-info .info-label {
+  font-weight: bold;
+  display: inline-block;
+  width: 140rpx; /* 调整标签宽度，使其对齐 */
+  color: #333333;
+  font-size: 28rpx;
+  vertical-align: top; /* 与右侧文字顶部对齐 */
+}
+
+.assigned-info .info-value {
+  display: inline-block;
+  color: #666666;
+  font-size: 28rpx;
+  word-break: break-all; /* 长文本换行 */
+  max-width: calc(100% - 140rpx); /* 确保不超出容器 */
+  vertical-align: top;
+}
+
+/* 响应列表区域 */
+.responses-section {
+  margin-bottom: 20rpx;
+}
+
+/* 响应列表容器 */
+.response-list {
+  background-color: #ffffff; /* 白色背景 */
+  padding: 10rpx;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
+}
+
+/* 单个响应项 */
+.response-item {
+  background-color: #fafafa; /* 每项背景色 */
+  padding: 20rpx;
+  margin-bottom: 10rpx;
+  border-radius: 8rpx;
+  position: relative; /* 为按钮定位做准备 */
+  display: flex;
+  flex-direction: column;
+  border: 1rpx solid #eee; /* 添加边框 */
+}
+
+/* 响应项中的租户名称 */
+.response-tenant-name {
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 8rpx;
+  font-size: 30rpx;
+}
+
+/* 响应项中的联系信息 */
+.response-contact {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 5rpx;
+}
+
+/* 选择按钮 */
+.select-btn {
+  position: absolute;
+  right: 20rpx;
+  top: 50%;
+  transform: translateY(-50%); /* 垂直居中 */
+  width: 120rpx; /* 调整按钮宽度 */
+  height: 50rpx; /* 调整按钮高度 */
+  line-height: 50rpx; /* 行高与高度一致，实现垂直居中 */
+  font-size: 24rpx; /* 按钮文字大小 */
+  padding: 0; /* 重置内边距 */
+  margin: 0; /* 重置外边距 */
+  background-color: #007aff; /* 按钮背景色 */
+  color: #ffffff; /* 按钮文字颜色 */
+  border-radius: 6rpx; /* 按钮圆角 */
+}
+
+/* 无响应提示 */
+.no-responses {
+  text-align: center;
+  color: #999999;
+  padding: 60rpx 0; /* 上下留更多空间 */
+  font-size: 28rpx;
+}
+
+/* 选择提示 */
+.selection-notice {
+  background-color: #fffbe6; /* 黄色背景提示 */
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+  color: #d2691e; /* 提示文字颜色 */
+  font-size: 28rpx;
+}
+
+/* 刷新按钮 */
+.refresh-btn {
+  width: 100%; /* 按钮宽度占满 */
+  margin-top: 30rpx;
+  background-color: #007aff; /* 按钮背景色 */
+  color: #ffffff; /* 按钮文字颜色 */
+  border-radius: 10rpx; /* 按钮圆角 */
+  font-size: 32rpx; /* 按钮文字大小 */
+  padding: 20rpx 0; /* 按钮内边距 */
+}

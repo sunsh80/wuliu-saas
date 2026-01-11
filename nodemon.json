@@ -1,0 +1,14 @@
+{
+  "watch": [
+    "server.js",
+    "api/**/*.js",
+    "db/**/*.js",
+    "handlers/**/*.js"
+  ],
+  "ext": "js,json,yaml,yml",
+  "ignore": [
+    "node_modules/**",
+    "data/**",
+    "*.test.js"
+  ]
+}

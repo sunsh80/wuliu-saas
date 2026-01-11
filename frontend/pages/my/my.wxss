@@ -1,0 +1,51 @@
+/* pages/my/my.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.user-section {
+  background-color: #ffffff;
+  padding: 40rpx 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+
+.user-info .name {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.user-info .phone {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.login-btn, .logout-btn {
+  width: 80%;
+  margin-top: 30rpx;
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+.features-section {
+  background-color: #ffffff;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+
+.feature-item {
+  padding: 30rpx 20rpx;
+  border-bottom: 1rpx solid #eee;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}

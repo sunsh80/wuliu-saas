@@ -1,0 +1,38 @@
+<!-- WULIU_PROJECT/miniprogram/pages/orderComparison/orderComparison.wxml -->
+<view class="container">
+  <view class="order-item" wx:for="{{ orders }}" wx:key="id">
+    <view class="order-header">
+      <text class="order-id">订单ID: {{ item.id }}</text>
+      <text class="status status-{{ item.status }}">状态: {{ item.status }}</text>
+    </view>
+    <view class="order-details">
+      <text class="detail-item">出发地: {{ item.origin }}</text>
+      <text class="detail-item">第一目的地: {{ item.destinationFirst }}</text>
+      <text class="detail-item">体积: {{ item.volume }}</text>
+      <text class="detail-item">重量: {{ item.weight }}</text>
+      <text class="detail-item">备注: {{ item.remark }}</text>
+      <!-- 如果后端返回了操作记录，可以在这里显示 -->
+      <!-- <text class="detail-item">最后由 {{ item.lastUpdatedByAdmin || 'N/A' }} 修改</text> -->
+      <text class="detail-item">创建时间: {{ item.createdAt }}</text>
+      <text class="detail-item">最后更新: {{ item.updatedAt }}</text>
+    </view>
+
+    <!-- 租户报价区域 (未来功能) -->
+    <view class="bids-section" wx:if="{{ item.bids && item.bids.length > 0 }}">
+      <text class="bids-title">租户报价:</text>
+      <view class="bid-item" wx:for="{{ item.bids }}" wx:key="tenantId">
+        <text class="bid-tenant">租户ID: {{ bid.tenantId }}</text>
+        <text class="bid-price">价格: ¥{{ bid.price }}</text>
+        <text class="bid-time">预计时间: {{ bid.estimatedTime }}小时</text>
+        <text class="bid-rating">评价: {{ bid.rating }}/5</text>
+        <!-- 选择按钮 (未来功能) -->
+        <button class="select-btn" bindtap="selectBid" data-order-id="{{ item.id }}" data-bid-id="{{ bid.id }}">选择此报价</button>
+      </view>
+    </view>
+
+    <!-- 如果没有报价 -->
+    <view class="no-bids" wx:else>
+      <text>暂无租户报价</text>
+    </view>
+  </view>
+</view>

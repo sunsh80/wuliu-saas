@@ -1,0 +1,73 @@
+<!-- pages/orderStatus/orderStatus.wxml -->
+<view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <text>正在加载...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:if="{{error}}" class="error-container">
+    <text>{{error}}</text>
+    <button bindtap="refreshOrder">重试</button>
+  </view>
+
+  <!-- 订单详情 -->
+  <view wx:else class="order-detail">
+    <view class="order-header">
+      <text class="title">订单详情</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">订单ID:</text>
+      <text class="value">{{order.id}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">状态:</text>
+      <text class="value" wx:if="{{order.status === 'pending'}}" style="color: #f5a623;">待处理</text>
+      <text class="value" wx:if="{{order.status === 'bid_success'}}" style="color: #4caf50;">已接单</text>
+      <text class="value" wx:if="{{order.status === 'deal_success'}}" style="color: #9c27b0;">交易成功</text>
+      <text class="value" wx:if="{{order.status === 'cancelled'}}" style="color: #f44336;">已取消</text>
+      <text class="value" wx:if="{{order.status !== 'pending' && order.status !== 'bid_success' && order.status !== 'deal_success' && order.status !== 'cancelled'}}">{{order.status}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">重量:</text>
+      <text class="value">{{order.weight}} kg</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">体积:</text>
+      <text class="value">{{order.volume}} m³</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">起始地:</text>
+      <text class="value">{{order.origin}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">目的地:</text>
+      <text class="value">{{order.destinationFirst}}</text>
+      <text wx:if="{{order.destinationSecond}}" class="value"> → {{order.destinationSecond}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">备注:</text>
+      <text class="value">{{order.remark}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">创建时间:</text>
+      <text class="value">{{order.createdAt}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">更新时间:</text>
+      <text class="value">{{order.updatedAt}}</text>
+    </view>
+
+    <!-- 刷新按钮 -->
+    <button bindtap="refreshOrder" class="refresh-btn">刷新状态</button>
+  </view>
+</view>

@@ -1,0 +1,11 @@
+序号,脚本名称,类型,所在文件/路径,触发方式,是否启用,执行时机,作用说明,可扩展性建议
+1,"OpenAPI 契约校验","验证脚本","validate-openapi.js","npm run validate:openapi",✅ 是,"prestart / predev 阶段","检查 openapi.yaml 中所有路径是否定义了 operationId，确保契约完整","✅ 可增强：校验 schema 引用、响应格式等"
+2,"Handler 文件校验","验证脚本","scripts/check-handler-duplicates.js","npm run validate:handlers",✅ 是,"prestart / predev 阶段","扫描 api/handlers/ 下所有 .js 文件，检查是否有重名或非法命名","✅ 可增强：检查是否导出函数、是否未注册等"
+3,"数据库初始化","自动初始化","db/init.js","server.js 启动流程中调用",✅ 是,"服务启动前","连接 SQLite，创建/确认表结构（如 orders, tenants, users），插入默认管理员","✅ 可扩展：支持数据库迁移（migration）、数据种子"
+4,"生产服务启动","主程序","server.js","npm start",✅ 是,"start 时","启动 Express 服务，加载中间件、注册 handlers、监听端口","—"
+5,"开发热重载","开发工具","nodemon.json + server.js","npm run dev",✅ 是,"开发阶段手动运行","使用 nodemon 监听文件变化，自动重启服务","✅ 可配置忽略目录，提升性能"
+6,"安全中间件","表达式层","server.js","服务启动时加载",✅ 是,"服务启动时","提供 helmet, cors, rateLimit, session, cookieParser 等生产级防护","✅ 可增强：CSRF 防护、输入净化"
+7,"AJV 格式支持","依赖插件","ajv-formats","server.js 中引入",✅ 是,"服务启动时","支持 format: email 和 format: date-time，消除 OpenAPI 格式警告","✅ 可用于其他格式（如 uuid, uri）"
+8,"全局错误处理","错误兜底","server.js","服务启动时注册",✅ 是,"请求处理失败时","捕获未处理异常，返回统一 500 错误响应","✅ 可记录日志、发送告警"
+9,"健康检查接口","API 接口","server.js","/health 路由",✅ 是,"服务启动后","返回 { status: 'ok' }，供监控系统调用","✅ 可增加数据库连接状态检测"
+10,"Handler 自动注册","动态注册","server.js 中 autoRegisterHandlers()","服务启动时执行",✅ 是,"api.init() 前","遍历 api/handlers/ 目录，自动注册 handler 到 OpenAPIBackend","✅ 可支持子目录层级映射"
