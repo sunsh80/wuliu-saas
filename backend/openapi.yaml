@@ -1,0 +1,915 @@
+openapi: 3.0.3
+info:
+  title: 多租户物流平台 API
+  version: 1.0.1  # 版本升级
+  description: |
+    支持客户（下单方）与承运方（接单方）双角色的物流订单系统。
+    - `/api/admin/...`：平台管理员
+    - `/api/customer/...`：客户租户
+    - `/api/carrier/...`：承运方租户
+    - `/api/public/...`：公共接口（逐步废弃）
+servers:
+  - url: http://localhost:3000
+    description: 开发环境
+tags:
+  - name: setup
+    description: 平台初始化（首次安装）
+  - name: admin-auth
+    description: 平台管理员 - 认证与会话
+  - name: admin-user
+    description: 平台管理员 - 用户管理
+  - name: admin-tenant
+    description: 平台管理员 - 租户管理
+  - name: admin-order
+    description: 平台管理员 - 订单管理
+  - name: customer-order
+    description: 客户租户 - 创建与查看自己的订单
+  - name: carrier-order
+    description: 承运方租户 - 认领、执行订单
+  - name: public
+    description: 公共接口（小程序使用，未来废弃）
+  - name: auth
+    description: 租户认证与会话
+
+components:
+  securitySchemes:
+    AdminSessionAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+      description: 平台管理员登录后自动携带（由 Express Session 管理）
+    TenantSessionAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+      description: 租户登录后自动携带（由 Express Session 管理）
+
+  schemas:
+    # --- 租户相关 ---
+    TenantApplication:
+      type: object
+      required: [name, contact_person, contact_phone, email, password, roles]
+      properties:
+        name:
+          type: string
+          example: "ABC 物流公司"
+        contact_person:
+          type: string
+          example: "张三"
+        contact_phone:
+          type: string
+          pattern: '^1[3-9]\d{9}$'
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [customer, carrier]
+          minItems: 1
+          example: ["customer", "carrier"]
+
+    TenantProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        contact_person:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [customer, carrier]
+
+    # --- 订单相关 ---
+    CreateOrderRequest:
+      type: object
+      required: [pickup_address, delivery_address, weight_kg]
+      properties:
+        pickup_address:
+          type: string
+          example: "北京市朝阳区XX大厦"
+        delivery_address:
+          type: string
+          example: "上海市浦东新区YY园区"
+        weight_kg:
+          type: number
+          format: float
+          minimum: 0.1
+          example: 25.5
+        # ✅ 新增字段（可选）
+        customer_name:
+          type: string
+          example: "李四"
+        customer_phone:
+          type: string
+          pattern: '^1[3-9]\d{9}$'
+          example: "13800138000"
+        description:
+          type: string
+          example: "易碎品，请轻拿轻放"
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "order_123e4567-e89b-12d3-a456-426614174000"
+        customer_tenant_id:
+          type: string
+        customer_tenant_name:
+          type: string
+        carrier_tenant_id:
+          type: string
+          nullable: true
+        carrier_tenant_name:
+          type: string
+          nullable: true
+        pickup_address:
+          type: string
+        delivery_address:
+          type: string
+        weight_kg:
+          type: number
+        status:
+          type: string
+          # ✅ 新增 claimed 状态，用于表示“已认领但未发货”
+          enum: [created, claimed, dispatched, in_transit, delivered, cancelled]
+        created_at:
+          type: string
+          format: date-time
+
+    OrderListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: "TENANT_ROLE_NOT_ENABLED"
+        message:
+          type: string
+          example: "当前租户未启用客户角色"
+
+  responses:
+    UnauthorizedError:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "UNAUTHORIZED"
+            message: "请先登录"
+    ForbiddenError:
+      description: 权限不足（如角色不匹配）
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "FORBIDDEN"
+            message: "当前操作需要承运方角色"
+    NotFoundError:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "ORDER_NOT_FOUND"
+            message: "订单不存在"
+
+paths:
+  # ======================
+  # 绑定订单与客户
+  # ======================
+  /api/customer/order/bind:
+    post:
+      summary: 将订单绑定到客户（通过手机号）
+      operationId: bindOrderToCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+                  example: "ORD123456"
+                customer_phone:
+                  type: string
+                  example: "13800138000"
+              required: [order_id, customer_phone]
+      responses:
+        '200':
+          description: 绑定成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+        '400':
+          description: 参数错误或客户不存在
+        '401':
+          description: 未登录
+        '404':
+          description: 订单未找到或已绑定
+
+  # ======================
+  # 客户订单 CRUD（补全缺失部分）
+  # ======================
+  /api/customer/orders:
+    post:
+      tags: [customer-order]
+      summary: 客户创建新订单
+      operationId: createCustomerOrder
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags: [customer-order]
+      summary: 获取客户自己的订单列表
+      operationId: listCustomerOrders
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 订单列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/customer/orders/{orderId}:
+    get:
+      tags: [customer-order]
+      summary: 获取单个客户订单详情
+      operationId: getCustomerOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 订单详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItem'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [customer-order]
+      summary: 更新客户订单（如修改地址、备注等）
+      operationId: updateCustomerOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pickup_address:
+                  type: string
+                delivery_address:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: 更新成功
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags: [customer-order]
+      summary: 删除客户订单（仅限未认领状态）
+      operationId: deleteCustomerOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 删除成功
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # ======================
+  # 平台初始化（首次安装）
+  # ======================
+  /api/setup/status:
+    get:
+      tags: [setup]
+      summary: 检查平台是否已完成初始化（是否存在管理员）
+      operationId: getSetupStatus
+      responses:
+        '200':
+          description: 返回初始化状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  initialized:
+                    type: boolean
+                    example: false
+        '500':
+          description: 服务内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/setup/admin:
+    post:
+      tags: [setup]
+      summary: 创建首个平台管理员（仅限未初始化时调用）
+      operationId: createFirstAdmin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, email, platform_name]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  example: "superadmin"
+                password:
+                  type: string
+                  minLength: 8
+                  example: "SecurePass123!"
+                email:
+                  type: string
+                  format: email
+                  example: "admin@yourlogistics.com"
+                platform_name:
+                  type: string
+                  description: 该平台实例的名称（如“华东物流云”）
+                  example: "我的物流平台"
+                license_key:
+                  type: string
+                  description: 授权密钥（可选，用于产品授权验证）
+                  example: "LIC-2026-XXXX-YYYY-ZZZZ"
+      responses:
+        '201':
+          description: 初始化成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "平台初始化成功"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 平台已初始化，禁止重复创建
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "ALREADY_INITIALIZED"
+                message: "平台已完成初始化，请通过登录入口访问"
+
+  # ======================
+  # 平台管理员 - 认证
+  # ======================
+  /api/admin/login:
+    post:
+      tags: [admin-auth]
+      summary: 平台管理员登录
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: "superadmin"
+                password:
+                  type: string
+                  example: "SecurePass123!"
+      responses:
+        '200':
+          description: 登录成功，Set-Cookie 自动设置 session
+        '401':
+          description: 用户名或密码错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "INVALID_CREDENTIALS"
+                message: "用户名或密码错误"
+
+  /api/admin/logout:
+    post:
+      tags: [admin-auth]
+      summary: 平台管理员登出
+      operationId: adminLogout
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "已安全退出"
+
+  /api/admin/profile:
+    get:
+      tags: [admin-auth]
+      summary: 获取当前管理员基本信息
+      operationId: getAdminProfile
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 管理员信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  platform_name:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # ======================
+  # 平台管理员 - 用户管理
+  # ======================
+  /api/admin/users:
+    post:
+      tags: [admin-user]
+      summary: 创建新的平台管理员用户（需当前管理员权限）
+      operationId: createAdminUser
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, email]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                password:
+                  type: string
+                  minLength: 8
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [admin, operator]
+                  default: admin
+      responses:
+        '201':
+          description: 管理员创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '409':
+          description: 用户名或邮箱已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ======================
+  # 平台管理员 - 租户管理
+  # ======================
+  /api/admin/tenants/pending:
+    get:
+      tags: [admin-tenant]
+      operationId: listPendingTenants
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 待审核租户列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TenantApplication'
+
+  /api/admin/tenants/{id}/approve:
+    put:
+      tags: [admin-tenant]
+      operationId: approveTenant
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [customer, carrier]
+      responses:
+        '200':
+          description: 审核通过
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/admin/tenants/{id}/reject:
+    put:
+      tags: [admin-tenant]
+      operationId: rejectTenantById
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: 拒绝原因（可选）
+      responses:
+        '200':
+          description: 拒绝成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "租户申请已拒绝"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ======================
+  # 平台管理员 - 订单管理
+  # ======================
+  /api/admin/orders:
+    get:
+      tags: [admin-order]
+      operationId: listAdminOrders
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 所有订单列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+
+  /api/admin/orders/{order_id}/status:
+    put:
+      tags: [admin-order]
+      operationId: updateOrderStatus
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  # ✅ 包含 claimed
+                  enum: [created, claimed, dispatched, in_transit, delivered, cancelled]
+                  example: "cancelled"
+      responses:
+        '200':
+          description: 状态更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "订单状态已更新"
+        '400':
+          description: 状态值无效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "INVALID_STATUS"
+                message: "无效的订单状态"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ======================
+  # 公共接口（小程序）
+  # ======================
+  /api/public/orders:
+    post:
+      tags: [public]
+      summary: 小程序创建订单（临时）
+      operationId: createPublicOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # ======================
+  # 承运方租户 - 订单
+  # ======================
+  /api/carrier/orders:
+    get:
+      tags: [carrier-order]
+      summary: 获取可认领的订单列表（状态=created）
+      operationId: listCarrierOrders
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 可认领订单列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/carrier/orders/{order_id}/claim:
+    put:
+      tags: [carrier-order]
+      summary: 承运方认领订单
+      operationId: claimCarrierOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 认领成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "订单已认领"
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/carrier/orders/{order_id}/complete:
+    put:
+      tags: [carrier-order]
+      summary: 承运方完成订单
+      operationId: completeCarrierOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 完成成功
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ======================
+  # 租户认证与资料
+  # ======================
+  /api/tenant-web/login:
+    post:
+      tags: [auth]
+      summary: 租户登录
+      operationId: loginTenantWeb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: 登录成功
+        '401':
+          description: 邮箱或密码错误
+
+  /api/tenant-web/profile:
+    get:
+      tags: [auth]
+      summary: 获取租户基本信息
+      operationId: getTenantProfile
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 租户信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantProfile'
+
+  /api/tenant-web/profile/roles:
+    get:
+      tags: [auth]
+      summary: 获取租户启用的角色列表
+      operationId: getTenantRoles
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 角色列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+                      enum: [customer, carrier]
+
+  /api/pc-tenant/apply:
+    post:
+      tags: [auth]
+      summary: 租户入驻申请
+      operationId: applyPcTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantApplication'
+      responses:
+        '201':
+          description: 申请提交成功
