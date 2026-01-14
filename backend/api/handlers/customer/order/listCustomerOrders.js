@@ -1,5 +1,5 @@
 // api/handlers/customer/order/listCustomerOrders.js
-const { getDb } = require('../../../db');
+const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
   try {

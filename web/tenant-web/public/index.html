@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>物流管理系统 - 租户后台</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="header">
+    <div class="logo">物流管理系统 - 租户</div>
+    <nav class="top-nav">
+      <a href="#" class="tab-link active" data-tab="dashboard">控制台</a>
+      <a href="#" class="tab-link" data-tab="orders">订单管理</a>
+      <a href="#" class="tab-link" data-tab="profile">租户信息</a>
+      <a href="#" class="tab-link" data-tab="messages">消息管理</a>
+      <a href="#" id="logout-btn">退出账户</a>
+    </nav>
+  </div>
+
+  <div class="content-area">
+    <!-- 控制台 -->
+    <div id="dashboard" class="tab-content active">
+      <h2>控制台</h2>
+      <p>欢迎回来，<span id="tenant-name-welcome">租户</span>！这里是您的控制台。</p>
+    </div>
+
+    <!-- 订单管理 -->
+    <div id="orders" class="tab-content">
+      <div class="sub-tabs">
+        <a href="#" class="sub-tab-link active" data-subtab="pending">新订单</a>
+        <a href="#" class="sub-tab-link" data-subtab="in-progress">进行中</a>
+        <a href="#" class="sub-tab-link" data-subtab="settling">待结算</a>
+        <a href="#" class="sub-tab-link" data-subtab="history">历史查询</a>
+      </div>
+
+      <!-- 新订单（含新建+待认领） -->
+      <div id="pending-orders" class="sub-tab-content" style="display:block;">
+        <h3>新建订单</h3>
+        <form id="newOrderForm">
+          <div class="form-group">
+            <label>客户姓名:</label>
+            <input type="text" name="customer_name" required />
+          </div>
+          <div class="form-group">
+            <label>客户电话:</label>
+            <input type="tel" name="customer_phone" required />
+          </div>
+          <div class="form-group">
+            <label>地址:</label>
+            <input type="text" name="address" required />
+          </div>
+          <div class="form-group">
+            <label>重量 (kg):</label>
+            <input type="number" name="weight" step="0.1" min="0.1" required />
+          </div>
+          <button type="submit">提交订单</button>
+        </form>
+        <hr />
+        <h3>待处理订单</h3>
+        <div id="pending-orders-list"></div>
+      </div>
+
+      <!-- 进行中 -->
+      <div id="in-progress-orders" class="sub-tab-content">
+        <div id="in-progress-orders-list"></div>
+      </div>
+
+      <!-- 待结算 -->
+      <div id="settling-orders" class="sub-tab-content">
+        <div id="settling-orders-list"></div>
+      </div>
+
+      <!-- 历史查询 -->
+      <div id="history-orders" class="sub-tab-content">
+        <div id="history-orders-list"></div>
+      </div>
+    </div>
+
+    <!-- 租户信息 -->
+    <div id="profile" class="tab-content">
+      <h2>租户信息</h2>
+      <form id="profileForm">
+        <div class="form-group">
+          <label>入驻主体名称:</label>
+          <input type="text" id="company_name" name="name" readonly />
+        </div>
+        <div class="form-group">
+          <label>租户管理员:</label>
+          <input type="text" id="admin_name" name="contact_person" />
+        </div>
+        <div class="form-group">
+          <label>联系电话:</label>
+          <input type="tel" id="contact_phone" name="contact_phone" />
+        </div>
+        <div class="form-group">
+          <label>地址:</label>
+          <input type="text" id="address_info" name="address" />
+        </div>
+        <div class="form-group">
+          <label>营业执照号:</label>
+          <input type="text" id="license_no" name="business_license" readonly />
+        </div>
+        <div class="form-group">
+          <label>入驻时间:</label>
+          <input type="text" id="join_date" readonly />
+        </div>
+        <button type="submit">更新信息</button>
+      </form>
+    </div>
+
+    <!-- 消息管理 -->
+    <div id="messages" class="tab-content">
+      <div class="sub-tabs">
+        <a href="#" class="msg-tab active" data-msgtab="new-orders">新订单消息</a>
+        <a href="#" class="msg-tab" data-msgtab="completed">已完成订单</a>
+        <a href="#" class="msg-tab" data-msgtab="chat">沟通消息</a>
+      </div>
+      <div id="new-orders-msg" class="msg-content" style="display:block;">
+        <p>（占位：显示新订单通知）</p>
+      </div>
+      <div id="completed-msg" class="msg-content">
+        <p>（占位：显示已完成订单通知）</p>
+      </div>
+      <div id="chat-msg" class="msg-content">
+        <p>（占位：显示小程序端的沟通消息）</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

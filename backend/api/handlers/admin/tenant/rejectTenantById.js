@@ -1,5 +1,5 @@
 // api/handlers/tenant-management/approveTenantById.js
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
   const tenantId = c.request.params.id;

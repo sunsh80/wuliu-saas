@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入驻申请管理 - PC Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .hidden { display: none; }
+        .error { color: red; }
+        .success { color: green; }
+        .btn { padding: 5px 10px; margin: 2px; cursor: pointer; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-info { background-color: #17a2b8; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        nav a { margin-right: 15px; text-decoration: none; color: blue; }
+        nav a:hover { text-decoration: underline; }
+        section { margin-bottom: 30px; }
+        #message, #loginMessage { margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <!-- 登录区域 -->
+    <div id="loginSection" class="hidden">
+        <h2>管理员登录</h2>
+        <form id="loginForm">
+            <div>
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">登录</button>
+        </form>
+        <div id="loginMessage"></div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div id="mainSection" class="hidden">
+        <h1>入驻申请管理</h1>
+        <p>
+            <span>管理员</span>
+            <button id="logoutButton">登出</button>
+        </p>
+
+        <nav>
+            <a href="/">返回主页</a> <!-- 假设主页是 / -->
+        </nav>
+
+        <section id="applications">
+            <h2>待审核申请</h2>
+            <button onclick="loadPendingTenants()">刷新</button>
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>租户名称</th>
+                        <th>联系人</th>
+                        <th>联系电话</th>
+                        <th>申请时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="pending-tenants-body">
+                    <tr id="no-pending-tenants-message">
+                        <td colspan="6">暂无待审核申请</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // --- 通用逻辑 ---
+        const API_BASE_URL = 'http://localhost:3000/api'; // 后端 API 地址
+        const loginSection = document.getElementById('loginSection');
+        const mainSection = document.getElementById('mainSection');
+        const loginForm = document.getElementById('loginForm');
+        const loginMessage = document.getElementById('loginMessage');
+
+        // 通用 API 请求函数
+        async function apiRequest(endpoint, options = {}) {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                throw new Error('未找到登录令牌，请重新登录');
+            }
+
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // 假设使用 Bearer Token
+                },
+                ...options
+            };
+
+            if (config.body && typeof config.body === 'object') {
+                config.body = JSON.stringify(config.body);
+            }
+
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+            if (response.status === 401) {
+                // Token 过期或无效
+                localStorage.removeItem('adminToken');
+                showLoginSection();
+                throw new Error('登录已过期，请重新登录');
+            }
+
+            if (!response.ok) {
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    errorData = { message: `HTTP Error ${response.status}` };
+                }
+                throw new Error(errorData.message || errorData.error || `请求失败: ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        function showLoginSection() {
+            loginSection.classList.remove('hidden');
+            mainSection.classList.add('hidden');
+        }
+
+        function showMainSection() {
+            loginSection.classList.add('hidden');
+            mainSection.classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            showLoginSection();
+        }
+
+        function showMessage(text, isError = false) {
+            const msgDiv = document.getElementById('message');
+            if (msgDiv) {
+                msgDiv.textContent = text;
+                msgDiv.className = isError ? 'error' : 'success';
+            } else {
+                alert(text);
+            }
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                loginMessage.textContent = '用户名和密码不能为空';
+                loginMessage.className = 'error';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('adminToken', data.token);
+                    loginMessage.textContent = '登录成功！';
+                    loginMessage.className = 'success';
+                    setTimeout(() => showMainSection(), 500); // 延迟一下，让用户看到成功消息
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    loginMessage.textContent = errorData.message || errorData.error || '登录失败';
+                    loginMessage.className = 'error';
+                }
+            } catch (error) {
+                console.error('登录请求失败:', error);
+                loginMessage.textContent = '网络错误，请稍后重试';
+                loginMessage.className = 'error';
+            }
+        }
+
+        function checkStoredToken() {
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                // Token 存在，尝试访问受保护资源验证有效性
+                // 这里简单起见，直接显示主界面，如果 API 返回 401，main.js 会处理跳转
+                showMainSection();
+            } else {
+                showLoginSection();
+            }
+        }
+
+        // --- 待审核租户逻辑 ---
+        async function loadPendingTenants() {
+            try {
+                const response = await apiRequest('/admin/tenants/pending');
+                const tenants = response.data; // OpenAPI 返回格式 { data: [...] }
+
+                const tbody = document.getElementById('pending-tenants-body');
+                const noTenantsMsg = document.getElementById('no-pending-tenants-message');
+
+                if (!Array.isArray(tenants)) {
+                    throw new Error('服务器返回的数据格式不正确');
+                }
+
+                if (tenants.length === 0) {
+                    tbody.innerHTML = '';
+                    noTenantsMsg.style.display = 'table-row';
+                    return;
+                }
+
+                noTenantsMsg.style.display = 'none';
+                tbody.innerHTML = '';
+
+                tenants.forEach(tenant => {
+                    const row = document.createElement('tr');
+                    const createdAt = new Date(tenant.created_at).toLocaleString();
+                    row.innerHTML = `
+                        <td>${tenant.id}</td>
+                        <td>${tenant.name}</td>
+                        <td>${tenant.contact_person}</td>
+                        <td>${tenant.contact_phone}</td>
+                        <td>${createdAt}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="approveTenant(${tenant.id})">通过</button>
+                            <button class="btn btn-danger" onclick="rejectTenantPrompt(${tenant.id})">拒绝</button>
+                            <button class="btn btn-info" onclick="viewTenantDetails(${tenant.id})">查看附件</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('加载待审核租户失败:', error);
+                showMessage(`加载失败: ${error.message}`, true);
+                document.getElementById('pending-tenants-body').innerHTML = `<tr><td colspan="6">加载失败，请刷新重试。</td></tr>`;
+            }
+        }
+
+        async function approveTenant(id) {
+            if (!confirm(`确定通过租户 ID: ${id} 的申请吗？`)) return;
+            try {
+                await apiRequest(`/admin/tenants/${id}/approve`, {
+                    method: 'PUT',
+                    body: { roles: ["customer", "carrier"] } // 示例角色分配
+                });
+                showMessage('申请已通过', false);
+                loadPendingTenants(); // 刷新列表
+            } catch (error) {
+                console.error('通过申请失败:', error);
+                showMessage(`操作失败: ${error.message}`, true);
+            }
+        }
+
+        async function rejectTenantPrompt(id) {
+            const notes = prompt('请输入拒绝原因:');
+            if (notes === null || notes.trim() === '') return;
+            try {
+                await apiRequest(`/admin/tenants/${id}/reject`, {
+                    method: 'PUT',
+                    body: { notes: notes.trim() }
+                });
+                showMessage('申请已拒绝', false);
+                loadPendingTenants(); // 刷新列表
+            } catch (error) {
+                console.error('拒绝申请失败:', error);
+                showMessage(`操作失败: ${error.message}`, true);
+            }
+        }
+
+        function viewTenantDetails(id) {
+            // TODO: 实现查看附件功能
+            alert(`查看租户 ${id} 的附件详情功能待实现。`);
+        }
+
+        // --- 初始化 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            checkStoredToken(); // 检查登录状态
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', login);
+            }
+
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', logout);
+            }
+        });
+
+    </script>
+</body>
+</html>

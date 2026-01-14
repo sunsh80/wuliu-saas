@@ -1,7 +1,7 @@
 // getTenantProfile.js
 // 自动修复于 2026-01-10T16:16:38.492Z
 
-const { getDb } = require('../../../db');
+const { getDb } = require('../../../db/index.js');
 
 /**
  * @param {import('openapi-backend').Context} c

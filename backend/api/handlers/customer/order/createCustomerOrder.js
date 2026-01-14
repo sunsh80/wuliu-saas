@@ -1,5 +1,5 @@
 // api/handlers/customer/order/createCustomerOrder.js
-const { getDb } = require('../../../db');
+const { getDb } = require('../../../../db/index.js');
 const crypto = require('crypto');
 
 module.exports = async (c) => {

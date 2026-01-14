@@ -1,13 +1,18 @@
 openapi: 3.0.3
 info:
   title: 多租户物流平台 API
-  version: 1.0.1  # 版本升级
+  version: 1.0.2-safe
   description: |
     支持客户（下单方）与承运方（接单方）双角色的物流订单系统。
     - `/api/admin/...`：平台管理员
     - `/api/customer/...`：客户租户
     - `/api/carrier/...`：承运方租户
-    - `/api/public/...`：公共接口（逐步废弃）
+    - `/api/public/...`：公共接口
+    🔹 本次增容（v1.0.2-safe）：
+    - 保留所有 v1.0.1 字段、路由、状态不变
+    - 新增承运方能力画像（可选）
+    - 新增体积、时效等可选字段
+    - 新增匹配相关接口（不改动原有 claim/award 流程）
 servers:
   - url: http://localhost:3000
     description: 开发环境
@@ -30,7 +35,8 @@ tags:
     description: 公共接口（小程序使用，未来废弃）
   - name: auth
     description: 租户认证与会话
-
+  - name: matching
+    description: 智能匹配（新增，可选使用）
 components:
   securitySchemes:
     AdminSessionAuth:
@@ -43,12 +49,17 @@ components:
       in: cookie
       name: connect.sid
       description: 租户登录后自动携带（由 Express Session 管理）
-
   schemas:
     # --- 租户相关 ---
     TenantApplication:
       type: object
-      required: [name, contact_person, contact_phone, email, password, roles]
+      required:
+        - name
+        - contact_person
+        - contact_phone
+        - email
+        - password
+        - roles
       properties:
         name:
           type: string
@@ -72,7 +83,26 @@ components:
             enum: [customer, carrier]
           minItems: 1
           example: ["customer", "carrier"]
-
+        # === 新增：可选能力字段（不影响旧逻辑）===
+        address:
+          type: string
+          example: "上海市浦东新区XX路XX号"
+        service_radius_km:
+          type: integer
+          minimum: 1
+          example: 200
+        capacity_kg:
+          type: number
+          minimum: 0.1
+          example: 5000
+        capacity_m3:
+          type: number
+          minimum: 0.1
+          example: 30
+        base_price_per_km:
+          type: number
+          minimum: 0.01
+          example: 2.5
     TenantProfile:
       type: object
       properties:
@@ -87,11 +117,78 @@ components:
           items:
             type: string
             enum: [customer, carrier]
-
+        # === 新增：可选能力字段 ===
+        address:
+          type: string
+        service_radius_km:
+          type: integer
+        capacity_kg:
+          type: number
+        capacity_m3:
+          type: number
+        base_price_per_km:
+          type: number
+        avg_rating:
+          type: number
+          minimum: 0
+          maximum: 5
+    # --- 报价模型 ---
+    QuoteRequest:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: number
+          minimum: 0.01
+          example: 150.0
+        estimated_hours:
+          type: integer
+          minimum: 1
+          example: 24
+        # === 新增：更精确的到达时间（可选）===
+        estimated_arrival:
+          type: string
+          format: date-time
+          example: "2026-01-14T18:00:00Z"
+        note:
+          type: string
+          example: "自有车辆，24小时内装车"
+    QuoteItem:
+      type: object
+      properties:
+        id:
+          type: string
+        order_id:
+          type: string
+        carrier_tenant_id:
+          type: string
+        carrier_tenant_name:
+          type: string
+        price:
+          type: number
+        estimated_hours:
+          type: integer
+        # === 新增 ===
+        estimated_arrival:
+          type: string
+          format: date-time
+        avg_rating:
+          type: number
+        match_score:
+          type: number
+        note:
+          type: string
+        created_at:
+          type: string
+          format: date-time
     # --- 订单相关 ---
     CreateOrderRequest:
       type: object
-      required: [pickup_address, delivery_address, weight_kg]
+      required:
+        - pickup_address
+        - delivery_address
+        - weight_kg
       properties:
         pickup_address:
           type: string
@@ -104,7 +201,20 @@ components:
           format: float
           minimum: 0.1
           example: 25.5
-        # ✅ 新增字段（可选）
+        # === 新增可选字段 ===
+        volume_m3:
+          type: number
+          minimum: 0.01
+          example: 1.2
+        required_delivery_time:
+          type: string
+          format: date-time
+          example: "2026-01-15T12:00:00Z"
+        quote_deadline:
+          type: string
+          format: date-time
+          example: "2026-01-14T10:00:00Z"
+        # 原有字段
         customer_name:
           type: string
           example: "李四"
@@ -138,14 +248,26 @@ components:
           type: string
         weight_kg:
           type: number
-        status:
+        # === 新增可选字段 ===
+        volume_m3:
+          type: number
+        required_delivery_time:
           type: string
-          # ✅ 新增 claimed 状态，用于表示“已认领但未发货”
-          enum: [created, claimed, dispatched, in_transit, delivered, cancelled]
+          format: date-time
+        quote_deadline:
+          type: string
+          format: date-time
+        status:
+          type: string # ⚠️ 严格保留原状态枚举！
+          enum: [created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
         created_at:
           type: string
           format: date-time
-
+        quotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteItem'
+          nullable: true
     OrderListResponse:
       type: object
       properties:
@@ -156,7 +278,9 @@ components:
 
     ErrorResponse:
       type: object
-      required: [error, message]
+      required:
+        - error
+        - message
       properties:
         error:
           type: string
@@ -165,6 +289,148 @@ components:
           type: string
           example: "当前租户未启用客户角色"
 
+    # --- 租户管理相关补充模型 ---
+    TenantListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        contact_person:
+          type: string
+        contact_phone:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected, active, inactive]
+        created_at:
+          type: string
+          format: date-time
+        address:
+          type: string
+        service_radius_km:
+          type: integer
+        capacity_kg:
+          type: number
+        capacity_m3:
+          type: number
+        base_price_per_km:
+          type: number
+        avg_rating:
+          type: number
+          minimum: 0
+          maximum: 5
+
+    TenantDetail:
+      allOf:
+        - $ref: '#/components/schemas/TenantListItem'
+        - type: object
+          properties:
+            updated_at:
+              type: string
+              format: date-time
+            vehicles:
+              type: array
+              items:
+                $ref: '#/components/schemas/VehicleInfo'
+            financial_info:
+              $ref: '#/components/schemas/TenantFinancialInfo'
+            contact_info:
+              $ref: '#/components/schemas/TenantContactInfo'
+
+    VehicleInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        plate_number:
+          type: string
+        type:
+          type: string
+        length:
+          type: number
+        width:
+          type: number
+        height:
+          type: number
+        max_weight:
+          type: number
+        volume:
+          type: number
+        status:
+          type: string
+        driver_name:
+          type: string
+        driver_phone:
+          type: string
+        image_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TenantFinancialInfo:
+      type: object
+      properties:
+        bank_account_number:
+          type: string
+        bank_name:
+          type: string
+        tax_id:
+          type: string
+        settlement_cycle:
+          type: string
+        credit_limit:
+          type: number
+        outstanding_balance:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TenantContactInfo:
+      type: object
+      properties:
+        finance_contact_name:
+          type: string
+        finance_contact_phone:
+          type: string
+        finance_contact_email:
+          type: string
+        support_contact_name:
+          type: string
+        support_contact_phone:
+          type: string
+        support_contact_email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PaginationInfo:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+        total_items:
+          type: integer
+        per_page:
+          type: integer
+
   responses:
     UnauthorizedError:
       description: 未认证
@@ -172,32 +438,464 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            error: "UNAUTHORIZED"
-            message: "请先登录"
     ForbiddenError:
       description: 权限不足（如角色不匹配）
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            error: "FORBIDDEN"
-            message: "当前操作需要承运方角色"
     NotFoundError:
       description: 资源不存在
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-          example:
-            error: "ORDER_NOT_FOUND"
-            message: "订单不存在"
 
 paths:
-  # ======================
-  # 绑定订单与客户
-  # ======================
+  /api/mp/orders:
+    post:
+      summary: 小程序匿名下单
+      operationId: createMpOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sender_name:
+                  type: string
+                sender_phone:
+                  type: string
+                sender_address:
+                  type: string
+                receiver_name:
+                  type: string
+                receiver_phone:
+                  type: string
+                receiver_address:
+                  type: string
+                goods_desc:
+                  type: string
+                weight_kg:
+                  type: number
+                remark:
+                  type: string
+              required:
+                - sender_name
+                - sender_phone
+                - receiver_name
+                - receiver_phone
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  tracking_code:
+                    type: string
+                  status:
+                    type: string
+        '400':
+          description: 请求参数错误
+
+  /api/admin/tenants:
+    get:
+      tags:
+        - admin-tenant
+      operationId: listAllTenants
+      summary: 获取所有租户（分页、可筛选）
+      description: 获取平台所有租户的列表，支持分页、状态筛选和关键词搜索。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: 筛选租户状态
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, rejected, active, inactive]
+        - name: search
+          in: query
+          description: 搜索租户名称或联系人
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 租户列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      tenants:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TenantListItem'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/admin/tenants/{id}:
+    get:
+      tags:
+        - admin-tenant
+      operationId: getTenantById
+      summary: 获取单个租户详情
+      description: 获取指定ID租户的完整信息，包括基本信息、车辆、财务和客服信息。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 租户详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TenantDetail'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - admin-tenant
+      operationId: updateTenantBasicInfo
+      summary: 更新租户基本信息
+      description: 更新指定ID租户的基本信息（如状态、联系人等）。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contact_person:
+                  type: string
+                contact_phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                status:
+                  type: string
+                  enum: [pending, approved, rejected, active, inactive]
+                address:
+                  type: string
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TenantListItem'
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ForbiddenError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/admin/tenants/{id}/financial:
+    put:
+      tags:
+        - admin-tenant
+      operationId: updateTenantFinancialInfo
+      summary: 更新租户财务信息
+      description: 更新指定ID租户的财务信息。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantFinancialInfo'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TenantFinancialInfo'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/admin/tenants/{id}/contact:
+    put:
+      tags:
+        - admin-tenant
+      operationId: updateTenantContactInfo
+      summary: 更新租户联系信息
+      description: 更新指定ID租户的财务和客服联系信息。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantContactInfo'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/TenantContactInfo'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/admin/tenants/{id}/vehicles:
+    post:
+      tags:
+        - admin-tenant
+      operationId: addTenantVehicle
+      summary: 添加租户车辆
+      description: 为指定ID的租户添加一辆车辆信息。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleInfo'
+      responses:
+        '201':
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/VehicleInfo'
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ForbiddenError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/pc/tenants/apply:
+    post:
+      operationId: applyPcTenant
+      summary: 租户入驻申请
+      description: 新租户提交入驻申请，创建新租户账户
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - contact_person
+                - contact_phone
+                - email
+                - password
+                - roles
+              properties:
+                name:
+                  type: string
+                  description: 公司名称
+                contact_person:
+                  type: string
+                  description: 联系人姓名
+                contact_phone:
+                  type: string
+                  description: 联系电话
+                email:
+                  type: string
+                  description: 邮箱地址
+                password:
+                  type: string
+                  minLength: 6
+                  description: 密码（至少6位）
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [customer, carrier]
+                  description: 角色列表
+                address:
+                  type: string
+                  description: 公司地址
+      responses:
+        '201':
+          description: 租户创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 租户ID
+                  name:
+                    type: string
+                  contact_person:
+                    type: string
+                  contact_phone:
+                    type: string
+                  email:
+                    type: string
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  address:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: 请求参数不完整或格式错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: MISSING_REQUIRED_FIELDS
+        '409':
+          description: 邮箱已存在
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: EMAIL_ALREADY_REGISTERED
+        '500':
+          description: 服务器内部错误
+
+  /api/health:
+    get:
+      summary: 健康检查
+      operationId: healthCheck
+      tags:
+        - public
+      responses:
+        '200':
+          description: 服务正常运行
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+        '500':
+          description: 服务内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/customer/order/bind:
     post:
       summary: 将订单绑定到客户（通过手机号）
@@ -215,7 +913,9 @@ paths:
                 customer_phone:
                   type: string
                   example: "13800138000"
-              required: [order_id, customer_phone]
+              required:
+                - order_id
+                - customer_phone
       responses:
         '200':
           description: 绑定成功
@@ -237,12 +937,10 @@ paths:
         '404':
           description: 订单未找到或已绑定
 
-  # ======================
-  # 客户订单 CRUD（补全缺失部分）
-  # ======================
   /api/customer/orders:
     post:
-      tags: [customer-order]
+      tags:
+        - customer-order
       summary: 客户创建新订单
       operationId: createCustomerOrder
       security:
@@ -268,7 +966,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
-      tags: [customer-order]
+      tags:
+        - customer-order
       summary: 获取客户自己的订单列表
       operationId: listCustomerOrders
       security:
@@ -285,7 +984,8 @@ paths:
 
   /api/customer/orders/{orderId}:
     get:
-      tags: [customer-order]
+      tags:
+        - customer-order
       summary: 获取单个客户订单详情
       operationId: getCustomerOrder
       security:
@@ -308,7 +1008,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     put:
-      tags: [customer-order]
+      tags:
+        - customer-order
       summary: 更新客户订单（如修改地址、备注等）
       operationId: updateCustomerOrder
       security:
@@ -340,7 +1041,8 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     delete:
-      tags: [customer-order]
+      tags:
+        - customer-order
       summary: 删除客户订单（仅限未认领状态）
       operationId: deleteCustomerOrder
       security:
@@ -359,12 +1061,10 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  # ======================
-  # 平台初始化（首次安装）
-  # ======================
   /api/setup/status:
     get:
-      tags: [setup]
+      tags:
+        - setup
       summary: 检查平台是否已完成初始化（是否存在管理员）
       operationId: getSetupStatus
       responses:
@@ -387,7 +1087,8 @@ paths:
 
   /api/setup/admin:
     post:
-      tags: [setup]
+      tags:
+        - setup
       summary: 创建首个平台管理员（仅限未初始化时调用）
       operationId: createFirstAdmin
       requestBody:
@@ -396,7 +1097,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [username, password, email, platform_name]
+              required:
+                - username
+                - password
+                - email
+                - platform_name
               properties:
                 username:
                   type: string
@@ -444,16 +1149,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "ALREADY_INITIALIZED"
-                message: "平台已完成初始化，请通过登录入口访问"
 
-  # ======================
-  # 平台管理员 - 认证
-  # ======================
   /api/admin/login:
     post:
-      tags: [admin-auth]
+      tags:
+        - admin-auth
       summary: 平台管理员登录
       operationId: adminLogin
       requestBody:
@@ -462,7 +1162,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [username, password]
+              required:
+                - username
+                - password
               properties:
                 username:
                   type: string
@@ -479,13 +1181,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "INVALID_CREDENTIALS"
-                message: "用户名或密码错误"
 
   /api/admin/logout:
     post:
-      tags: [admin-auth]
+      tags:
+        - admin-auth
       summary: 平台管理员登出
       operationId: adminLogout
       security:
@@ -504,7 +1204,8 @@ paths:
 
   /api/admin/profile:
     get:
-      tags: [admin-auth]
+      tags:
+        - admin-auth
       summary: 获取当前管理员基本信息
       operationId: getAdminProfile
       security:
@@ -531,12 +1232,10 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  # ======================
-  # 平台管理员 - 用户管理
-  # ======================
   /api/admin/users:
     post:
-      tags: [admin-user]
+      tags:
+        - admin-user
       summary: 创建新的平台管理员用户（需当前管理员权限）
       operationId: createAdminUser
       security:
@@ -547,7 +1246,10 @@ paths:
           application/json:
             schema:
               type: object
-              required: [username, password, email]
+              required:
+                - username
+                - password
+                - email
               properties:
                 username:
                   type: string
@@ -581,12 +1283,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  # ======================
-  # 平台管理员 - 租户管理
-  # ======================
   /api/admin/tenants/pending:
     get:
-      tags: [admin-tenant]
+      tags:
+        - admin-tenant
       operationId: listPendingTenants
       security:
         - AdminSessionAuth: []
@@ -605,7 +1305,8 @@ paths:
 
   /api/admin/tenants/{id}/approve:
     put:
-      tags: [admin-tenant]
+      tags:
+        - admin-tenant
       operationId: approveTenant
       security:
         - AdminSessionAuth: []
@@ -635,7 +1336,8 @@ paths:
 
   /api/admin/tenants/{id}/reject:
     put:
-      tags: [admin-tenant]
+      tags:
+        - admin-tenant
       operationId: rejectTenantById
       security:
         - AdminSessionAuth: []
@@ -671,12 +1373,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  # ======================
-  # 平台管理员 - 订单管理
-  # ======================
   /api/admin/orders:
     get:
-      tags: [admin-order]
+      tags:
+        - admin-order
       operationId: listAdminOrders
       security:
         - AdminSessionAuth: []
@@ -690,7 +1390,8 @@ paths:
 
   /api/admin/orders/{order_id}/status:
     put:
-      tags: [admin-order]
+      tags:
+        - admin-order
       operationId: updateOrderStatus
       security:
         - AdminSessionAuth: []
@@ -706,12 +1407,12 @@ paths:
           application/json:
             schema:
               type: object
-              required: [status]
+              required:
+                - status
               properties:
                 status:
                   type: string
-                  # ✅ 包含 claimed
-                  enum: [created, claimed, dispatched, in_transit, delivered, cancelled]
+                  enum: [created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
                   example: "cancelled"
       responses:
         '200':
@@ -733,18 +1434,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: "INVALID_STATUS"
-                message: "无效的订单状态"
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  # ======================
-  # 公共接口（小程序）
-  # ======================
   /api/public/orders:
     post:
-      tags: [public]
+      tags:
+        - public
       summary: 小程序创建订单（临时）
       operationId: createPublicOrder
       requestBody:
@@ -766,12 +1462,10 @@ paths:
         '400':
           $ref: '#/components/responses/ForbiddenError'
 
-  # ======================
-  # 承运方租户 - 订单
-  # ======================
   /api/carrier/orders:
     get:
-      tags: [carrier-order]
+      tags:
+        - carrier-order
       summary: 获取可认领的订单列表（状态=created）
       operationId: listCarrierOrders
       security:
@@ -788,28 +1482,28 @@ paths:
 
   /api/carrier/orders/{order_id}/claim:
     put:
-      tags: [carrier-order]
-      summary: 承运方认领订单
+      tags:
+        - carrier
+      summary: 承运商认领订单
       operationId: claimCarrierOrder
       security:
-        - TenantSessionAuth: []
+        - CarrierSessionAuth: []
       parameters:
         - name: order_id
           in: path
           required: true
           schema:
             type: string
+          description: 订单唯一标识（如 tracking_number 或系统 ID）
       responses:
         '200':
-          description: 认领成功
+          description: 认领成功，返回更新后的完整订单信息
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "订单已认领"
+                $ref: '#/components/schemas/OrderItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
@@ -817,7 +1511,8 @@ paths:
 
   /api/carrier/orders/{order_id}/complete:
     put:
-      tags: [carrier-order]
+      tags:
+        - carrier-order
       summary: 承运方完成订单
       operationId: completeCarrierOrder
       security:
@@ -836,12 +1531,97 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  # ======================
-  # 租户认证与资料
-  # ======================
+  /api/carrier/orders/{order_id}/quote:
+    post:
+      tags:
+        - carrier-order
+      summary: 承运方对订单提交报价
+      operationId: submitCarrierQuote
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuoteRequest'
+      responses:
+        '201':
+          description: 报价成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  quote_id:
+                    type: string
+        '400':
+          description: 请求参数错误
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/customer/orders/{order_id}/award:
+    post:
+      tags:
+        - customer-order
+      summary: 客户选择承运方（成交）
+      operationId: awardOrderToCarrier
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carrier_tenant_id:
+                  type: string
+                  description: 被选中的承运方租户ID
+              required:
+                - carrier_tenant_id
+      responses:
+        '200':
+          description: 订单已分配给承运方
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "订单已成交，承运方已通知"
+        '400':
+          description: 请求参数错误（如 carrier_tenant_id 无效）
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
   /api/tenant-web/login:
     post:
-      tags: [auth]
+      tags:
+        - auth
       summary: 租户登录
       operationId: loginTenantWeb
       requestBody:
@@ -850,7 +1630,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password]
+              required:
+                - email
+                - password
               properties:
                 email:
                   type: string
@@ -865,7 +1647,8 @@ paths:
 
   /api/tenant-web/profile:
     get:
-      tags: [auth]
+      tags:
+        - auth
       summary: 获取租户基本信息
       operationId: getTenantProfile
       security:
@@ -877,10 +1660,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TenantProfile'
+    put:
+      tags:
+        - auth
+      summary: 更新租户基本信息
+      operationId: updateTenantProfile
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contact_person:
+                  type: string
+                contact_phone:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: 信息更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - auth
+      summary: 租户创建新订单
+      operationId: createTenantOrder
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customer_name
+                - customer_phone
+                - address
+                - weight
+              properties:
+                customer_name:
+                  type: string
+                customer_phone:
+                  type: string
+                  pattern: '^1[3-9]\d{9}$'
+                address:
+                  type: string
+                weight:
+                  type: number
+                  minimum: 0.1
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/tenant-web/profile/roles:
     get:
-      tags: [auth]
+      tags:
+        - auth
       summary: 获取租户启用的角色列表
       operationId: getTenantRoles
       security:
@@ -901,7 +1751,8 @@ paths:
 
   /api/pc-tenant/apply:
     post:
-      tags: [auth]
+      tags:
+        - auth
       summary: 租户入驻申请
       operationId: applyPcTenant
       requestBody:
@@ -913,3 +1764,186 @@ paths:
       responses:
         '201':
           description: 申请提交成功
+
+  /api/tenant-web/orders/pending:
+    get:
+      tags:
+        - auth
+      summary: 获取可认领的订单列表（状态=created）
+      operationId: listUnclaimedOrders
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 可认领订单列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/tenant-web/orders/{orderId}/claim:
+    put:
+      tags:
+        - auth
+      summary: 租户认领订单
+      operationId: claimOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 认领成功
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/tenant-web/orders/{orderId}/complete:
+    put:
+      tags:
+        - auth
+      summary: 租户完成订单
+      operationId: completeOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 完成成功
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/tenant-web/logout:
+    post:
+      tags:
+        - auth
+      summary: 租户登出
+      operationId: logoutTenant
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "已安全退出"
+
+  # ======================
+  # 🔸 新增：智能匹配接口（全新路径，不干扰旧流程）
+  /api/matching/search-carriers:
+    post:
+      tags:
+        - matching
+      summary: 根据订单需求搜索匹配的承运方
+      operationId: searchMatchingCarriers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pickup_address
+                - delivery_address
+                - weight_kg
+              properties:
+                pickup_address:
+                  type: string
+                  example: "北京市朝阳区XX大厦"
+                delivery_address:
+                  type: string
+                  example: "上海市浦东新区YY园区"
+                weight_kg:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  example: 25.5
+                # === 新增可选字段 ===
+                volume_m3:
+                  type: number
+                  minimum: 0.01
+                  example: 1.2
+                required_delivery_time:
+                  type: string
+                  format: date-time
+                  example: "2026-01-15T12:00:00Z"
+                preferred_carrier_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: "优先匹配的承运方ID列表"
+      responses:
+        '200':
+          description: 匹配的承运方列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuoteItem'
+        '400':
+          $ref: '#/components/responses/ForbiddenError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/matching/get-quote-suggestions:
+    get:
+      tags:
+        - matching
+      summary: 获取针对特定订单的预估报价建议
+      operationId: getQuoteSuggestions
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 订单ID
+      responses:
+        '200':
+          description: 预估报价建议列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuoteItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'

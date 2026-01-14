@@ -1,5 +1,6 @@
 // api/handlers/auth/adminLogin.js
-const { getDb } = require('../../../../db');
+console.log('Trying to load db from:', __dirname);
+const { getDb } = require('../../../../db/index.js');
 const { bcrypt, jwt } = require('../../../../utils');
 
 module.exports = async (c) => {

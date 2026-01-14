@@ -1,7 +1,7 @@
 // listCarrierOrders.js
 // 对应 OpenAPI: GET /carrier/orders
 
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
 /**
  * @param {import('openapi-backend').Context} c

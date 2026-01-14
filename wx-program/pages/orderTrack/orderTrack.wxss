@@ -1,0 +1,195 @@
+/* pages/orderTrack/orderTrack.wxss */
+
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5; /* 背景色 */
+  min-height: 100vh;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20rpx;
+  color: #333;
+}
+
+.order-id-container {
+  background-color: white;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.order-id-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  color: #999;
+  font-size: 32rpx;
+}
+
+.error-text {
+  color: #ff4d4f;
+  margin-bottom: 20rpx;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
+  background-color: #007aff;
+  color: white;
+  width: 200rpx;
+  font-size: 28rpx;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  color: #666;
+  font-size: 32rpx;
+}
+
+.login-prompt button {
+  margin-top: 20rpx;
+  background-color: #007aff;
+  color: white;
+  width: 200rpx;
+  font-size: 28rpx;
+}
+
+.quotes-section {
+  /* 列表整体样式 */
+}
+
+.instructions {
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+  color: #666;
+  text-align: left; /* 左对齐更自然 */
+}
+
+.quote-card-wrapper {
+  /* 为卡片列表添加间距 */
+}
+
+.quote-card {
+  position: relative; /* 为选中图标定位 */
+  background-color: white;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  border-radius: 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out; /* 添加过渡效果 */
+}
+
+.quote-card.selected {
+  border: 2rpx solid #007aff; /* 选中时的边框 */
+  transform: scale(1.02); /* 选中时轻微放大 */
+  box-shadow: 0 4rpx 15rpx rgba(0, 122, 255, 0.2); /* 更强的阴影 */
+}
+
+.quote-card .carrier-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.quote-card .quote-price {
+  display: flex;
+  align-items: baseline; /* 垂直居中 */
+  margin-bottom: 10rpx;
+}
+
+.quote-card .price-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.quote-card .price-amount {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #e74c3c; /* 价格颜色 */
+}
+
+.quote-card .delivery-time,
+.quote-card .remarks {
+  display: flex;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 5rpx;
+}
+
+.quote-card .time-label,
+.quote-card .remarks-label {
+  margin-right: 10rpx;
+  font-weight: 500;
+}
+
+.selection-icon {
+  position: absolute;
+  top: 10rpx;
+  right: 10rpx;
+}
+
+.icon-selected {
+  font-size: 36rpx;
+  color: #007aff;
+  font-weight: bold;
+}
+
+.action-buttons {
+  margin-top: 40rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.confirm-btn {
+  width: 80%;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: white;
+  border: none; /* 移除默认边框 */
+  transition: background-color 0.3s; /* 背景色过渡 */
+}
+
+.confirm-btn.active {
+  background-color: #007aff; /* 选中状态背景色 */
+}
+
+.confirm-btn.disabled {
+  background-color: #ccc; /* 禁用状态背景色 */
+  color: #999; /* 禁用状态文字颜色 */
+}
+
+.status-section {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.order-details {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.detail-item {
+  margin-bottom: 10rpx;
+}

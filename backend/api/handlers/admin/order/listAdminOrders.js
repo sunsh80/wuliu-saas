@@ -2,7 +2,7 @@
 // 对应 OpenAPI: GET /api/admin/orders
 // operationId: listAdminOrders
 
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
 /**
  * @param {import('openapi-backend').Context} c

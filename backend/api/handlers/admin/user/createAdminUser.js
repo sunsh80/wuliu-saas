@@ -1,5 +1,6 @@
 // api/handlers/admin-user/createAdminUser.js
-const { getDb } = require('../../../../db');
+console.log('✅ Loading createAdminUser handler...');
+const { getDb } = require('../../../../db/index.js');
 const { bcrypt } = require('../../../../utils');
 
 module.exports = async (c) => {
@@ -10,13 +11,13 @@ module.exports = async (c) => {
 
   // 检查唯一性
   if (await database.get(`SELECT 1 FROM users WHERE username = ? AND organization_id = ?`, [username, adminOrgId])) {
-    return { status: 409, body: { success: false, error: 'Username already exists' } };
+    return { statusCode: 409, body: { success: false, error: 'Username already exists' } };
   }
   if (email && await database.get(`SELECT 1 FROM users WHERE email = ?`, [email])) {
-    return { status: 409, body: { success: false, error: 'Email already exists' } };
+    return { statusCode: 409, body: { success: false, error: 'Email already exists' } };
   }
   if (phone && await database.get(`SELECT 1 FROM users WHERE phone = ?`, [phone])) {
-    return { status: 409, body: { success: false, error: 'Phone number already exists' } };
+    return { statusCode: 409, body: { success: false, error: 'Phone number already exists' } };
   }
 
   // 创建用户

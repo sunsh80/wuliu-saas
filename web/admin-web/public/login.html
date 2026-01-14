@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录</title>
+    <!-- 引入 CSS 文件 -->
+    <link rel="stylesheet" href="/admin/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>管理员登录</h2>
+        <form id="loginForm">
+            <div>
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">登录</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <!-- 引入 JS 文件 -->
+    <script src="/admin/js/main.js"></script> <!-- 必须首先引入 main.js -->
+    <script src="/admin/js/login.js"></script>
+</body>
+</html>

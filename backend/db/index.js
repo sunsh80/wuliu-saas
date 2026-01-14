@@ -1,110 +1,144 @@
-// db/index.js
+// backend/db/index.js
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs'); // 引入 bcryptjs 用于密码哈希
 require('dotenv').config(); // 加载 .env
 
 const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.db');
 let dbInstance = null;
 
-/** 初始化数据库表结构 */
+/** ================== 数据库操作封装 ================== */
+function getDb() {
+  if (!dbInstance) {
+    throw new Error('数据库未初始化，请先调用 openDatabaseAndInitialize()');
+  }
+  return {
+    get: (sql, params = []) =>
+      new Promise((resolve, reject) =>
+        dbInstance.get(sql, params, (err, row) => (err ? reject(err) : resolve(row)))
+      ),
+    all: (sql, params = []) =>
+      new Promise((resolve, reject) =>
+        dbInstance.all(sql, params, (err, rows) => (err ? reject(err) : resolve(rows)))
+      ),
+    run: (sql, params = []) =>
+      new Promise((resolve, reject) =>
+        dbInstance.run(sql, params, function (err) {
+          err ? reject(err) : resolve(this);
+        })
+      ),
+    close: () =>
+      new Promise((resolve, reject) =>
+        dbInstance.close((err) => (err ? reject(err) : resolve()))
+      ),
+  };
+}
+
+/** ================== 表结构定义 ================== */
+const TABLE_DEFINITIONS = {
+  customers: `
+    CREATE TABLE IF NOT EXISTS customers (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  customer_applications: `
+    CREATE TABLE IF NOT EXISTS customer_applications (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  orders: `
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      customer_id TEXT,
+      carrier_id TEXT,
+      tracking_number TEXT UNIQUE NOT NULL,
+      sender_info TEXT NOT NULL,
+      receiver_info TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'created',
+      completed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      quote_price REAL,
+      quote_delivery_time TEXT,
+      quote_remarks TEXT,
+      quote_deadline TEXT,
+      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
+    );
+  `,
+  user_sessions: `
+    CREATE TABLE IF NOT EXISTS user_sessions (
+      session_id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  organizations: `
+    CREATE TABLE IF NOT EXISTS organizations (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('tenant', 'admin')),
+      status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  users: `
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL,
+      type TEXT NOT NULL,
+      organization_id TEXT,
+      organization_name TEXT,
+      organization_type TEXT,
+      password_hash TEXT NOT NULL,
+      user_type TEXT NOT NULL CHECK (user_type IN ('tenant_user', 'user', 'admin_user')),
+      tenant_id INTEGER,
+      customer_id INTEGER,
+      is_active BOOLEAN DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE SET NULL,
+      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
+    );
+  `,
+  tenants: `
+    CREATE TABLE IF NOT EXISTS tenants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      contact_person TEXT NOT NULL,
+      contact_phone TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,          
+      password_hash TEXT NOT NULL,         
+      roles TEXT NOT NULL,
+      address TEXT,
+      status TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      approved_at DATETIME,
+      rejected_at DATETIME,
+      rejection_notes TEXT
+    );
+  `
+};
+
+/** ================== 初始化数据库表结构 ================== */
 async function initializeDatabase(db) {
   console.log('开始初始化数据库表结构...');
-
-  // --- 客户相关表 ---
-  const customerTables = {
-    customers: `
-      CREATE TABLE IF NOT EXISTS customers (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        address TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      );
-    `,
-    customer_applications: `
-      CREATE TABLE IF NOT EXISTS customer_applications (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        address TEXT,
-        status TEXT NOT NULL DEFAULT 'pending',
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      );
-    `,
-    orders: `
-      CREATE TABLE IF NOT EXISTS orders (
-        id TEXT PRIMARY KEY,
-        customer_id TEXT,
-        tracking_number TEXT UNIQUE NOT NULL,
-        sender_info TEXT NOT NULL,
-        receiver_info TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'pending',
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
-      );
-    `,
-    user_sessions: `
-      CREATE TABLE IF NOT EXISTS user_sessions (
-        session_id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        expires_at TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-      );
-    `
-  };
-
-  // --- 总后台相关表 ---
-  const adminTables = {
-    organizations: `
-      CREATE TABLE IF NOT EXISTS organizations (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        type TEXT NOT NULL CHECK (type IN ('tenant', 'admin')),
-        status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      );
-    `,
-    users: `
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        username TEXT NOT NULL,
-        email TEXT UNIQUE,
-        phone TEXT UNIQUE NOT NULL DEFAULT '13800000000',
-        name TEXT NOT NULL,
-        role TEXT NOT NULL CHECK (role IN ('user', 'admin', 'viewer', 'super_admin', 'tenant_approver', 'order_viewer')),
-        type TEXT NOT NULL CHECK (type IN ('app', 'tenant', 'admin')),
-        organization_id TEXT,
-        organization_name TEXT,
-        organization_type TEXT CHECK (organization_type IN ('tenant', 'admin')),
-        password_hash TEXT NOT NULL,
-        is_active BOOLEAN DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-        FOREIGN KEY (organization_id) REFERENCES organizations (id) ON DELETE SET NULL
-      );
-    `,
-    tenants: `
-      CREATE TABLE IF NOT EXISTS tenants (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        contact_person TEXT NOT NULL,
-        contact_phone TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
-        business_license_path TEXT,
-        legal_id_front_path TEXT,
-        legal_id_back_path TEXT,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      );
-    `
-  };
 
   // 启用外键
   await new Promise((resolve, reject) => {
@@ -114,20 +148,12 @@ async function initializeDatabase(db) {
     });
   });
 
-  // 创建客户表
-  for (const [name, sql] of Object.entries(customerTables)) {
+  // 创建所有表
+  for (const [name, sql] of Object.entries(TABLE_DEFINITIONS)) {
     await new Promise((resolve, reject) => {
       db.run(sql, (err) => (err ? reject(err) : resolve()));
     });
-    console.log(`✅ 客户表 ${name} 已初始化`);
-  }
-
-  // 创建后台表
-  for (const [name, sql] of Object.entries(adminTables)) {
-    await new Promise((resolve, reject) => {
-      db.run(sql, (err) => (err ? reject(err) : resolve()));
-    });
-    console.log(`✅ 后台表 ${name} 已初始化`);
+    console.log(`✅ 表 ${name} 已初始化`);
   }
 
   // 插入默认 admin 组织和用户
@@ -145,9 +171,23 @@ async function initializeDatabase(db) {
 
   await new Promise((resolve, reject) => {
     db.run(
-      `INSERT OR IGNORE INTO users (id, username, phone, name, role, type, organization_id, organization_name, organization_type, password_hash)
-       VALUES (?, 'admin', '13800138000', 'Administrator', 'super_admin', 'admin', ?, 'Logistics Admin', 'admin', ?)`,
-      [defaultUserId, defaultOrgId, defaultPasswordHash],
+      `INSERT OR IGNORE INTO users (
+        id, username, email, name, role, type,
+        organization_id, organization_name, organization_type,
+        password_hash, user_type, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin_user', 1)`,
+      [
+        defaultUserId,
+        'admin',
+        'admin@example.com',
+        'Administrator',
+        'super_admin',
+        'admin',
+        defaultOrgId,
+        'Logistics Admin',
+        'admin',
+        defaultPasswordHash
+      ],
       (err) => (err ? reject(err) : resolve())
     );
   });
@@ -155,7 +195,102 @@ async function initializeDatabase(db) {
   console.log('✅ 默认管理员已就绪 (账号: admin / 密码: admin123)');
 }
 
-/** 打开数据库并初始化 */
+/** ================== 用户相关的查询方法 ================== */
+async function createUser(userData) {
+  const db = getDb();
+  const { username, email, password, user_type, tenant_id, customer_id } = userData;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const result = await db.run(
+    'INSERT INTO users (username, email, password_hash, user_type, tenant_id, customer_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [username, email, hashedPassword, user_type, tenant_id, customer_id]
+  );
+  return { id: result.lastID, ...userData, password_hash: hashedPassword };
+}
+
+async function findUserById(id) {
+  const db = getDb();
+  const row = await db.get('SELECT * FROM users WHERE id = ?', [id]);
+  return row;
+}
+
+async function findUserByUsername(username) {
+  const db = getDb();
+  const row = await db.get('SELECT * FROM users WHERE username = ?', [username]);
+  return row;
+}
+
+async function findUserByEmail(email) {
+  const db = getDb();
+  const row = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+  return row;
+}
+
+async function validatePassword(plainPassword, hashedPassword) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
+
+/** ================== 租户 (Tenants) 相关的查询方法 ================== */
+async function createTenant(tenantData) {
+  const db = getDb();
+  const { name, contact_person, contact_phone, email, password_hash, roles, address } = tenantData;
+
+  // ✅ 使用 db.run（你已封装为 Promise）
+  // ✅ 7 个字段对应 7 个参数
+  // ✅ roles 转为 JSON 字符串
+  const result = await db.run(
+    `INSERT INTO tenants (
+      name, contact_person, contact_phone, email, password_hash, roles, address
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [name, contact_person, contact_phone, email, password_hash, JSON.stringify(roles), address]
+  );
+
+  return {
+    id: result.lastID,
+    name,
+    contact_person,
+    contact_phone,
+    email,
+    roles, // 注意：这里返回的是原始数组（如果你希望返回数组）
+    address,
+    created_at: new Date().toISOString(),
+    status: 'pending'
+  };
+}
+
+async function findTenantById(id) {
+  const db = getDb();
+  const row = await db.get('SELECT * FROM tenants WHERE id = ?', [id]);
+  return row;
+}
+
+async function findAllTenants() {
+  const db = getDb();
+  const rows = await db.all('SELECT * FROM tenants ORDER BY created_at DESC');
+  return rows;
+}
+
+async function findPendingTenants() {
+  const db = getDb();
+  const rows = await db.all("SELECT * FROM tenants WHERE status = 'pending' ORDER BY created_at ASC");
+  return rows;
+}
+
+async function updateTenantStatus(id, status, approved_at = null, rejected_at = null, rejection_notes = null) {
+  const db = getDb();
+  const result = await db.run(
+    'UPDATE tenants SET status = ?, approved_at = ?, rejected_at = ?, rejection_notes = ? WHERE id = ?',
+    [status, approved_at, rejected_at, rejection_notes, id]
+  );
+  return result.changes > 0;
+}
+
+async function deleteTenantById(id) {
+  const db = getDb();
+  const result = await db.run('DELETE FROM tenants WHERE id = ?', [id]);
+  return result.changes > 0;
+}
+
+/** ================== 公共接口 ================== */
 async function openDatabaseAndInitialize() {
   console.log('正在连接数据库:', DB_PATH);
   dbInstance = new sqlite3.Database(DB_PATH, (err) => {
@@ -166,17 +301,21 @@ async function openDatabaseAndInitialize() {
   console.log('✅ 数据库初始化完成。');
 }
 
-/** 获取数据库操作接口 */
-function getDb() {
-  if (!dbInstance) {
-    throw new Error('数据库未初始化，请先调用 openDatabaseAndInitialize()');
-  }
-  return {
-    get: (sql, params = []) => new Promise((resolve, reject) => dbInstance.get(sql, params, (err, row) => (err ? reject(err) : resolve(row)))),
-    all: (sql, params = []) => new Promise((resolve, reject) => dbInstance.all(sql, params, (err, rows) => (err ? reject(err) : resolve(rows)))),
-    run: (sql, params = []) => new Promise((resolve, reject) => dbInstance.run(sql, params, function (err) { (err ? reject(err) : resolve(this)); })),
-    close: () => new Promise((resolve, reject) => dbInstance.close((err) => (err ? reject(err) : resolve()))),
-  };
-}
-
-module.exports = { openDatabaseAndInitialize, getDb };
+// 导出所有方法
+module.exports = {
+  openDatabaseAndInitialize,
+  getDb,
+  // 用户相关
+  createUser,
+  findUserById,
+  findUserByUsername,
+  findUserByEmail,
+  validatePassword,
+  // 租户相关
+  createTenant,
+  findTenantById,
+  findAllTenants,
+  findPendingTenants,
+  updateTenantStatus,
+  deleteTenantById
+};

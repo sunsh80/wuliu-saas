@@ -1,5 +1,5 @@
 // api/handlers/auth/getAdminProfile.js
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 const { jwt } = require('../../../../utils');
 
 module.exports = async (c) => {

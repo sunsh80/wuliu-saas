@@ -1,5 +1,5 @@
-// utils.js
-const bcrypt = require('bcrypt');
+// backend/utils.js
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // 示例：添加一个通用错误类（可选）

@@ -1,4 +1,5 @@
-// server.js - OpenAPI 驱动 + 自动注册 handlers + 生产级中间件 + 数据库初始化
+// backend/server.js
+// OpenAPI 驱动 + 自动注册 handlers + 生产级中间件 + 数据库初始化
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
@@ -9,6 +10,7 @@ const path = require('path');
 const fs = require('fs');
 
 // ✅ 引入数据库模块（自动加载 ./db/index.js）
+// 现在它包含了所有我们需要的数据库方法
 const { openDatabaseAndInitialize } = require('./db');
 
 // ✅ 引入 AJV 格式插件（支持 email / date-time）
@@ -33,18 +35,16 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'wuliu-2026-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // 开发环境设为 false；生产 HTTPS 设为 true
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 小时
-    },
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'wuliu-2026-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // 开发环境设为 false；生产 HTTPS 设为 true
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 小时
+  },
+}));
 
 // ===== OpenAPI 自动路由 + 自动注册 handlers =====
 const api = new OpenApiBackend({
@@ -105,6 +105,7 @@ async function startServer() {
       if (!req.path.startsWith('/api')) {
         return next();
       }
+
       try {
         const response = await api.handleRequest({
           method: req.method,
@@ -113,12 +114,23 @@ async function startServer() {
           headers: req.headers,
           body: req.body,
         });
-        res.status(response.statusCode);
+
+        // ✅ 安全获取 HTTP 状态码（兼容 openapi-backend 内部响应和自定义 handler）
+        const httpStatus = response.status || response.statusCode;
+        if (typeof httpStatus !== 'number' || httpStatus < 100 || httpStatus > 599) {
+          console.error('❌ 无效或缺失的状态码，响应对象:', response);
+          res.status(500).json({ success: false, error: 'INTERNAL_SERVER_ERROR' });
+          return;
+        }
+
+        res.status(httpStatus);
+
         if (response.headers) {
           Object.entries(response.headers).forEach(([key, value]) => {
             res.set(key, value);
           });
         }
+
         if (response.body !== undefined && response.body !== null) {
           if (typeof response.body === 'object') {
             res.json(response.body);
@@ -164,3 +176,17 @@ async function startServer() {
 
 // ✅ 执行启动
 startServer();
+
+// --- 以下是一个示例，展示如何在 server.js 中直接使用新的数据库方法 ---
+// 这通常应该放在 api/handlers/ 目录下的具体 handler 文件中
+/*
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const newUser = await createUser({ username, email, password, user_type: 'user' });
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+*/

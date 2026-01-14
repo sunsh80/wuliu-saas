@@ -1,0 +1,6 @@
+{
+  "name": "wuliu-web-all",
+  "scripts": {
+    "dev": "concurrently \"npm --prefix admin-web run dev\" \"npm --prefix tenant-web run dev\" \"npm --prefix customer-web run dev\""
+  }
+}

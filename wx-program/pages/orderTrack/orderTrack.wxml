@@ -1,0 +1,127 @@
+<!-- pages/orderTrack/orderTrack.wxml -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-title">订单跟踪</view>
+
+  <!-- 订单编号 -->
+  <view class="order-id-container">
+    <text class="order-id-text">订单编号: {{ order.id }}</text> <!-- 假设 order.id 是订单号 -->
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{ loading }}" class="loading-container">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{ error }}" class="error-container">
+    <text class="error-text">{{ error }}</text>
+    <button class="retry-btn" bindtap="onRefresh">重新加载</button> <!-- 调用原有的 onRefresh 方法 -->
+  </view>
+
+  <!-- 登录提示 -->
+  <view wx:elif="{{ showLoginPrompt }}" class="login-prompt">
+    <text>该订单已被承运商报价或接单，请登录以查看详细信息并进行操作。</text>
+    <button bindtap="onLoginClick">去登录</button>
+  </view>
+
+  <!-- 报价选择状态 (整合 quoteSelection.wxml 的逻辑) -->
+  <view wx:elif="{{ order && order.status === 'quoted' }}" class="quotes-section">
+    <!-- 说明文字 -->
+    <view class="instructions">
+      <text>以下承运商已报价，请选择您满意的方案：</text>
+    </view>
+
+    <!-- 报价倒计时 (如果需要，可在此处添加) -->
+    <!-- <view class="countdown" wx:if="{{ timeRemaining }}">剩余时间: {{ timeRemaining }}</view> -->
+
+    <!-- 承运商报价卡片列表 -->
+    <view class="quote-card-wrapper">
+      <view
+        class="quote-card {{ selectedCarrierId === quote.carrier_tenant_id ? 'selected' : '' }}" <!-- 注意字段名需与JS中API返回数据匹配 -->
+        wx:for="{{ carrierQuotes }}" <!-- carrierQuotes 是新增的数据 -->
+        wx:key="carrier_tenant_id" <!-- 注意 key 需与数据结构匹配 -->
+        bindtap="onQuoteCardTap" <!-- 新增的点击处理函数 -->
+        data-carrier-id="{{ quote.carrier_tenant_id }}" <!-- 传递承运商ID -->
+      >
+        <!-- 承运商名称 -->
+        <view class="carrier-name">
+          <text>{{ quote.carrier_tenant_name || '未知承运商' }}</text> <!-- 注意字段名需与JS中API返回数据匹配 -->
+        </view>
+
+        <!-- 报价金额 (突出显示) -->
+        <view class="quote-price">
+          <text class="price-label">报价:</text>
+          <text class="price-amount">¥{{ quote.price.toFixed(2) }}</text> <!-- 注意字段名需与JS中API返回数据匹配 -->
+        </view>
+
+        <!-- 预计送达时间 -->
+        <view class="delivery-time" wx:if="{{ quote.estimated_arrival }}"> <!-- 注意字段名需与JS中API返回数据匹配 -->
+          <text class="time-label">预计送达:</text>
+          <text class="time-value">{{ formatTime(quote.estimated_arrival) }}</text> <!-- 使用现有的 formatTime 函数 -->
+        </view>
+
+        <!-- 备注 -->
+        <view class="remarks" wx:if="{{ quote.note }}"> <!-- 注意字段名需与JS中API返回数据匹配 -->
+          <text class="remarks-label">备注:</text>
+          <text class="remarks-content">{{ quote.note }}</text> <!-- 注意字段名需与JS中API返回数据匹配 -->
+        </view>
+
+        <!-- 选中状态图标 -->
+        <view class="selection-icon" wx:if="{{ selectedCarrierId === quote.carrier_tenant_id }}">
+          <text class="icon-selected">✓</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 确认选择按钮 -->
+    <view class="action-buttons">
+      <button
+        class="confirm-btn {{ selectedCarrierId ? 'active' : 'disabled' }}"
+        bindtap="onConfirmTap" <!-- 新增的确认处理函数 -->
+        disabled="{{ !selectedCarrierId }}"
+      >
+        确认选择
+      </button>
+    </view>
+  </view>
+
+  <!-- 其他订单状态 (非 quoted) 的原有跟踪逻辑 -->
+  <view wx:elif="{{ order }}" class="order-tracking-details">
+    <!-- 订单状态 -->
+    <view class="status-section">
+      <text class="status-text">当前状态: {{ getStatusText(order.status) }}</text>
+    </view>
+
+    <!-- 订单详细信息 (示例) -->
+    <view class="order-details">
+      <view class="detail-item">
+        <text class="label">起点:</text>
+        <text class="value">{{ order.from_address }}</text> <!-- 假设数据结构中有 -->
+      </view>
+      <view class="detail-item">
+        <text class="label">终点:</text>
+        <text class="value">{{ order.to_address }}</text> <!-- 假设数据结构中有 -->
+      </view>
+      <view class="detail-item">
+        <text class="label">货物描述:</text>
+        <text class="value">{{ order.goods_description }}</text> <!-- 假设数据结构中有 -->
+      </view>
+      <view class="detail-item">
+        <text class="label">下单时间:</text>
+        <text class="value">{{ formatTime(order.created_at) }}</text> <!-- 使用现有的 formatTime 函数 -->
+      </view>
+      <!-- 可能还有承运商信息、物流节点等... -->
+      <view class="detail-item" wx:if="{{ order.claimed_at }}">
+        <text class="label">被接单时间:</text>
+        <text class="value">{{ formatTime(order.claimed_at) }}</text>
+      </view>
+      <view class="detail-item" wx:if="{{ order.claimed_by_carrier_name }}">
+        <text class="label">承运商:</text>
+        <text class="value">{{ order.claimed_by_carrier_name }}</text> <!-- 假设数据结构中有 -->
+      </view>
+      <!-- ... 其他状态特有信息 ... -->
+    </view>
+  </view>
+
+</view>

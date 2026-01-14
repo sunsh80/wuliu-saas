@@ -1,5 +1,5 @@
 // api/handlers/order-management/updateOrderStatus.js
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
   const { id } = c.request.params;
