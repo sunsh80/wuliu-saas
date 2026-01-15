@@ -129,6 +129,12 @@ const TABLE_DEFINITIONS = {
       address TEXT,
       status TEXT DEFAULT 'pending',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      service_radius_km INTEGER, -- 服务半径
+      capacity_kg REAL, -- 最大承重（公斤）
+      capacity_m3 REAL, -- 最大体积（立方米）
+      base_price_per_km REAL, -- 每公里基础价格
+      avg_rating REAL DEFAULT 0.0, -- 平均评分
       approved_at DATETIME,
       rejected_at DATETIME,
       rejection_notes TEXT
@@ -159,7 +165,8 @@ async function initializeDatabase(db) {
   // 插入默认 admin 组织和用户
   const defaultOrgId = 'admin_org_id_001';
   const defaultUserId = 'admin_user_id_001';
-  const defaultPasswordHash = '$2b$10$9boPY1MoDy5QVdzitw/m.e.YO0bBRUKy2dJ9Xj/qY47Onra6xH2G'; // 'admin123'
+  const bcrypt = require('bcrypt'); // 确保 bcrypt 已引入
+  const defaultPasswordHash = await bcrypt.hash('admin123', 10); // 动态生成 'admin123' 的哈希
 
   await new Promise((resolve, reject) => {
     db.run(

@@ -1041,3 +1041,65 @@ openapi.现状，可以扩展推荐修改
     5.  前端 (小程序): 修正 orderTrack.js 中 promptLogin 的重定向 URL 逻辑。
 
 完成以上修复和增容后，项目的前后端服务器应该可以顺利启动并协同工作。
+需要配置 .gitignore 文件来忽略某些不需要上传的文件（如 node_modules、.env 等
+
+管理员登录
+租户申请
+租户登录
+获得租户列表
+
+管理员可以直接干预订单状态，例如取消订单或标记为已完成（如果业务逻辑允许）。
+管理员不能直接将订单分配给某个租户。订单分配是通过客户选择中标承运商 (award) 或者承运商主动认领 (claim) 来完成的。
+如果需要一个管理员手动分配订单给租户的功能，需要在 openapi.yaml 中新增 API 定义，并在 backend/api/handlers/admin/order/ 目录下新增对应的处理器文件（例如 assignOrder.js）。
+你目前拥有的代码（updateOrderStatus.js 和 listAdminOrders.js）实现了管理员查看和修改订单状态的功能，但没有实现管理员直接分配订单的功能
+
+初始状态: 订单创建后进入一个公共池（状态可能是 created 或 pending_claim/available），与任何特定租户（无论是 customer 还是 carrier）都不直接绑定。 2. 认领阶段: carrier 类型的租户从公共池中认领订单（状态变为 claimed），此时订单与 carrier 租户绑定。 3. 报价/分配阶段: customer 类型的租户可能会收到多个 carrier 的报价，然后从中选择一个。或者系统自动分配给认领的 carrier。订单状态可能变为 awarded。 4. 执行阶段: 被选中的 carrier 执行运输任务（状态变为 dispatched, in_transit, delivered）。
+
+完美！问题找到了（数据库问题先记录，后续一起修改20260115）
+
+服务器日志明确显示：
+
+[loginTenantWeb] Retrieved user object: {
+  id: null,  //  点击 "Structure" 或 "表结构"。
+        *   找到 id 列，将其类型改为 INTEGER PRIMARY KEY AUTOINCREMENT。
+        *   保存更改。
+        *   然后，你需要重新插入这条数据，或者手动为其分配一个唯一的整数 ID。
+    *   方法二 (临时)：如果 id 不是主键，你可以手动为这一行设置一个唯一的整数值（例如，找一个当前表中最大的 id + 1）。
+        *   在表格视图中，直接编辑 id 字段，输入一个唯一的数字（比如 5 或其他未使用的数字）。
+        *   点击保存。
+
+示例 SQL (如果选择方法一)：
+
+-- 如果你想修改表结构使其拥有自增主键，可能需要重建表。这是一个常见的模式：
+-- 1. 创建一个新表，带有正确的主键定义
+CREATE TABLE users_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    tenant_id INTEGER NOT NULL,
+    -- ... 其他列 ...
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+
+-- 2. 将旧表数据复制到新表 (注意：这里假设旧表的 id 不是主键，否则复制时可能出错)
+INSERT INTO users_new (id, email, password_hash, tenant_id, ...) 
+SELECT id, email, password_hash, tenant_id, ... FROM users;
+
+-- 3. 删除旧表
+DROP TABLE users;
+
+-- 4. 重命名新表
+ALTER TABLE users_new RENAME TO users;
+(注意：SQL DDL 操作可能因工具而异，上述 ALTER TABLE 语法在某些 SQLite 版本中可能受限)
+
+操作步骤：
+
+1.  修复数据库：按照上面的方法修改数据库，确保 tenant005@example.com 这条记录的 id 字段有一个有效的、非 NULL 的整数值。
+2.  重启服务器 (npm start)。
+3.  在 Postman 中清除 Cookies。
+4.  再次执行 POST /api/tenant-web/login。
+5.  观察服务器控制台：
+    *   [loginTenantWeb] Retrieved user object: 日志中的 id 应该不再是 null。
+    *   ✅ Session set in server.js for user:  Tenant: 1 中的  应该是一个数字。
+
+完成这个修复后，Session 应该就能正确设置了。请尝试并反馈结果。

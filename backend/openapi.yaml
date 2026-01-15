@@ -1436,7 +1436,36 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
+  
+  /api/public/orders/{id}:
+    get:
+      operationId: fetchPublicOrder
+      summary: 获取公开订单详情
+      description: 通过追踪号获取订单的公开信息。
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: 订单的追踪号 (tracking_number)
+      responses:
+        '200':
+          description: 订单信息获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  order:
+                    $ref: '#/components/schemas/OrderItem'
+        '404':
+          description: 订单未找到
+        '500':
+          description: 服务器内部错误.
+  
   /api/public/orders:
     post:
       tags:
@@ -1770,7 +1799,7 @@ paths:
       tags:
         - auth
       summary: 获取可认领的订单列表（状态=created）
-      operationId: listUnclaimedOrders
+      operationId: listPendingOrders
       security:
         - TenantSessionAuth: []
       responses:
