@@ -1,46 +1,309 @@
-<!-- pages/order/order.wxml - 新订单提交表单 -->
-<view class="container">
-  <form bindsubmit="submitOrder">
+<!-- pages/order/order.wxml -->
+<view class="order-container">
+  <!-- 进度指示器 -->
+  <view class="steps">
+    <view class="step {{currentStep >= 1 ? 'active' : ''}}" data-step="1" bindtap="goToStep">
+      <text>1. 基本信息</text>
+    </view>
+    <view class="step {{currentStep >= 2 ? 'active' : ''}}" data-step="2" bindtap="goToStep">
+      <text>2. 货物信息</text>
+    </view>
+    <view class="step {{currentStep >= 3 ? 'active' : ''}}" data-step="3" bindtap="goToStep">
+      <text>3. 地址信息</text>
+    </view>
+    <view class="step {{currentStep >= 4 ? 'active' : ''}}" data-step="4" bindtap="goToStep">
+      <text>4. 时效要求</text>
+    </view>
+    <view class="step {{currentStep >= 5 ? 'active' : ''}}" data-step="5" bindtap="goToStep">
+      <text>5. 偏好设置</text>
+    </view>
+  </view>
+
+  <!-- 提交进度 -->
+  <view wx:if="{{isSubmitting}}" class="progress-container">
+    <progress percent="{{submitProgress}}" stroke-width="6" />
+    <text>正在提交...{{submitProgress}}%</text>
+  </view>
+
+  <!-- 步骤1: 基本信息 -->
+  <view wx:if="{{currentStep === 1}}" class="step-content">
     <view class="form-group">
-      <text class="label">重量 (kg):</text>
-      <input class="input" type="number" placeholder="请输入重量" bindinput="bindWeightInput" value="{{weight}}" />
+      <text class="label">联系人姓名</text>
+      <input 
+        placeholder="请输入联系人姓名" 
+        value="{{customerName}}"
+        data-field="customerName"
+        bindinput="onInput"
+      />
     </view>
 
     <view class="form-group">
-      <text class="label">体积 (m³):</text>
-      <input class="input" type="number" placeholder="请输入体积" bindinput="bindVolumeInput" value="{{volume}}" />
+      <text class="label">联系电话*</text>
+      <input 
+        placeholder="请输入联系电话" 
+        value="{{customerPhone}}"
+        data-field="customerPhone"
+        bindinput="onInput"
+      />
     </view>
 
     <view class="form-group">
-      <text class="label">起点:</text>
-      <input class="input" placeholder="请输入起点" bindinput="bindOriginInput" value="{{origin}}" />
+      <text class="label">邮箱地址</text>
+      <input 
+        placeholder="请输入邮箱地址" 
+        type="email"
+        value="{{customerEmail}}"
+        data-field="customerEmail"
+        bindinput="onInput"
+      />
+    </view>
+  </view>
+
+  <!-- 步骤2: 货物信息 -->
+  <view wx:if="{{currentStep === 2}}" class="step-content">
+    <view class="form-group">
+      <text class="label">货物描述</text>
+      <textarea 
+        placeholder="请描述货物内容"
+        value="{{goodsDescription}}"
+        data-field="goodsDescription"
+        bindinput="onInput"
+      />
     </view>
 
     <view class="form-group">
-      <text class="label">终点 (第一站):</text>
-      <input class="input" placeholder="请输入终点第一站" bindinput="bindDestinationFirstInput" value="{{destinationFirst}}" />
+      <text class="label">货物类型</text>
+      <picker 
+        range="{{goodsTypes}}" 
+        value="{{goodsTypes.indexOf(goodsType)}}"
+        data-field="goodsType"
+        bindchange="onPickerChange"
+      >
+        <view class="picker">{{goodsType}}</view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <view class="form-group half">
+        <text class="label">重量 (kg)*</text>
+        <input 
+          placeholder="0.0" 
+          type="number"
+          value="{{weightKg}}"
+          data-field="weightKg"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="form-group half">
+        <text class="label">体积 (m³)</text>
+        <input 
+          placeholder="0.0" 
+          type="number"
+          value="{{volumeM3}}"
+          data-field="volumeM3"
+          bindinput="onInput"
+        />
+      </view>
     </view>
 
     <view class="form-group">
-      <text class="label">终点 (第二站):</text>
-      <input class="input" placeholder="请输入终点第二站" bindinput="bindDestinationSecondInput" value="{{destinationSecond}}" />
+      <text class="label">包装要求</text>
+      <textarea 
+        placeholder="请描述包装要求"
+        value="{{packagingRequirements}}"
+        data-field="packagingRequirements"
+        bindinput="onInput"
+      />
+    </view>
+  </view>
+
+  <!-- 步骤3: 地址信息 -->
+  <view wx:if="{{currentStep === 3}}" class="step-content">
+    <view class="form-group">
+      <text class="label">取件地址*</text>
+      <textarea 
+        placeholder="请填写取件详细地址"
+        value="{{pickupLocation.address}}"
+        data-field="pickupLocation.address"
+        bindinput="onInput"
+      />
+      <button class="location-btn" bindtap="choosePickupLocation">
+        在地图上选择
+      </button>
     </view>
 
     <view class="form-group">
-      <text class="label">客户姓名:</text>
-      <input class="input" placeholder="请输入客户姓名" bindinput="bindCustomerNameInput" value="{{customerName}}" />
+      <text class="label">收货地址*</text>
+      <textarea 
+        placeholder="请填写收货详细地址"
+        value="{{deliveryLocation.address}}"
+        data-field="deliveryLocation.address"
+        bindinput="onInput"
+      />
+      <button class="location-btn" bindtap="chooseDeliveryLocation">
+        在地图上选择
+      </button>
+    </view>
+  </view>
+
+  <!-- 步骤4: 时效要求 -->
+  <view wx:if="{{currentStep === 4}}" class="step-content">
+    <view class="form-group">
+      <text class="label">取件时间范围</text>
+      <view class="time-range">
+        <picker 
+          mode="datetime" 
+          value="{{pickupTimeWindow.earliest}}"
+          data-field="pickupTimeWindow" data-subfield="earliest"
+          bindchange="onTimePickerChange"
+        >
+          <text>从 {{pickupTimeWindow.earliest || '选择开始时间'}}</text>
+        </picker>
+        <picker 
+          mode="datetime" 
+          value="{{pickupTimeWindow.latest}}"
+          data-field="pickupTimeWindow" data-subfield="latest"
+          bindchange="onTimePickerChange"
+        >
+          <text>到 {{pickupTimeWindow.latest || '选择结束时间'}}</text>
+        </picker>
+      </view>
     </view>
 
     <view class="form-group">
-      <text class="label">客户电话:</text>
-      <input class="input" type="number" placeholder="请输入客户电话" bindinput="bindCustomerPhoneInput" value="{{customerPhone}}" />
+      <text class="label">送达时间范围</text>
+      <view class="time-range">
+        <picker 
+          mode="datetime" 
+          value="{{deliveryTimeWindow.earliest}}"
+          data-field="deliveryTimeWindow" data-subfield="earliest"
+          bindchange="onTimePickerChange"
+        >
+          <text>从 {{deliveryTimeWindow.earliest || '选择开始时间'}}</text>
+        </picker>
+        <picker 
+          mode="datetime" 
+          value="{{deliveryTimeWindow.latest}}"
+          data-field="deliveryTimeWindow" data-subfield="latest"
+          bindchange="onTimePickerChange"
+        >
+          <text>到 {{deliveryTimeWindow.latest || '选择结束时间'}}</text>
+        </picker>
+      </view>
     </view>
 
     <view class="form-group">
-      <text class="label">备注:</text>
-      <textarea class="textarea" placeholder="请输入备注" bindinput="bindRemarkInput" value="{{remark}}" />
+      <text class="label">最晚送达时间</text>
+      <picker 
+        mode="datetime" 
+        value="{{requiredDeliveryBy}}"
+        data-field="requiredDeliveryBy"
+        bindchange="onTimePickerChange"
+      >
+        <text>{{requiredDeliveryBy || '选择最晚送达时间'}}</text>
+      </picker>
     </view>
 
-    <button class="submit-btn" form-type="submit">提交订单</button>
-  </form>
+    <view class="form-group">
+      <text class="label">紧急程度</text>
+      <picker 
+        range="{{['low', 'normal', 'high', 'urgent']}}" 
+        value="{{priorityLevel}}"
+        data-field="priorityLevel"
+        bindchange="onPickerChange"
+      >
+        <view class="picker">{{priorityLevel}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 步骤5: 偏好设置 -->
+  <view wx:if="{{currentStep === 5}}" class="step-content">
+    <view class="form-group">
+      <text class="label">偏好车型</text>
+      <checkbox-group bindchange="onVehicleTypeSelect">
+        <label wx:for="{{vehicleTypes}}" wx:key="index">
+          <checkbox value="{{item}}" checked="{{preferredVehicleTypes.indexOf(item) !== -1}}" />
+          <text>{{item}}</text>
+        </label>
+      </checkbox-group>
+    </view>
+
+    <view class="form-group">
+      <text class="label">匹配策略</text>
+      <picker 
+        range="{{['fastest', 'cheapest', 'best_rated', 'balanced']}}" 
+        value="{{matchingStrategy}}"
+        data-field="matchingStrategy"
+        bindchange="onPickerChange"
+      >
+        <view class="picker">{{matchingStrategy}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="label">价格敏感度</text>
+      <picker 
+        range="{{['low', 'medium', 'high']}}" 
+        value="{{priceSensitivity}}"
+        data-field="priceSensitivity"
+        bindchange="onPickerChange"
+      >
+        <view class="picker">{{priceSensitivity}}</view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="label">最高预算 (元)</text>
+      <input 
+        placeholder="不设限可不填" 
+        type="number"
+        value="{{maxPrice}}"
+        data-field="maxPrice"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="price-display">
+      <text class="label">预估价格: </text>
+      <text class="price">¥{{estimatedPrice}}</text>
+    </view>
+  </view>
+
+  <!-- 导航按钮 -->
+  <view class="navigation-buttons">
+    <button 
+      wx:if="{{currentStep > 1}}" 
+      class="btn-secondary" 
+      bindtap="prevStep"
+    >
+      上一步
+    </button>
+    
+    <button 
+      wx:if="{{currentStep < 5}}" 
+      class="btn-primary" 
+      bindtap="nextStep"
+    >
+      下一步
+    </button>
+    
+    <button 
+      wx:if="{{currentStep === 5}}" 
+      class="btn-submit {{isSubmitting ? 'disabled' : ''}}" 
+      bindtap="submitOrder"
+      disabled="{{isSubmitting}}"
+    >
+      {{isSubmitting ? '提交中...' : '提交订单'}}
+    </button>
+  </view>
+
+  <!-- 订单状态显示 -->
+  <view wx:if="{{tempOrderId}}" class="order-status">
+    <text class="status-title">订单已创建</text>
+    <text>订单号: {{tempOrderId}}</text>
+    <text wx:if="{{trackingNumber}}">跟踪号: {{trackingNumber}}</text>
+    <button class="btn-small" bindtap="copyTrackingNumber">复制跟踪号</button>
+  </view>
 </view>

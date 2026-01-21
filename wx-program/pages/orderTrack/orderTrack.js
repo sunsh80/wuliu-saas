@@ -101,17 +101,31 @@ Page({
         const order = res.data;
         this.setData({ order: order, showLoginPrompt: false, isCustomerView: true });
 
-         // --- 新增逻辑: 检查状态并加载报价 ---
+                // 检查并自动绑定订单 ---
+       // 条件1: 订单尚未绑定客户 (public 视图下 customer_id 为 null)
+          // 条件2: 用户已登录且有手机号
+          if (!order.customer_id) {
+           const userInfo = wx.getStorageSync('userInfo') || {};
+            const customerPhone = userInfo.contact_phone || userInfo.phone;
+ 
+           if (customerPhone) {
+              console.log('尝试自动绑定订单:', orderId, '到手机号:', customerPhone);
+              await this.bindOrderToCustomer(orderId, customerPhone);
+              // 绑定后重新获取最新订单数据（含 customer_id）
+              await this.fetchPublicOrder(orderId); // 注意：这里先走 public 接口确保一致性
+            }
+          }
+
+         // --- 检查状态并加载报价 ---
          if (order.status === 'quoted') {
              this.loadQuotes(orderId);
-             // 如果有报价截止时间，启动倒计时
-             if (order.quote_deadline) {
-                 this.startCountdown(order.quote_deadline);
-             }
+        // 如果有报价截止时间，启动倒计时
+         if (order.quote_deadline) {
+         this.startCountdown(order.quote_deadline);
+          }
          }
-         // --- END 新增逻辑 ---
 
-      } else if (res.statusCode === 401) {
+       } else if (res.statusCode === 401) {
         wx.removeStorageSync('authToken');
         this.promptLogin();
       } else {
@@ -121,8 +135,37 @@ Page({
       console.error('upgradeToCustomerView error:', err);
     }
   },
-
-  // --- 新增方法: 加载报价 ---
+  // -- 绑定订单到客户 ---
+  async bindOrderToCustomer(orderId, phone) {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `http://localhost:3000/api/customer/order/bind`,
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json'
+        },
+        data: {order_id: orderId},
+        withCredentials: true, // 👈 关键！携带登录 Cookie
+        success: (res) => {
+          if (res.statusCode === 200 && res.data.success) {
+            console.log('✅ 订单绑定成功');
+            wx.showToast({ title: '订单已关联', icon: 'success', duration: 1000 });
+            resolve();
+          } else {
+            console.warn('❌ 绑定失败:', res.data?.error || '未知错误');
+            // 不抛出错误，避免阻断后续流程
+            resolve();
+          }
+        },
+        fail: (err) => {
+          console.error('❌ 绑定网络错误:', err);
+          wx.showToast({ title: '绑定失败', icon: 'none' });
+          resolve(); // 仍继续流程
+        }
+      });
+    });
+  },
+  // ---  加载报价 ---
   async loadQuotes(orderId) {
     const token = wx.getStorageSync('authToken');
     if (!token) {
@@ -215,47 +258,42 @@ Page({
     });
   },
 
-  async submitSelection(orderId, selectedCarrierId) {
-    const token = wx.getStorageSync('authToken');
-    if (!token) {
-        wx.showToast({ title: '请先登录', icon: 'none' });
-        this.promptLogin();
-        return;
+// --- 新增方法: 确认选择 ---
+async submitSelection(orderId, selectedCarrierId) {
+  wx.showLoading({ title: '提交中...', mask: true });
+  try {
+    // 👇 使用 await 直接等待 wx.request，避免 Promise 包装
+    const res = await wx.request({
+      url: `http://localhost:3000/api/customer/orders/${orderId}/select-carrier`,
+      method: 'POST',
+      header: { 'Content-Type': 'application/json' },
+      data: { carrier_tenant_id: selectedCarrierId },
+      withCredentials: true, // ✅ 关键！携带 Cookie
+      timeout: 10000
+    });
+
+    // ✅ 检查响应状态码
+    if (res.statusCode === 200 && res.data.success) {
+      wx.hideLoading();
+      wx.showToast({ title: '选择成功', icon: 'success' });
+      // 👇 使用箭头函数确保 this 绑定正确
+      setTimeout(() => {
+        this.fetchOrderData(orderId);
+      }, 1000);
+    } else {
+      wx.hideLoading();
+      wx.showToast({ 
+        title: res.data?.message || '操作失败', 
+        icon: 'none' 
+      });
     }
 
-    wx.showLoading({ title: '提交中...', mask: true });
-
-    try {
-        const res = await new Promise((resolve, reject) => {
-            wx.request({
-                url: `http://localhost:3000/api/customer/orders/${orderId}/select-carrier`, // 请替换为您的实际API地址
-                method: 'POST', // 或 PUT
-                header: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                data: { carrier_tenant_id: selectedCarrierId }, // 注意字段名可能需要根据后端API调整
-                success: resolve,
-                fail: reject
-            });
-        });
-
-        if (res.statusCode === 200) {
-            wx.hideLoading();
-            wx.showToast({ title: '选择成功', icon: 'success' });
-            // 选择成功后，刷新页面以获取最新的订单状态
-            setTimeout(() => this.fetchOrderData(orderId), 1000);
-        } else {
-            wx.hideLoading();
-            wx.showToast({ title: res.data?.message || '操作失败', icon: 'none' });
-        }
-    } catch (err) {
-        console.error('submitSelection error:', err);
-        wx.hideLoading();
-        wx.showToast({ title: '网络错误', icon: 'none' });
-    }
-  },
-  // --- END 新增方法 ---
+  } catch (err) {
+    console.error('submitSelection error:', err);
+    wx.hideLoading();
+    wx.showToast({ title: '网络错误', icon: 'none' });
+  }
+}-
 
   // --- 新增方法: 辅助函数 ---
   getCarrierNameById(id) {

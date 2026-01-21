@@ -1,16 +1,12 @@
 // api/handlers/customer/order/deleteCustomerOrder.js
 const { getDb } = require('../../../../db/index.js');
 
-module.exports = async (c) => {
+module.exports = async (c, req, res) => {
   try {
     const db = getDb();
-    const userId = c.request.session?.userId;
-    const orderId = c.request.params?.id;
+    const userId = c.context?.id; // 👈 来自 session
 
-    // 🔒 验证登录
-    if (!userId) {
-      return { statusCode: 401, body: { success: false, error: 'Unauthorized' } };
-    }
+    const orderId = c.request.params?.id;
 
     // 📥 验证订单 ID
     if (!orderId || typeof orderId !== 'string') {
@@ -36,23 +32,16 @@ module.exports = async (c) => {
     // 🗑️ 执行删除
     await db.run('DELETE FROM orders WHERE id = ?', [orderId]);
 
-    // ✅ 返回成功（204 No Content 是 RESTful 推荐，但为统一风格用 200）
+    // ✅ 返回成功
     return {
       statusCode: 200,
-      body: {
-        success: true,
-        message: 'Order deleted successfully',
-      },
+      body: { success: true, message: 'Order deleted successfully' },
     };
   } catch (error) {
     console.error('Error in deleteCustomerOrder:', error);
     return {
       statusCode: 500,
-      body: {
-        success: false,
-        error: 'Failed to delete order',
-        details: error.message,
-      },
+      body: { success: false, error: 'Failed to delete order', details: error.message },
     };
   }
 };

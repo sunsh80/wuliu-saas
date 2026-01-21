@@ -1,87 +1,118 @@
 // backend/api/handlers/public/createPublicOrder.js
 const { getDb } = require('../../../db/index.js');
-const crypto = require('crypto');
 
+/**
+ * 匿名用户创建公共订单（小程序下单）
+ * 
+ * 要求：
+ * - 必须提供 customer_phone（用于联系）
+ * - 初始状态为 'pending'，需 ADMIN 审核后变为 'created'
+ */
 module.exports = async (c) => {
   try {
     const db = getDb();
     const {
-      pickup_address,        // 发货地
-      delivery_address,      // 收货地
-      weight_kg,             // 重量
-      customer_name,         // 客户姓名（可选）
-      customer_phone,        // 客户电话（可选）
-      description            // 描述（体积+备注，可选）
+      pickup_address,
+      delivery_address,
+      weight_kg,
+      customer_name,
+      customer_phone,
+      description
     } = c.request.body;
 
-    // === 校验必填字段（根据 OpenAPI）===
-    if (!pickup_address?.trim()) {
-      return { statusCode: 400, body: { error: 'MISSING_PICKUP_ADDRESS' } };
-    }
-    if (!delivery_address?.trim()) {
-      return { statusCode: 400, body: { error: 'MISSING_DELIVERY_ADDRESS' } };
-    }
-    if (typeof weight_kg !== 'number' || weight_kg <= 0) {
-      return { statusCode: 400, body: { error: 'INVALID_WEIGHT' } };
+    // === 1. 基础字段校验 ===
+    if (
+      !pickup_address ||
+      !delivery_address ||
+      typeof weight_kg !== 'number' ||
+      weight_kg <= 0
+    ) {
+      return {
+        statusCode: 400,
+        body: { success: false, error: 'MISSING_REQUIRED_FIELDS' }
+      };
     }
 
-    // === 构建 sender_info（发件人）===
-    // 小程序匿名下单，发件人信息来自表单
-    const sender_info = JSON.stringify({
-      name: customer_name?.trim() || '匿名用户',
-      phone: customer_phone?.trim() || '',
+    // === 2. customer_phone 必填校验（核心要求）===
+    if (!customer_phone || typeof customer_phone !== 'string' || !customer_phone.trim()) {
+      return {
+        statusCode: 400,
+        body: { success: false, error: 'CUSTOMER_PHONE_REQUIRED' }
+      };
+    }
+
+    const cleanPhone = customer_phone.trim();
+
+    // === 3. 手机号格式校验（中国 11 位）===
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      return {
+        statusCode: 400,
+        body: { success: false, error: 'INVALID_CUSTOMER_PHONE_FORMAT' }
+      };
+    }
+
+    // === 4. 构建 sender_info（发件人信息）===
+    const senderInfo = {
+      name: (customer_name && customer_name.trim()) || '匿名用户',
+      phone: cleanPhone,
       address: pickup_address.trim(),
       source: 'mini_program'
-    });
+    };
 
-    // === 构建 receiver_info（收件人）===
-    // 注意：小程序未提供收件人姓名/电话，只能从地址推断
-    // 如果未来需要，可在前端增加字段
-    const receiver_info = JSON.stringify({
+    // === 5. 构建 receiver_info（收件人信息）===
+    const receiverInfo = {
       address: delivery_address.trim(),
       weight_kg: weight_kg,
-      description: description?.trim() || ''
-    });
+      description: (description && description.trim()) || ''
+    };
 
-    // === 生成唯一 ID 和运单号 ===
-    const order_id = 'order_' + crypto.randomUUID();
-    const tracking_number = 'LOG' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+    // === 6. 生成唯一运单号：LOG + 时间戳 + 5位大写字母 ===
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const trackingNumber = `LOG${timestamp}${randomStr}`;
 
-    // === 插入数据库（严格匹配你的表结构）===
-    await db.run(`
-      INSERT INTO orders (
-        id,
+    // === 7. 插入数据库（status='pending'）===
+    const result = await db.run(
+      `INSERT INTO orders (
         tracking_number,
         sender_info,
         receiver_info,
         status,
         customer_id,
         created_at,
-        updated_at
-      ) VALUES (?, ?, ?, ?, 'created', NULL, datetime('now'), datetime('now'))
-    `, [
-      order_id,
-      tracking_number,
-      sender_info,
-      receiver_info
-    ]);
+        updated_at,
+        customer_phone
+      ) VALUES (?, ?, ?, 'pending', NULL, datetime('now'), datetime('now'), ?)`,
+      [
+        trackingNumber,
+        JSON.stringify(senderInfo),
+        JSON.stringify(receiverInfo),
+        cleanPhone
+      ]
+    );
 
-    // === 返回成功响应 ===
+    const orderId = `order_${result.lastID}`;
+
+    // === 8. 返回成功响应 ===
     return {
-      statusCode: 201,
+      statusCode: 200,
       body: {
-        order_id,
-        tracking_code: tracking_number, // 兼容前端可能叫 tracking_code
-        status: 'pending',
-        created_at: new Date().toISOString()
+        success: true,
+        data: {
+          order_id: orderId,
+          tracking_code: trackingNumber,
+          status: 'pending', // 前端展示用，实际 DB 状态为 'pending'
+          created_at: new Date().toISOString()
+        }
       }
     };
 
   } catch (error) {
-    console.error('❌ [createPublicOrder] Error:', error.message);
+    console.error('[createPublicOrder] Error:', error);
     return {
       statusCode: 500,
-      body: { error: 'INTERNAL_SERVER_ERROR' }
+      body: { success: false, error: 'INTERNAL_SERVER_ERROR' }
     };
   }
 };

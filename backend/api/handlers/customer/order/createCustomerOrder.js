@@ -2,15 +2,10 @@
 const { getDb } = require('../../../../db/index.js');
 const crypto = require('crypto');
 
-module.exports = async (c) => {
+module.exports = async (c, req, res) => {
   try {
     const db = getDb();
-    const userId = c.request.session?.userId;
-
-    // 🔒 安全检查：确保用户已登录
-    if (!userId) {
-      return { statusCode: 401, body: { success: false, error: 'Unauthorized' } };
-    }
+    const userId = c.context?.id; // 👈 来自 session
 
     const { total_amount, items } = c.request.body;
 
@@ -28,7 +23,6 @@ module.exports = async (c) => {
     } catch (e) {
       return { statusCode: 400, body: { success: false, error: 'Items must be a valid JSON string' } };
     }
-
     if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
       return { statusCode: 400, body: { success: false, error: 'Items must be a non-empty JSON array' } };
     }
@@ -39,7 +33,7 @@ module.exports = async (c) => {
       return { statusCode: 403, body: { success: false, error: 'User not found' } };
     }
 
-    // 尝试查找该用户的 customer 记录（可选，若无则订单 customer_id 为 null）
+    // 尝试查找该用户的 customer 记录
     const customer = await db.get('SELECT id FROM customers WHERE phone = (SELECT phone FROM users WHERE id = ?)', [userId]);
     const customerId = customer ? customer.id : null;
 
@@ -63,21 +57,14 @@ module.exports = async (c) => {
       body: {
         success: true,
         message: 'Order created successfully',
-        data: {
-          id: order_id,
-          tracking_number: tracking_number,
-        },
+        data: { id: order_id, tracking_number: tracking_number },
       },
     };
   } catch (error) {
     console.error('Error in createCustomerOrder:', error);
     return {
       statusCode: 500,
-      body: {
-        success: false,
-        error: 'Internal server error',
-        details: error.message,
-      },
+      body: { success: false, error: 'Internal server error', details: error.message },
     };
   }
 };

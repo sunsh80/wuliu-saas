@@ -3,7 +3,12 @@ const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
   // 从 JWT 获取当前承运商租户 ID
-  const { tenantId } = c.request.auth;
+const { tenantId, roles } = c.context;
+
+// 校验 carrier 角色
+if (!roles.includes('carrier')) {
+  return { status: 403, body: { success: false, error: 'NOT_A_CARRIER' } };
+}
 
   // 从 URL 路径获取 orderId（OpenAPI 定义为路径参数）
   const { orderId } = c.req.param();

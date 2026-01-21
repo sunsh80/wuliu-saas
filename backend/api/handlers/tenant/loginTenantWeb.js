@@ -1,89 +1,158 @@
-// backend/api/handlers/tenant/loginTenantWeb.js
+// backend/api/handlers/tenant-web/loginTenantWeb.js
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const { getDb } = require('../../../db/index.js');
 
-module.exports = async (c /*, req, res */) => {
-  const { email, password } = c.request.body;
-
-  if (!email || !password) {
-    return {
-      statusCode: 400,
-      body: { success: false, error: 'EMAIL_AND_PASSWORD_REQUIRED' }
-    };
-  }
+module.exports = async (c) => {
+  const { email, phone, password, code } = c.request.body;
+  const db = getDb();
 
   try {
-    const db = getDb();
+    // === 模式 1: 租户登录（邮箱 + 密码）===
+    if (email && password) {
+      console.log('🔐 尝试租户登录:', email);
+      const user = await db.get(`
+        SELECT u.id, u.email, u.password_hash, u.tenant_id, t.name AS tenant_name, t.roles, t.status AS tenant_status
+        FROM users u
+        LEFT JOIN tenants t ON u.tenant_id = t.id
+        WHERE u.email = ? AND u.user_type = 'tenant_user' AND t.status = 'active'
+      `, [email.toLowerCase().trim()]);
 
-    const user = await db.get(`
-      SELECT u.id, u.email, u.password_hash, u.tenant_id, t.name AS tenant_name, t.roles
-      FROM users u
-      JOIN tenants t ON u.tenant_id = t.id
-      WHERE u.email = ?
-    `, [email]);
-
-    if (!user) {
-      console.log("[loginTenantWeb] User not found for email:", email);
-      return {
-        statusCode: 401,
-        body: { success: false, error: 'INVALID_CREDENTIALS' }
-      };
-    }
-
-    // 添加日志，查看查询到的 user 对象
-    console.log("[loginTenantWeb] Retrieved user object:", user);
-
-    const isValid = await bcrypt.compare(password, user.password_hash);
-    if (!isValid) {
-      console.log("[loginTenantWeb] Invalid password for email:", email);
-      return {
-        statusCode: 401,
-        body: { success: false, error: 'INVALID_CREDENTIALS' }
-      };
-    }
-
-    // 此时 user 对象应该包含 id, email, tenant_id 等信息
-    console.log("[loginTenantWeb] User authentication successful, preparing session data.");
-
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        tenantId: user.tenant_id,
-        email: user.email
-      },
-      process.env.JWT_SECRET || 'logistics-platform-jwt-secret-2026',
-      { expiresIn: '24h' }
-    );
-
-    // 检查 sessionData 的内容
-    const sessionDataToReturn = {
-        userId: user.id,
-        tenantId: user.tenant_id,
-        email: user.email
-    };
-    console.log("[loginTenantWeb] Preparing sessionData to return:", sessionDataToReturn);
-
-    return {
-      statusCode: 200,
-      body: {
-        success: true,
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          tenant_id: user.tenant_id,
-          tenant_name: user.tenant_name
-        },
-        sessionData: sessionDataToReturn // 这个字段必须存在
+      if (!user) {
+        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
+        return {
+          statusCode: 401,
+          body: { success: false, error: 'INVALID_CREDENTIALS' }
+        };
       }
+
+      const isValid = await bcrypt.compare(password, user.password_hash);
+      if (!isValid) {
+        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
+        return {
+          statusCode: 401,
+          body: { success: false, error: 'INVALID_CREDENTIALS' }
+        };
+      }
+
+      const userId = user.id;
+      const data = {
+        tenant_id: user.tenant_id,
+        name: user.tenant_name,
+        roles: Array.isArray(user.roles) ? user.roles : JSON.parse(user.roles || '[]'),
+        type: 'tenant'
+      };
+      console.log('📤 Login response:', { userId, data });
+      return {
+        statusCode: 200,
+        body: {
+          success: true,
+          userId: user.id,
+          data: data
+        }
+      };
+    }
+
+    // === 模式 2: 客户登录（手机号 + 密码）===
+    if (phone && password) {
+      console.log('📱 尝试客户密码登录:', phone);
+      const user = await db.get(`
+        SELECT id, phone, password_hash, user_type
+        FROM users
+        WHERE phone = ? AND user_type = 'user'
+      `, [phone]);
+
+      if (!user) {
+        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
+        return {
+          statusCode: 401,
+          body: { success: false, error: 'INVALID_CREDENTIALS' }
+        };
+      }
+
+      const isValid = await bcrypt.compare(password, user.password_hash);
+      if (!isValid) {
+        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
+        return {
+          statusCode: 401,
+          body: { success: false, error: 'INVALID_CREDENTIALS' }
+        };
+      }
+
+      const userId = user.id;
+      const data = { phone: user.phone, type: 'customer' };
+      console.log('📤 Login response:', { userId, data });
+      return {
+        statusCode: 200,
+        body: {
+          success: true,
+          userId: user.id,
+          data: data
+        }
+      };
+    }
+
+    // === 模式 3: 客户登录（手机号 + 验证码）===
+    if (phone && code) {
+      console.log('📱 尝试客户验证码登录:', phone);
+      const isValidCode = await validateSmsCode(phone, code);
+      if (!isValidCode) {
+        console.log('📤 Login response:', { success: false, error: 'INVALID_CODE' });
+        return {
+          statusCode: 401,
+          body: { success: false, error: 'INVALID_CODE' }
+        };
+      }
+
+      let customer = await db.get(
+        `SELECT id FROM users WHERE phone = ? AND user_type = 'user'`,
+        [phone]
+      );
+
+      if (!customer) {
+        console.log('📤 Login response:', { success: false, error: 'USER_NOT_FOUND' });
+        const newCustomerId = await createCustomerUser(phone);
+        customer = { id: newCustomerId };
+      }
+
+      const userId = customer.id;
+      const data = { phone: phone, type: 'customer' };
+      console.log('📤 Login response:', { userId, data });
+      return {
+        statusCode: 200,
+        body: {
+          success: true,
+          userId: userId,
+          data: data
+        }
+      };
+    }
+
+    console.log('📤 Login response:', { success: false, error: 'MISSING_PARAMS' });
+    return {
+      statusCode: 400,
+      body: { success: false, error: 'MISSING_PARAMS' }
     };
+
   } catch (error) {
-    console.error('[loginTenantWeb] 内部错误:', error.message);
-    console.error('[loginTenantWeb] Error Stack:', error.stack);
+    console.error('[loginTenantWeb] Error:', error);
     return {
       statusCode: 500,
-      body: { success: false, error: 'INTERNAL_SERVER_ERROR' }
+      body: { success: false, error: 'INTERNAL_ERROR' }
     };
   }
 };
+
+// 辅助函数
+async function validateSmsCode(phone, code) {
+  return code === '123456'; // 示例
+}
+
+async function createCustomerUser(phone) {
+  const db = getDb();
+  const result = await db.run(
+    `INSERT INTO users (phone, username, user_type, is_active)
+     VALUES (?, ?, 'user', 1)`,
+    [phone, phone] // username = phone
+  );
+  return result.lastID;
+}

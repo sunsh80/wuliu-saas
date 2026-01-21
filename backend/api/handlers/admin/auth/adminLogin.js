@@ -7,7 +7,7 @@ const { bcrypt, jwt } = require('../../../../utils');
 console.log("🚀 adminLogin.js handler function is executing!");
 
 module.exports = async (c) => {
-    console.log("🎯 Inside adminLogin handler, processing request..."); // <--- 新增日志
+  console.log('🎯 [ADMIN LOGIN] Raw request body:', c.request.body);
     const { username, password } = c.request.body;
 
     console.log("👤 Received credentials:", { username, password: "***" }); // <--- 新增日志，隐藏密码

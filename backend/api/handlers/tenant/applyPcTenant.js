@@ -35,7 +35,8 @@ module.exports = async (c) => {
       email,
       password_hash,
       roles: rolesJson,
-      address
+      address,
+      status: 'pending'
     });
     console.log('🟢 [applyPcTenant] 租户创建成功，ID:', newTenant.id);
 

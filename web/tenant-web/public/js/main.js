@@ -1,331 +1,348 @@
-// pc-tenant/main.js
-
-// ========== 配置区 ==========
-const API_BASE = 'http://localhost:3000'; // 开发环境
-// const API_BASE = 'https://api.yourdomain.com'; // 生产环境（上线时取消注释）
-// ===========================
-
-let currentTenantId = null;
-
+// main.js - 基于原始文件的最小修复版（保留全部功能）
 document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const profileResponse = await fetch(`${API_BASE}/api/tenant-web/profile`, { credentials: 'include' });
-    if (!profileResponse.ok) {
-      window.location.href = '/pc-tenant/apply.html';
-      return;
-    }
-    const profile = await profileResponse.json();
-    currentTenantId = profile.id;
+    const API_BASE = 'http://localhost:3000'; // 保留原始开发配置
 
-    document.querySelectorAll('#tenant-name-display, #tenant-name-welcome').forEach(el => {
-      el.textContent = profile.name || '租户';
+    let currentTenantId = null;
+
+    // ========== 初始化租户信息 ==========
+    try {
+        const res = await fetch(`${API_BASE}/api/tenant-web/profile`, {
+            credentials: 'include'
+        });
+        if (res.ok) {
+            const data = await res.json();
+            currentTenantId = data.data.id;
+            const tenantName = data.data.company_name || '我的租户';
+            
+            // ✅ 保留原始租户名称显示逻辑
+            document.querySelectorAll('#tenant-name-display, #tenant-name-welcome').forEach(el => {
+                el.textContent = tenantName;
+            });
+            
+            loadProfileInfo(data.data);
+        } else {
+            alert('请先登录');
+            window.location.href = '/apply.html';
+        }
+    } catch (error) {
+        console.error('初始化失败:', error);
+        alert('系统异常，请重试');
+        window.location.href = '/apply.html';
+    }
+
+    // ========== 主 Tab 切换 ==========
+    function showMainTab(tabName) {
+        document.querySelectorAll('.main-tab-content').forEach(content => {
+            content.style.display = 'none';
+        });
+        document.querySelectorAll('.main-tab-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.getElementById(tabName)?.style.display = 'block';
+        event?.target?.classList.add('active');
+        
+        // 自动加载订单 Tab 的默认子 Tab
+        if (tabName === 'orders-tab') {
+            showSubTab('pending');
+        }
+    }
+
+    // ========== 订单子 Tab 切换 ==========
+    function showSubTab(subTabName) {
+        document.querySelectorAll('.sub-tab-content').forEach(content => {
+            content.style.display = 'none';
+        });
+        document.querySelectorAll('.sub-tab-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.getElementById(subTabName + '-orders')?.style.display = 'block';
+        document.querySelector(`.sub-tab-link[data-subtab="${subTabName}"]`)?.classList.add('active');
+        
+        // 加载对应订单
+        if (['pending', 'claimed', 'delivered', 'settling'].includes(subTabName)) {
+            const status = subTabName === 'settling' ? 'delivered' : subTabName;
+            loadOrders(status);
+        }
+    }
+
+    // ========== 绑定导航事件 ==========
+    document.querySelectorAll('.main-tab-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showMainTab(e.target.dataset.tab);
+        });
     });
 
-    await loadProfileInfo();
-    showMainTab('dashboard');
+    document.querySelectorAll('.sub-tab-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSubTab(e.target.dataset.subtab);
+        });
+    });
 
-    bindNavigationEvents();
+    // ========== 资料加载与表单绑定 ==========
+    function loadProfileInfo(tenant) {
+        document.getElementById('company_name').value = tenant.company_name || '';
+        document.getElementById('admin_name').value = tenant.contact_person || '';
+        document.getElementById('admin_phone').value = tenant.contact_phone || '';
+        document.getElementById('address').value = tenant.address || '';
+    }
+
+    function bindProfileForm() {
+        const form = document.getElementById('profileForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = {
+                company_name: formData.get('company_name'),
+                contact_person: formData.get('admin_name'),
+                contact_phone: formData.get('admin_phone'),
+                address: formData.get('address')
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/tenant-web/profile`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert('资料保存成功');
+                } else {
+                    const err = await res.json();
+                    alert(`保存失败: ${err.error || '未知错误'}`);
+                }
+            } catch (error) {
+                alert('网络错误，请重试');
+            }
+        });
+    }
+
+    // ========== 新建订单绑定 ==========
+    function bindNewOrderForm() {
+        const form = document.getElementById('newOrderForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = {
+                customer_name: formData.get('customer_name'),
+                customer_phone: formData.get('customer_phone'),
+                address: formData.get('address'),
+                weight_kg: parseFloat(formData.get('weight')) || 0
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/tenant-web/orders`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    alert('订单创建成功');
+                    form.reset();
+                    loadOrders('pending');
+                } else {
+                    const err = await res.json();
+                    alert(`创建失败: ${err.error || '未知错误'}`);
+                }
+            } catch (error) {
+                alert('网络错误，请重试');
+            }
+        });
+    }
+
+    // ========== 订单操作 ==========
+    async function updateOrderStatus(orderId, action) {
+        const endpoint = action === 'claim'
+            ? `${API_BASE}/api/carrier/orders/${orderId}/claim`
+            : `${API_BASE}/api/carrier/orders/${orderId}/complete`;
+
+        try {
+            const res = await fetch(endpoint, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+
+            if (res.ok) {
+                alert(action === 'claim' ? '订单认领成功' : '订单完成成功');
+                // 重新加载相关 Tab
+                if (action === 'claim') {
+                    loadOrders('pending');
+                    loadOrders('claimed');
+                } else {
+                    loadOrders('claimed');
+                    loadOrders('delivered');
+                }
+            } else {
+                const err = await res.json();
+                alert(`操作失败: ${err.error || '未知错误'}`);
+            }
+        } catch (error) {
+            alert('网络错误，请重试');
+        }
+    }
+
+    // ========== 订单渲染辅助 ==========
+    function getStatusText(order) {
+        if (order.displayType === 'pending_unclaimed') return '待认领';
+        const map = {
+            pending_claim: '可认领订单',
+            claimed: '运输中',
+            delivered: '已送达',
+            settled: '已结算'
+        };
+        return map[order.status] || order.status;
+    }
+
+    // ========== 渲染订单列表 ==========
+    function renderOrderList(orders, status) {
+        const containerMap = {
+            pending: 'pending-orders-list',
+            claimed: 'in-progress-orders-list',
+            delivered: status === 'settling' ? 'settling-orders-list' : 'history-orders-list'
+        };
+        const containerId = containerMap[status] || 'pending-orders-list';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (orders.length === 0) {
+            container.innerHTML = '<p>暂无订单</p>';
+            return;
+        }
+
+        const html = orders.map(order => {
+            // ✅ 关键修复：兼容两种数据结构
+            const customerName = order.customer_name || order.receiver_info?.name || '未知客户';
+            const phone = order.customer_phone || order.receiver_info?.phone || '';
+            const address = order.address || order.receiver_info?.address || '';
+            const weight = order.weight || order.parcel_info?.weight_kg || 0;
+            const trackingNumber = order.order_number || order.tracking_number || 'N/A';
+
+            let actionBtn = '';
+            if (order.displayType === 'pending_unclaimed') {
+                actionBtn = `<button class="btn-claim" data-id="${order.id}">认领订单</button>`;
+            } else if (order.status === 'claimed') {
+                actionBtn = `<button class="btn-complete" data-id="${order.id}">完成订单</button>`;
+            } else {
+                actionBtn = '<span>已完成</span>';
+            }
+
+            return `
+                <div class="order-item">
+                    <p><strong>运单号:</strong> ${trackingNumber}</p>
+                    <p><strong>客户:</strong> ${customerName}</p>
+                    <p><strong>电话:</strong> ${phone}</p>
+                    <p><strong>地址:</strong> ${address}</p>
+                    <p><strong>重量:</strong> ${weight} kg</p>
+                    <p><strong>状态:</strong> ${getStatusText(order)}</p>
+                    <p>${actionBtn}</p>
+                </div>
+                <hr />
+            `;
+        }).join('');
+
+        container.innerHTML = html;
+
+        // 绑定事件
+        container.querySelectorAll('.btn-claim').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                updateOrderStatus(id, 'claim');
+            });
+        });
+        container.querySelectorAll('.btn-complete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                updateOrderStatus(id, 'complete');
+            });
+        });
+    }
+
+    // ========== 加载订单（核心修复） ==========
+    async function loadOrders(status) {
+      console.log('🔍 [TRACE] loadOrders called | status:', status, 
+              '| stack:', new Error().stack.split('\n')[2].trim());
+        const containerMap = {
+            pending: 'pending-orders-list',
+            claimed: 'in-progress-orders-list',
+            delivered: status === 'settling' ? 'settling-orders-list' : 'history-orders-list'
+        };
+        const containerId = containerMap[status] || 'pending-orders-list';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = '<p>加载中...</p>'; // 显示 loading
+
+        try {
+            let allOrders = [];
+
+            // 1. 加载已认领/进行中的订单（租户通用接口）
+            const ownRes = await fetch(`${API_BASE}/api/tenant-web/orders?status=${status}`, {
+                credentials: 'include'
+            });
+
+            if (ownRes.ok) {
+                const ownData = await ownRes.json();
+                (ownData.orders || []).forEach(order => {
+                    order.displayType = 'claimed';
+                });
+                allOrders.push(...(ownData.orders || []));
+            }
+
+            // 2. 【关键修复】仅当 status= pending 时，加载待认领订单（承运商接口）
+            if (status === 'pending') {
+                const pendingRes = await fetch(`${API_BASE}/api/carrier/orders`, {
+                    credentials: 'include'
+                });
+
+                if (pendingRes.ok) {
+                    const pendingData = await pendingRes.json();
+                    (pendingData.orders || []).forEach(order => {
+                        order.displayType = 'pending_unclaimed';
+                        // 字段标准化（适配 renderOrderList）
+                        order.customer_name = order.receiver_info?.name || '未知客户';
+                        order.customer_phone = order.receiver_info?.phone || '';
+                        order.address = order.receiver_info?.address || '';
+                        order.weight = order.parcel_info?.weight_kg || 0;
+                    });
+                    allOrders = [...(pendingData.orders || []), ...allOrders];
+                }
+            }
+
+            renderOrderList(allOrders, status);
+
+        } catch (error) {
+            console.error('加载订单失败:', error);
+            container.innerHTML = `<p>加载失败: ${error.message || '请重试'}</p>`; // ✅ 停止 loading
+        }
+    }
+
+    // ========== 初始加载 ==========
     bindProfileForm();
     bindNewOrderForm();
-  } catch (error) {
-    console.error('初始化失败:', error);
-    alert('系统初始化失败，请重试或重新登录。');
-    window.location.href = '/pc-tenant/apply.html';
-  }
+
+    // 默认显示 dashboard
+    showMainTab('dashboard-tab');
+
+    // ========== 登出 ==========
+    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await fetch(`${API_BASE}/api/tenant-web/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            window.location.href = '/apply.html';
+        } catch (error) {
+            console.error('登出失败:', error);
+        }
+    });
 });
-
-// ========== 导航切换 ==========
-function bindNavigationEvents() {
-  document.querySelectorAll('.tab-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const tabId = link.getAttribute('data-tab');
-      showMainTab(tabId);
-    });
-  });
-
-  document.querySelectorAll('.sub-tab-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const subTabId = link.getAttribute('data-subtab');
-      showSubTab(subTabId);
-    });
-  });
-
-  document.querySelectorAll('.msg-tab').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const msgTab = link.getAttribute('data-msgtab');
-      showMsgTab(msgTab);
-    });
-  });
-
-  document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
-}
-
-function showMainTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.getElementById(tabId)?.classList.add('active');
-
-  document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
-  document.querySelector(`.tab-link[data-tab="${tabId}"]`)?.classList.add('active');
-
-  if (tabId === 'orders') {
-    showSubTab('pending');
-  } else if (tabId === 'profile') {
-    loadProfileInfo();
-  }
-}
-
-function showSubTab(subTabId) {
-  const mapping = { pending: 'pending-orders', 'in-progress': 'in-progress-orders', settling: 'settling-orders', history: 'history-orders' };
-  const targetId = mapping[subTabId] || 'pending-orders';
-
-  document.querySelectorAll('.sub-tab-content').forEach(el => el.style.display = 'none');
-  document.getElementById(targetId).style.display = 'block';
-
-  document.querySelectorAll('.sub-tab-link').forEach(el => el.classList.remove('active'));
-  document.querySelector(`.sub-tab-link[data-subtab="${subTabId}"]`)?.classList.add('active');
-
-  if (subTabId === 'pending') {
-    loadOrders('pending');
-  } else if (subTabId === 'in-progress') {
-    loadOrders('claimed');
-  } else if (subTabId === 'settling' || subTabId === 'history') {
-    loadOrders('delivered');
-  }
-}
-
-function showMsgTab(msgTab) {
-  const mapping = { 'new-orders': 'new-orders-msg', completed: 'completed-msg', chat: 'chat-msg' };
-  const targetId = mapping[msgTab] || 'new-orders-msg';
-
-  document.querySelectorAll('.msg-content').forEach(el => el.style.display = 'none');
-  document.getElementById(targetId).style.display = 'block';
-
-  document.querySelectorAll('.msg-tab').forEach(el => el.classList.remove('active'));
-  document.querySelector(`.msg-tab[data-msgtab="${msgTab}"]`)?.classList.add('active');
-}
-
-// ========== 租户信息 ==========
-async function loadProfileInfo() {
-  try {
-    const res = await fetch(`${API_BASE}/api/tenant-web/profile`, { credentials: 'include' });
-    if (!res.ok) throw new Error('获取租户信息失败');
-    const data = await res.json();
-
-    document.getElementById('company_name').value = data.name || '';
-    document.getElementById('admin_name').value = data.contact_person || '';
-    document.getElementById('contact_phone').value = data.contact_phone || '';
-    document.getElementById('address_info').value = data.address || '';
-    document.getElementById('license_no').value = data.business_license || '';
-    document.getElementById('join_date').value = data.created_at ? new Date(data.created_at).toLocaleString() : '';
-  } catch (err) {
-    console.error(err);
-    alert('加载租户信息失败');
-  }
-}
-
-function bindProfileForm() {
-  const form = document.getElementById('profileForm');
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const updateData = {
-      contact_person: form.admin_name.value || '',
-      contact_phone: form.contact_phone.value || '',
-      address: form.address_info.value || ''
-    };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/tenant-web/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData),
-        credentials: 'include'
-      });
-
-      if (res.ok) {
-        alert('信息更新成功！');
-        loadProfileInfo();
-      } else {
-        const err = await res.json().catch(() => ({}));
-        alert('更新失败: ' + (err.message || '未知错误'));
-      }
-    } catch (error) {
-      console.error(error);
-      alert('网络错误，请重试');
-    }
-  });
-}
-
-// ========== 新建订单 ==========
-function bindNewOrderForm() {
-  const form = document.getElementById('newOrderForm');
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const customer_name = form.customer_name.value.trim();
-    const customer_phone = form.customer_phone.value.trim();
-    const address = form.address.value.trim();
-    const weight = parseFloat(form.weight.value);
-
-    if (!customer_name || !customer_phone || !address || isNaN(weight) || weight <= 0) {
-      alert('请填写完整且有效的订单信息');
-      return;
-    }
-
-    const orderData = { customer_name, customer_phone, address, weight };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/tenant-web/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-        credentials: 'include'
-      });
-
-      if (res.ok) {
-        alert('新订单创建成功！');
-        form.reset();
-        loadOrders('pending');
-      } else {
-        const err = await res.json().catch(() => ({}));
-        alert('创建失败: ' + (err.error || err.message || '未知错误'));
-      }
-    } catch (error) {
-      console.error('创建订单失败:', error);
-      alert('网络错误，请检查连接后重试');
-    }
-  });
-}
-
-// ========== 订单管理 ==========
-async function loadOrders(status) {
-  try {
-    let allOrders = [];
-
-    const ownRes = await fetch(`${API_BASE}/api/tenant-web/orders?status=${status}`, { credentials: 'include' });
-    if (ownRes.ok) {
-      const ownOrders = await ownRes.json();
-      ownOrders.forEach(order => order.displayType = 'claimed');
-      allOrders = [...ownOrders];
-    }
-
-    if (status === 'pending') {
-      const pendingRes = await fetch(`${API_BASE}/api/tenant-web/orders/pending`, { credentials: 'include' });
-      if (pendingRes.ok) {
-        const pendingOrders = await pendingRes.json();
-        pendingOrders.forEach(order => order.displayType = 'pending_unclaimed');
-        allOrders = [...pendingOrders, ...allOrders];
-      }
-    }
-
-    renderOrderList(allOrders, status);
-  } catch (error) {
-    console.error('加载订单失败:', error);
-    alert('加载订单失败，请重试');
-  }
-}
-
-function renderOrderList(orders, status) {
-  const containerId = {
-    pending: 'pending-orders-list',
-    claimed: 'in-progress-orders-list',
-    delivered: status === 'settling' ? 'settling-orders-list' : 'history-orders-list'
-  }[status] || 'pending-orders-list';
-
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  if (orders.length === 0) {
-    container.innerHTML = '<p>暂无订单</p>';
-    return;
-  }
-
-  const html = orders.map(order => {
-    let actionBtn = '';
-    if (order.displayType === 'pending_unclaimed') {
-      actionBtn = `<button class="btn-claim" data-id="${order.id}">认领订单</button>`;
-    } else if (order.status === 'claimed') {
-      actionBtn = `<button class="btn-complete" data-id="${order.id}">完成订单</button>`;
-    } else if (order.status === 'delivered') {
-      actionBtn = '<span>已完成</span>';
-    }
-
-    return `
-      <div class="order-item">
-        <p><strong>订单号:</strong> ${order.order_number}</p>
-        <p><strong>客户:</strong> ${order.customer_name}</p>
-        <p><strong>电话:</strong> ${order.customer_phone}</p>
-        <p><strong>地址:</strong> ${order.address}</p>
-        <p><strong>重量:</strong> ${order.weight} kg</p>
-        <p><strong>状态:</strong> ${getStatusText(order)}</p>
-        <p>${actionBtn}</p>
-      </div>
-      <hr />
-    `;
-  }).join('');
-
-  container.innerHTML = html;
-
-  container.querySelectorAll('.btn-claim').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = e.target.dataset.id;
-      updateOrderStatus(id, 'claim');
-    });
-  });
-  container.querySelectorAll('.btn-complete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = e.target.dataset.id;
-      updateOrderStatus(id, 'complete');
-    });
-  });
-}
-
-function getStatusText(order) {
-  if (order.displayType === 'pending_unclaimed') return '待认领';
-  if (order.status === 'claimed') return '进行中';
-  if (order.status === 'delivered') return '已完成';
-  return order.status;
-}
-
-async function updateOrderStatus(orderId, action) {
-  const endpoint = action === 'claim' 
-    ? `/api/tenant-web/orders/${orderId}/claim`
-    : `/api/tenant-web/orders/${orderId}/complete`;
-
-  try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      method: 'PUT',
-      credentials: 'include'
-    });
-
-    if (res.ok) {
-      alert(action === 'claim' ? '订单认领成功！' : '订单已完成！');
-      loadOrders('pending');
-    } else {
-      const err = await res.json().catch(() => ({}));
-      alert('操作失败: ' + (err.error || err.message || '未知错误'));
-    }
-  } catch (error) {
-    console.error('更新订单状态失败:', error);
-    alert('网络错误，请重试');
-  }
-}
-
-// ========== 登出 ==========
-async function handleLogout(e) {
-  e.preventDefault();
-  try {
-    await fetch(`${API_BASE}/api/tenant-web/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-  } catch (err) {
-    console.warn('登出请求失败，但仍清除本地状态');
-  }
-  window.location.href = '/pc-tenant/apply.html';
-}

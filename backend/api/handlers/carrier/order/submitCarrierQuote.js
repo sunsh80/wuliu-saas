@@ -1,68 +1,182 @@
-// src/routes/quoteCarrierOrder.js
-const db = require('../../../../db/index.js');
+// backend/api/handlers/carrier/quote/submitCarrierQuote.js
+const { getDb } = require('../../../../db/index.js');
 
-async function quoteCarrierOrder(req, res) {
-  const { order_id } = req.params;
-  const carrierId = req.user.tenantId;
-  const { price, estimated_delivery_time, remarks } = req.body;
-
-  // 验证输入
-  if (!price || price <= 0) {
-    return res.status(400).json({ error: "INVALID_PRICE", message: "报价必须大于0" });
-  }
-
+module.exports = async (c) => { // Use 'c' for consistency with openapi-backend context
   try {
-    // 检查订单是否存在且处于可报价状态
-    const order = await db.get(
-      `SELECT id, status, carrier_id FROM orders WHERE id = ?`,
-      [order_id]
-    );
+    console.log("Handler function 'submitCarrierQuote' called.");
+    console.log("Context received:", c.request.path, c.user); // Log the user context
+
+    // --- CRITICAL FIX: Use c.context?.id instead of req.user ---
+    const userId = c.context?.id; // Get user ID from c.user
+    console.log("Received request to submit quote for user ID:", userId);
+
+    if (!userId) {
+      console.log("User ID not found in context (c.user). Authentication might have failed.");
+      return {
+        status: 401, // Unauthorized
+        body: { success: false, error: 'UNAUTHORIZED' }
+      };
+    }
+
+    // Extract data from the request body
+    const { price, deliveryTime, remarks } = c.request.body;
+
+    // Validate input
+    if (typeof price !== 'number' || price <= 0) {
+      console.log("Invalid price in request body:", price);
+      return {
+        status: 400, // Bad Request
+        body: { success: false, error: 'INVALID_PRICE' }
+      };
+    }
+
+    if (typeof deliveryTime !== 'string' || !deliveryTime.trim()) {
+      console.log("Invalid deliveryTime in request body:", deliveryTime);
+      return {
+        status: 400, // Bad Request
+        body: { success: false, error: 'INVALID_DELIVERY_TIME' }
+      };
+    }
+
+    // Validate remarks if present
+    if (remarks && typeof remarks !== 'string') {
+      console.log("Invalid remarks in request body:", remarks);
+      return {
+        status: 400,
+        body: { success: false, error: 'INVALID_REMARKS' }
+      };
+    }
+
+    // Extract orderId from path parameters
+    const orderId = c.request.params.orderId;
+    if (!orderId) {
+      console.log("Missing order ID in request parameters:", { orderId });
+      return {
+        status: 400, // Bad Request
+        body: { success: false, error: 'MISSING_ORDER_ID' }
+      };
+    }
+
+    const db = getDb(); // Get the database instance
+
+    // Get tenantId from users table using userId (similar to listCarrierOrders)
+    const userRecord = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT tenant_id FROM users WHERE id = ?`,
+        [userId],
+        (err, row) => {
+          if (err) {
+             console.error('Database error fetching tenant_id for quote submission:', err.message);
+             reject(err);
+          } else {
+             resolve(row);
+          }
+        }
+      );
+    });
+ // 直接使用上下文
+if (!c.context.roles.includes('carrier')) {
+  return { status: 403, body: { success: false, error: 'NOT_A_CARRIER' } };
+}
+const carrierTenantId = c.context.tenantId;
+    // Check if order exists and is in 'created' status (or 'claimed' if that's the stage before customer awards)
+    // Adjust the allowed statuses based on your specific business logic for when quotes can be submitted
+    const order = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT id, status FROM orders WHERE id = ? AND status IN ('created', 'claimed')`, // Allow quoting for both created and claimed orders
+        [orderId],
+        (err, row) => {
+          if (err) {
+            console.error('Database error checking order status for quote submission:', err.message);
+            reject(err);
+          } else {
+            resolve(row);
+          }
+        }
+      );
+    });
 
     if (!order) {
-      return res.status(404).json({ error: "ORDER_NOT_FOUND", message: "订单不存在" });
+      console.log("Order not found or not in a status allowing quotes (e.g., 'created', 'claimed'):", orderId);
+      return {
+        status: 404, // Not Found or Conflict
+        body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_QUOTABLE' }
+      };
     }
 
-    if (order.status !== 'created') {
-      return res.status(403).json({ error: "ORDER_NOT_QUOTABLE", message: "订单不可报价" });
+    // Optional: Check if this carrier has already quoted for this order
+    // This depends on whether multiple quotes per carrier per order are allowed
+    const existingQuote = await new Promise((resolve, reject) => {
+      db.get(
+        `SELECT id FROM quotes WHERE order_id = ? AND carrier_id = ?`,
+        [orderId, carrierTenantId],
+        (err, row) => {
+          if (err) {
+            console.error('Database error checking existing quote:', err.message);
+            reject(err);
+          } else {
+            resolve(row);
+          }
+        }
+      );
+    });
+
+    if (existingQuote) {
+      console.log("Carrier (tenantId:", carrierTenantId, ") has already quoted for order:", orderId);
+      return {
+        status: 409, // Conflict
+        body: { success: false, error: 'CARRIER_HAS_ALREADY_QUOTED_FOR_THIS_ORDER' }
+      };
     }
 
-    // 检查是否已被其他承运商认领
-    if (order.carrier_id) {
-      return res.status(403).json({ error: "ALREADY_ASSIGNED", message: "该订单已被其他承运商认领" });
-    }
+    // Insert the quote into the quotes table
+    await new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO quotes (order_id, carrier_id, amount, estimated_delivery_time, remarks, status)
+         VALUES (?, ?, ?, ?, ?, 'pending')`, // Default status for quote is 'pending'
+        [orderId, carrierTenantId, price, deliveryTime, remarks || null], // Use null for empty remarks
+        function (err) {
+          if (err) {
+            console.error('Database error inserting quote:', err.message);
+            reject(err);
+          } else {
+            console.log("Successfully inserted quote for order ID:", orderId, "by carrier ID:", carrierTenantId);
+            resolve();
+          }
+        }
+      );
+    });
 
-    // 更新订单状态为 quoted，并记录报价信息
-    await db.run(
-      `UPDATE orders 
-       SET 
-         status = 'quoted',
-         carrier_id = ?,
-         quote_price = ?,
-         quote_delivery_time = ?,
-         quote_remarks = ?,
-         updated_at = datetime('now')
-       WHERE id = ?`,
-      [carrierId, price, estimated_delivery_time, remarks, order_id]
-    );
+    // Do NOT update the main orders table status here
 
-    // 返回完整订单对象（含新字段）
-    const updatedOrder = await db.get(`
-      SELECT 
-        id, customer_id, carrier_id, tracking_number,
-        sender_info, receiver_info, status, completed_at,
-        created_at, updated_at, volume_m3,
-        required_delivery_time, quote_deadline,
-        quote_price, quote_delivery_time, quote_remarks
-      FROM orders 
-      WHERE id = ?`, 
-      [order_id]
-    );
+    return {
+      status: 201, // Created - Successfully created a quote record
+      body: {
+        success: true,
+        message: 'Quote submitted successfully',
+        data: {
+            orderId: parseInt(orderId, 10), // Ensure numeric type
+            quote: {
+                price: price,
+                deliveryTime: deliveryTime,
+                remarks: remarks || null
+            },
+            carrierId: carrierTenantId
+        }
+      }
+    };
 
-    res.json(updatedOrder);
-  } catch (err) {
-    console.error('Quote order error:', err);
-    res.status(500).json({ error: "INTERNAL_ERROR", message: "操作失败" });
+  } catch (error) {
+    console.error('Error in submitCarrierQuote:', error);
+    console.error('Error stack:', error.stack);
+
+    return {
+      status: 500,
+      body: {
+        success: false,
+        error: 'INTERNAL_SERVER_ERROR',
+        // message: error.message
+      }
+    };
   }
-}
-
-module.exports = quoteCarrierOrder;
+};

@@ -1,80 +1,93 @@
 // pages/my/my.js
-const BASE_URL = 'http://localhost:3000/api';
 
-function apiRequest(url, options = {}) {
-  const token = wx.getStorageSync('token');
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: BASE_URL + url,
-      method: options.method || 'GET',
-      data: options.data,
-      header: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else {
-          reject(new Error(res.data?.message || `请求失败 (${res.statusCode})`));
-        }
-      },
-      fail: () => reject(new Error('网络错误')),
-    });
-  });
-}
+// 注意：BASE_URL 和 apiRequest 函数在此文件中似乎未被使用，如果确实不需要，可以考虑删除。
+// 如果未来需要调用租户相关的 API，可能需要调整 BASE_URL 和 token 的获取方式。
+// const BASE_URL = 'http://localhost:3000/api';
+
+// function apiRequest(url, options = {}) { 
+//   const token = wx.getStorageSync('token'); 
+//   return new Promise((resolve, reject) => { 
+//     wx.request({ 
+//       url: BASE_URL + url, 
+//       method: options.method || 'GET', 
+//       data: options.data, 
+//       header: { 
+//         'Content-Type': 'application/json', 
+//         ...(token ? { Authorization: `Bearer ${token}` } : {}), 
+//       }, 
+//       success: (res) => { 
+//         if (res.statusCode >= 200 && res.statusCode < 300) { 
+//           resolve(res.data); 
+//         } else { 
+//           reject(new Error(res.data?.message || `请求失败 (${res.statusCode})`)); 
+//         } 
+//       }, 
+//       fail: () => reject(new Error('网络错误')), 
+//     }); 
+//   }); 
+// }
 
 Page({
   data: {
     userInfo: null,
     userLoggedIn: false
   },
-
+  
   onLoad() {
     this.checkLoginStatus();
   },
-
+  
   onShow() {
     this.checkLoginStatus();
   },
 
   checkLoginStatus() {
-    const token = wx.getStorageSync('token');
+    // 检查是否已登录 (兼容新旧两种登录方式)
+    // 方案一：只要 isLoggedIn 为 true 且 userInfo 存在，就认为已登录
+    const isLoggedIn = wx.getStorageSync('isLoggedIn');
     const userInfo = wx.getStorageSync('userInfo');
-    const isLoggedIn = wx.getStorageSync('isLoggedIn'); // 兼容 session 登录
 
-    if ((token || isLoggedIn) && userInfo) {
-      this.setData({ userInfo, userLoggedIn: true });
+    if (isLoggedIn && userInfo) {
+      this.setData({
+        userInfo: userInfo,
+        userLoggedIn: true
+      });
     } else {
-      this.setData({ userInfo: null, userLoggedIn: false });
+      // 方案二：如果需要兼容旧的 token 登录方式，可以这样检查
+      // const token = wx.getStorageSync('token');
+      // if ((token || isLoggedIn) && userInfo) { 
+      //   this.setData({
+      //     userInfo: userInfo,
+      //     userLoggedIn: true
+      //   });
+      // } else {
+      //   this.setData({
+      //     userInfo: null,
+      //     userLoggedIn: false
+      //   });
+      // }
+      this.setData({
+        userInfo: null,
+        userLoggedIn: false
+      });
     }
   },
 
-  // 微信登录（保留）
-  async handleLogin() {
-    wx.showLoading({ title: '微信登录中...' });
-    try {
-      const code = (await wx.login()).code;
-      const res = await apiRequest('/users/wxlogin', {
-        method: 'POST',
-        data: { code }
-      });
+  // --- 移除或修改微信登录逻辑 ---
+  // 如果不再使用微信登录，可以移除此函数，或将其改为跳转到登录页
+  // handleLogin() {
+  //   wx.navigateTo({
+  //     url: '/pages/login/login', // 跳转到登录页面
+  //   });
+  // }
 
-      if (res.token && res.user) {
-        wx.setStorageSync('token', res.token);
-        wx.setStorageSync('userInfo', res.user);
-        wx.setStorageSync('isLoggedIn', true);
-        this.setData({ userInfo: res.user, userLoggedIn: true });
-        wx.showToast({ title: '登录成功', icon: 'success' });
-        setTimeout(() => wx.navigateBack(), 1000);
-      } else {
-        throw new Error('登录失败');
-      }
-    } catch (err) {
-      wx.showToast({ title: err.message || '微信登录失败', icon: 'none' });
-    } finally {
-      wx.hideLoading();
-    }
+  // 保持登录状态检查
+  handleLogin() {
+     // 如果仍有微信登录的需求，保留原逻辑；否则，改为导航到新登录页
+     // 例如，跳转到登录选择页
+     wx.navigateTo({
+       url: '/pages/login/login', // 跳转到新的邮箱/手机号登录页
+     });
   },
 
   handleLogout() {
@@ -83,11 +96,20 @@ Page({
       content: '确定要退出登录吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.removeStorageSync('token');
-          wx.removeStorageSync('userInfo');
-          wx.removeStorageSync('isLoggedIn');
-          this.setData({ userInfo: null, userLoggedIn: false });
-          wx.showToast({ title: '已登出', icon: 'success' });
+          // 清除所有登录相关的缓存
+          wx.removeStorageSync('token');        // 清除旧的 token
+          wx.removeStorageSync('userInfo');     // 清除用户信息
+          wx.removeStorageSync('isLoggedIn');   // 清除登录状态标记
+
+          this.setData({
+            userInfo: null,
+            userLoggedIn: false
+          });
+          
+          wx.showToast({
+            title: '已登出',
+            icon: 'success'
+          });
         }
       }
     });

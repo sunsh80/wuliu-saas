@@ -2,15 +2,33 @@
 <view class="container">
   <text class="title">用户登录</text>
 
-  <view class="form-item">
-    <text>用户名:</text>
-    <input placeholder="请输入用户名" value="{{username}}" bindinput="bindUsernameInput"/>
+  <!-- 登录方式切换按钮 -->
+  <view class="login-method-toggle">
+    <view class="method-btn {{data.loginMethod === 'email' ? 'active' : ''}}" data-method="email" bindtap="toggleLoginMethod">邮箱登录</view>
+    <view class="method-btn {{data.loginMethod === 'phone' ? 'active' : ''}}" data-method="phone" bindtap="toggleLoginMethod">手机号登录</view>
   </view>
 
+  <!-- 条件渲染：邮箱输入框 -->
+  <view class="form-item" wx:if="{{data.loginMethod === 'email'}}">
+    <text>邮箱:</text>
+    <input placeholder="请输入邮箱" value="{{data.email}}" bindinput="bindEmailInput"/>
+  </view>
+
+  <!-- 条件渲染：手机号输入框 -->
+  <view class="form-item" wx:elif="{{data.loginMethod === 'phone'}}">
+    <text>手机号:</text>
+    <input placeholder="请输入手机号" value="{{data.phone}}" bindinput="bindPhoneInput"/>
+  </view>
+
+  <!-- 密码输入框 (始终显示) -->
   <view class="form-item">
     <text>密码:</text>
-    <input type="password" placeholder="请输入密码" value="{{password}}" bindinput="bindPasswordInput"/>
+    <input type="password" placeholder="请输入密码" value="{{data.password}}" bindinput="bindPasswordInput"/>
   </view>
 
+  <!-- 登录按钮 -->
   <button class="login-btn" bindtap="login">登录</button>
+
+  <!-- 注册链接 -->
+  <navigator url="/pages/register/register" class="register-link">还没有账号？立即注册</navigator>
 </view>

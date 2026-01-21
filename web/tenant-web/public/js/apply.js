@@ -31,13 +31,15 @@ async function handleApplySubmit(e) {
     contact_person: form.querySelector('input[name="contact_person"]').value.trim(),
     contact_phone: form.querySelector('input[name="contact_phone"]').value.trim(),
     address: form.querySelector('input[name="address"]').value.trim(),
+    address: form.querySelector('input[name="email"]').value.trim(),
     business_license: form.querySelector('input[name="business_license"]').value.trim(),
     license_file: form.querySelector('input[name="license_file"]')?.value.trim() || '',
     other_files: form.querySelector('input[name="other_files"]')?.value.trim() || '',
-    password: form.querySelector('input[name="password"]').value
+    password: form.querySelector('input[name="password"]').value,
+    roles: ['carrier']
   };
 
-  const requiredFields = ['name', 'contact_person', 'contact_phone', 'address', 'business_license', 'password'];
+  const requiredFields = [{ name, contact_person, contact_phone, email, password, roles }];
   for (const field of requiredFields) {
     if (!data[field]) {
       alert('所有带 * 的字段都是必填的');

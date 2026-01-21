@@ -14,7 +14,7 @@
 | `/api/admin/users` | `POST` | `createAdminUser` | `api/handlers/misc/createAdminUser.js` |
 | `/api/admin/tenants/pending` | `GET` | `listPendingTenants` | `api/handlers/misc/listPendingTenants.js` |
 | `/api/admin/tenants/{id}/approve` | `PUT` | `approveTenant` | `api/handlers/misc/approveTenant.js` |
-| `/api/admin/tenants/{id}/reject` | `PUT` | `rejectTenantById` | `api/handlers/misc/rejectTenantById.js` |
+| `/api/admin/tenants/{id}/reject` | `PUT` | `rejectTenant` | `api/handlers/misc/rejectTenant.js` |
 | `/api/admin/orders` | `GET` | `listAdminOrders` | `api/handlers/misc/listAdminOrders.js` |
 | `/api/admin/orders/{order_id}/status` | `PUT` | `updateOrderStatus` | `api/handlers/misc/updateOrderStatus.js` |
 | `/api/public/orders` | `POST` | `createPublicOrder` | `api/handlers/public/createPublicOrder.js` |

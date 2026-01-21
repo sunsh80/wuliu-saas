@@ -2,15 +2,20 @@ openapi: 3.0.3
 info:
   title: 多租户物流平台 API
   version: 1.0.2-safe
+    技术栈:Node.js + Express + SQLite + OpenAPI Backend
+    认证机制:express-session(基于 Cookie 的会话）
+    安全模型：通过 TenantSessionAuth 安全处理器校验 req.session.userId
+    多租户支持:tenants 表存储租户,users 表存储租户员工 & 小程序顾客
   description: |
     支持客户（下单方）与承运方（接单方）双角色的物流订单系统。
     - `/api/admin/...`：平台管理员
     - `/api/customer/...`：客户租户
     - `/api/carrier/...`：承运方租户
     - `/api/public/...`：公共接口
-    🔹 本次增容（v1.0.2-safe）：
+    🔹 本次增容(v1.0.2-safe):
     - 保留所有 v1.0.1 字段、路由、状态不变
     - 新增承运方能力画像（可选）
+    - 租户本身可以在一定条件下转变为承运方，客户，仓库实体
     - 新增体积、时效等可选字段
     - 新增匹配相关接口（不改动原有 claim/award 流程）
 servers:
@@ -450,59 +455,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: 内部服务器错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
 paths:
-  /api/mp/orders:
-    post:
-      summary: 小程序匿名下单
-      operationId: createMpOrder
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                sender_name:
-                  type: string
-                sender_phone:
-                  type: string
-                sender_address:
-                  type: string
-                receiver_name:
-                  type: string
-                receiver_phone:
-                  type: string
-                receiver_address:
-                  type: string
-                goods_desc:
-                  type: string
-                weight_kg:
-                  type: number
-                remark:
-                  type: string
-              required:
-                - sender_name
-                - sender_phone
-                - receiver_name
-                - receiver_phone
-      responses:
-        '201':
-          description: 订单创建成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  tracking_code:
-                    type: string
-                  status:
-                    type: string
-        '400':
-          description: 请求参数错误
-
   /api/admin/tenants:
     get:
       tags:
@@ -771,107 +731,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/pc/tenants/apply:
-    post:
-      operationId: applyPcTenant
-      summary: 租户入驻申请
-      description: 新租户提交入驻申请，创建新租户账户
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - contact_person
-                - contact_phone
-                - email
-                - password
-                - roles
-              properties:
-                name:
-                  type: string
-                  description: 公司名称
-                contact_person:
-                  type: string
-                  description: 联系人姓名
-                contact_phone:
-                  type: string
-                  description: 联系电话
-                email:
-                  type: string
-                  description: 邮箱地址
-                password:
-                  type: string
-                  minLength: 6
-                  description: 密码（至少6位）
-                roles:
-                  type: array
-                  items:
-                    type: string
-                    enum: [customer, carrier]
-                  description: 角色列表
-                address:
-                  type: string
-                  description: 公司地址
-      responses:
-        '201':
-          description: 租户创建成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: 租户ID
-                  name:
-                    type: string
-                  contact_person:
-                    type: string
-                  contact_phone:
-                    type: string
-                  email:
-                    type: string
-                  roles:
-                    type: array
-                    items:
-                      type: string
-                  address:
-                    type: string
-                  created_at:
-                    type: string
-                    format: date-time
-        '400':
-          description: 请求参数不完整或格式错误
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  error:
-                    type: string
-                    example: MISSING_REQUIRED_FIELDS
-        '409':
-          description: 邮箱已存在
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  error:
-                    type: string
-                    example: EMAIL_ALREADY_REGISTERED
-        '500':
-          description: 服务器内部错误
-
   /api/health:
     get:
       summary: 健康检查
@@ -900,6 +759,8 @@ paths:
     post:
       summary: 将订单绑定到客户（通过手机号）
       operationId: bindOrderToCustomer
+      security:
+       []
       requestBody:
         required: true
         content:
@@ -1156,6 +1017,7 @@ paths:
         - admin-auth
       summary: 平台管理员登录
       operationId: adminLogin
+      security: []
       requestBody:
         required: true
         content:
@@ -1174,7 +1036,7 @@ paths:
                   example: "SecurePass123!"
       responses:
         '200':
-          description: 登录成功，Set-Cookie 自动设置 session
+          description: 登录成功,Set-Cookie 自动设置 session
         '401':
           description: 用户名或密码错误
           content:
@@ -1307,6 +1169,7 @@ paths:
     put:
       tags:
         - admin-tenant
+      summary: 批准租户申请
       operationId: approveTenant
       security:
         - AdminSessionAuth: []
@@ -1338,7 +1201,8 @@ paths:
     put:
       tags:
         - admin-tenant
-      operationId: rejectTenantById
+      summary: 拒绝租户申请
+      operationId: rejectTenant
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1388,15 +1252,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderListResponse'
 
-  /api/admin/orders/{order_id}/status:
+  /api/admin/orders/{id}/status:
     put:
       tags:
         - admin-order
+      summary: 总后台调度订单
       operationId: updateOrderStatus
       security:
         - AdminSessionAuth: []
       parameters:
-        - name: order_id
+        - name: id
           in: path
           required: true
           schema:
@@ -1412,7 +1277,7 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
+                  enum: [pending,pending_claim, available,created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
                   example: "cancelled"
       responses:
         '200':
@@ -1495,7 +1360,7 @@ paths:
     get:
       tags:
         - carrier-order
-      summary: 获取可认领的订单列表（状态=created）
+      summary: 获取可认领的订单列表（状态=pending_claim)
       operationId: listCarrierOrders
       security:
         - TenantSessionAuth: []
@@ -1512,17 +1377,17 @@ paths:
   /api/carrier/orders/{order_id}/claim:
     put:
       tags:
-        - carrier
+        - carrier-order
       summary: 承运商认领订单
       operationId: claimCarrierOrder
       security:
-        - CarrierSessionAuth: []
+        - TenantSessionAuth: []
       parameters:
         - name: order_id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
           description: 订单唯一标识（如 tracking_number 或系统 ID）
       responses:
         '200':
@@ -1560,29 +1425,54 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/carrier/orders/{order_id}/quote:
+  /api/carrier/orders/{orderId}/quote:
     post:
-      tags:
-        - carrier-order
-      summary: 承运方对订单提交报价
       operationId: submitCarrierQuote
+      summary: 承运商为指定订单提交报价
+      description: |
+        承运商提交一个报价（价格、预计送达时间、备注）给指定的订单。
+        此操作不会改变订单的主状态(status)报价信息将存储在 quotes 表中。
+        订单状态的变更将在后续的客户选择或平台指派环节发生。
+      tags:
+        - Carrier
+        - Quote
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: order_id
+        - name: orderId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+          description: 要报价的订单ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/QuoteRequest'
+              type: object
+              properties:
+                price:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  description: 报价金额
+                  example: 150.75
+                deliveryTime:
+                  type: string
+                  description: 预计送达时间 (ISO 8601 格式或自定义格式)
+                  example: "2024-05-25T18:00:00Z"
+                remarks:
+                  type: string
+                  maxLength: 500
+                  description: 报价备注
+                  example: "可加急，但需额外费用"
+              required:
+                - price
+                - deliveryTime
       responses:
         '201':
-          description: 报价成功
+          description: 报价提交成功
           content:
             application/json:
               schema:
@@ -1591,14 +1481,71 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  quote_id:
+                  message:
                     type: string
+                    example: "Quote submitted successfully"
+                  data:
+                    type: object
+                    properties:
+                      orderId:
+                        type: integer
+                        example: 123
+                      quote:
+                        type: object
+                        properties:
+                          price:
+                            type: number
+                            format: float
+                            example: 150.75
+                          deliveryTime:
+                            type: string
+                            example: "2024-05-25T18:00:00Z"
+                          remarks:
+                            type: string
+                            example: "可加急，但需额外费用"
+                      carrierId:
+                        type: integer
+                        example: 456
         '400':
           description: 请求参数错误
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          $ref: '#/components/responses/NotFoundError'
+          description: 订单未找到或不允许报价
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 承运商已为此订单提交过报价
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+         $ref: '#/components/responses/InternalServerError'
+
+# ... (schemas, securitySchemes, responses remain unchanged)
+# If you don't have an Error schema defined, add it under components/schemas:
+#   Error:
+#     type: object
+#     properties:
+#       success:
+#         type: boolean
+#         example: false
+#       error:
+#         type: string
+#         example: "ERROR_CODE"
+#       message:
+#         type: string
+#         example: "Human-readable error message" # Optional
+#     required:
+#       - success
+#       - error
 
   /api/customer/orders/{order_id}/award:
     post:
@@ -1647,32 +1594,163 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
+  /api/tenant-web/register:
+    post:
+      tags:
+        - auth # 可以归类到 auth，或者新建一个 'registration' tag
+      summary: 租户/客户注册
+      operationId: registerTenantWeb
+      description: 新租户或客户提交注册信息，创建账户。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantApplication' # 复用已定义的 TenantApplication
+      responses:
+        '201':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Tenant registered successfully"
+                  data:
+                    type: object
+                    description: "可选：返回新创建的租户信息或登录凭据"
+                    properties:
+                      tenant_id:
+                        type: string
+                        example: "tenant_abc123"
+                      # 如果注册后自动登录，也可以返回 sessionData 或 token
+                      # sessionData:
+                      #   type: object
+                      #   description: "Session 数据，由 server.js 处理"
+                      #   properties: ...
+        '400':
+          description: 请求参数不完整或格式错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 邮箱或手机号已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/tenant-web/login:
     post:
       tags:
         - auth
-      summary: 租户登录
+      summary: 租户登录/客户登录
       operationId: loginTenantWeb
+      description: |
+        租户或客户使用邮箱或手机号登录。
+        - 请求体必须包含 `email` 或 `phone` 中的 **任意一个**，以及 `password`。
+        - 示例 1: { "email": "user@example.com", "password": "..." }
+        - 示例 2: { "phone": "13800138000", "password": "..." }
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - email
-                - password
+              # 移除原有的强制要求 email 和 password 的 required 数组
+              # required:
+              #   - email
+              #   - password
               properties:
                 email:
                   type: string
                   format: email
+                  description: "租户/客户注册邮箱"
+                  example: "user@example.com"
+                phone:
+                  type: string
+                  pattern: '^1[3-9]\\d{9}$' # 中国手机号格式
+                  description: "租户/客户注册手机号"
+                  example: "13800138000"
                 password:
                   type: string
+                  description: "登录密码"
+                  example: "SecurePassword123!"
+              # 仅在此处标记 password 为必需，email 和 phone 由后端逻辑校验
+              required:
+                - password
       responses:
         '200':
           description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login successful"
+                  data:
+                    type: object
+                    properties:
+                      tenant_id:
+                        type: string
+                        example: "tenant_12345"
+                      name:
+                        type: string
+                        example: "Example Tenant"
+                      roles:
+                        type: array
+                        items:
+                          type: string
+                          enum: [customer, carrier]
+                        example: ["customer"]
+                      # ... 可能还有其他字段，如 token (如果使用 JWT) 等
+                    required:
+                      - tenant_id
+                      - name
+                      - roles
+        '400':
+          description: 请求参数错误 (缺少 email 或 phone，或格式错误)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Either email or phone must be provided along with password."
         '401':
-          description: 邮箱或密码错误
+          description: 邮箱或密码错误 / 手机号或密码错误 / 账户未激活
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid credentials" # 或 "Account is not active..."
 
   /api/tenant-web/profile:
     get:
@@ -1780,19 +1858,104 @@ paths:
 
   /api/pc-tenant/apply:
     post:
-      tags:
-        - auth
-      summary: 租户入驻申请
       operationId: applyPcTenant
+      summary: 租户入驻申请
+      description: 新租户提交入驻申请，创建新租户账户
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TenantApplication'
+              type: object
+              required:
+                - name
+                - contact_person
+                - contact_phone
+                - email
+                - password
+                - roles
+              properties:
+                name:
+                  type: string
+                  description: 公司名称
+                contact_person:
+                  type: string
+                  description: 联系人姓名
+                contact_phone:
+                  type: string
+                  description: 联系电话
+                email:
+                  type: string
+                  description: 邮箱地址
+                password:
+                  type: string
+                  minLength: 6
+                  description: 密码（至少6位）
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum: [customer, carrier]
+                  description: 角色列表
+                address:
+                  type: string
+                  description: 公司地址
       responses:
         '201':
-          description: 申请提交成功
+          description: 租户创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 租户ID
+                  name:
+                    type: string
+                  contact_person:
+                    type: string
+                  contact_phone:
+                    type: string
+                  email:
+                    type: string
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  address:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: 请求参数不完整或格式错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: MISSING_REQUIRED_FIELDS
+        '409':
+          description: 邮箱已存在
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: EMAIL_ALREADY_REGISTERED
+        '500':
+          description: 服务器内部错误
 
   /api/tenant-web/orders/pending:
     get:

@@ -1,14 +1,16 @@
-// api/handlers/tenant-management/approveTenantById.js
+// api/handlers/tenants/rejectTenant.js 
 const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
-  const tenantId = c.request.params.id;
+  const { id } = c.request.params;
+  const { notes } = c.request.body;
+
   const database = getDb();
 
   const result = await database.run(
-    `UPDATE tenants SET status = 'approved', approved_at = datetime('now') 
+    `UPDATE tenants SET status = 'rejected', rejected_at = datetime('now'), rejection_notes = ? 
      WHERE id = ? AND status = 'pending'`,
-    [tenantId]
+    [notes, id]
   );
 
   if (result.changes === 0) {
@@ -20,6 +22,6 @@ module.exports = async (c) => {
 
   return {
     status: 200,
-    body: { success: true, message: 'Tenant approved successfully' }
+    body: { success: true, message: 'Tenant rejected successfully' }
   };
 };

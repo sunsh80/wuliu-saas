@@ -1,17 +1,13 @@
 // api/handlers/customer/order/updateCustomerOrder.js
 const { getDb } = require('../../../../db/index.js');
 
-module.exports = async (c) => {
+module.exports = async (c, req, res) => {
   try {
     const db = getDb();
-    const userId = c.request.session?.userId;
+    const userId = c.context?.id; // 👈 来自 session
+
     const orderId = c.request.params?.id;
     const updates = c.request.body;
-
-    // 🔒 验证登录
-    if (!userId) {
-      return { statusCode: 401, body: { success: false, error: 'Unauthorized' } };
-    }
 
     // 📥 验证订单 ID
     if (!orderId || typeof orderId !== 'string') {
@@ -30,7 +26,10 @@ module.exports = async (c) => {
           if (!validStatuses.includes(updates.status)) {
             return {
               statusCode: 400,
-              body: { success: false, error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
+              body: {
+                success: false,
+                error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
+              },
             };
           }
         } else if (typeof updates[field] !== 'string') {
@@ -47,7 +46,10 @@ module.exports = async (c) => {
     if (!hasValidUpdate) {
       return {
         statusCode: 400,
-        body: { success: false, error: 'At least one updatable field (status, receiver_info, sender_info) must be provided' },
+        body: {
+          success: false,
+          error: 'At least one updatable field (status, receiver_info, sender_info) must be provided',
+        },
       };
     }
 
@@ -74,29 +76,20 @@ module.exports = async (c) => {
     const values = [...Object.values(updateFields), new Date().toISOString(), orderId, organization_id];
 
     await db.run(
-      `UPDATE orders
-       SET ${setClause}, updated_at = ?
-       WHERE id = ? AND organization_id = ?`,
+      `UPDATE orders SET ${setClause}, updated_at = ? WHERE id = ? AND organization_id = ?`,
       values
     );
 
     // ✅ 返回成功
     return {
       statusCode: 200,
-      body: {
-        success: true,
-        message: 'Order updated successfully',
-      },
+      body: { success: true, message: 'Order updated successfully' },
     };
   } catch (error) {
     console.error('Error in updateCustomerOrder:', error);
     return {
       statusCode: 500,
-      body: {
-        success: false,
-        error: 'Failed to update order',
-        details: error.message,
-      },
+      body: { success: false, error: 'Failed to update order', details: error.message },
     };
   }
 };

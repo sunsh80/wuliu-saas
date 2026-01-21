@@ -1103,3 +1103,77 @@ ALTER TABLE users_new RENAME TO users;
     *   ✅ Session set in server.js for user:  Tenant: 1 中的  应该是一个数字。
 
 完成这个修复后，Session 应该就能正确设置了。请尝试并反馈结果。
+
+https://github.com/sunsh80/wuliu-saas.git。
+好的，要将本地的 Git 提交推送到远程仓库（比如 GitHub、GitLab 或其他 Git 服务商），你需要知道你的远程仓库地址。
+
+查找远程仓库地址的方法：
+
+在你的项目根目录（也就是包含 .git 文件夹的地方）打开终端/命令行，然后运行：
+
+git remote -v
+
+这个命令会列出所有配置的远程仓库名称及其对应的 URL 地址。
+
+输出通常看起来像这样：
+
+origin	https://github.com/你的用户名/你的仓库名.git (fetch)
+origin	https://github.com/你的用户名/你的仓库名.git (push)
+upstream	https://github.com/原作者/原仓库名.git (fetch)
+upstream	https://github.com/原作者/原仓库名.git (push)
+
+*   origin 是默认的远程仓库名称（通常是你自己 Fork 的仓库，或者是直接克隆的仓库）。
+*   upstream 通常是上游原始仓库的名称（如果你是基于别人的项目进行开发）。
+*   (fetch) 和 (push) 分别表示用于拉取和推送的 URL。
+
+如何推送：
+
+1.  确定推送目标： 通常情况下，你会将更改推送到 origin。
+2.  执行推送命令： 使用 git push 命令，并指定远程仓库名和分支名。例如，如果你要推送到名为 origin 的远程仓库的 main 分支：
+        git push origin main
+    
+    如果你的默认分支是 master，则命令是：
+        git push origin master
+    
+    如果你不确定分支名，可以用 git branch 查看本地分支，用 git remote show origin 查看远程分支信息。
+
+运行 git remote -v 看看你的远程仓库地址吧。
+
+| 维度 | 小程序端注册<br>`/api/tenant-web/register`<br>（`registerTenantWeb.js`） | PC 端注册<br>`/api/tenant-pc/apply`<br>（`applyPcTenant.js`） |
+|------|--------------------------------------------------|--------------------------------------------------|
+| 目标用户 | 终端个人用户（如货主、司机等） | 企业/组织（货主公司、承运商公司） |
+| 使用场景 | 小程序内快速注册，立即使用 | PC 网站提交正式入驻申请 |
+| 审核机制 | ✅ 无需审核，注册即激活 | ⚠️ 承运商需审核，货主可直通 |
+| 用户类型 (`user_type`) | `'user'`（普通用户） | `'tenant_user'`（租户关联用户） |
+| 所属租户 | 可能属于平台默认租户，或自动创建轻量租户 | 明确创建新租户（`tenants` 表记录） |
+| 激活状态 (`is_active`) | `1`（始终激活） | `1`（货主） / `0`（承运商，待审核） |
+| 字段校验 | 较轻量（手机号、验证码等） | 较完整（企业名称、联系人、资质等） |
+| 前端入口 | 微信小程序 | PC 浏览器网页 |
+
+但你的 OpenAPI 安全方案是 Session 认证！
+
+等客户侧完全稳定后，再统一迁移管理员登录到 Session，最后一次性删除 jsonwebtoken。
+
+| 身份类型 | 注册方式 | 审批 | 登录后身份 | 存储位置 | 是否有 `userId` |
+|--------|--------|-----|----------|--------|----------------|
+| 匿名客户（小程序） | 小程序注册（`/api/tenant-web/register`） | ❌ 无需审批 | `user` | `users` 表 | ✅ 有 `userId` |
+| 租户（PC 端） | PC 后台注册（`/api/tenant-web/register`） | ✅ 需审批 | `admin` / `manager` 等 | `users` 表 + `tenants` 表 | ✅ 有 `userId` |
+
+| 文件 | 路径（推测） | 功能 | 是否租户登录 |
+|------|-------------|------|------------|
+| `loginTenantWeb.js` | `/api/tenant-web/login` | 租户员工邮箱+密码登录 | ✅ 是 |
+| `registerTenantWeb.js` | `/api/tenant-web/register` | 租户注册（已审核通过后的账号创建） | ❌ 否 |
+| `applyPcTenant.js` | `/api/pc-tenant/apply` | 新租户入驻申请（提交资料等待审核） | ❌ 否 |
+| `getTenantProfile.js` | `/api/tenant-web/profile` | 获取租户信息（登录后使用） | ❌ 否 |
+| `getTenantRoles.js` | `/api/tenant-web/roles` | 获取角色（未实现） | ❌ 否 |
+
+|| 文件 | 功能 | 状态要求 | 输出 |
+|------|------|----------|------|
+| `claimCarrierOrder.js` | 认领订单 | `created` | `status=claimed` |
+| `submitCarrierQuote.js` | 提交报价 | `created/claimed` | 新增 `quotes` 记录 |
+| `completeCarrierOrder.js` | 完成订单 | `in_transit` | `status=delivered` |
+
+订单池当中，总后台对订单进行调度，改变订单状态的这个条件没有进行设定。
+
+
+

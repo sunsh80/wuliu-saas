@@ -3,13 +3,18 @@
   <view class="user-section">
     <block wx:if="{{userLoggedIn}}">
       <view class="user-info">
-        <text class="name">你好, {{userInfo.name || '用户'}}</text>
-        <text class="phone">{{userInfo.phone || '未绑定手机'}}</text>
+        <!-- 尝试从 userInfo 中获取更具体的名字或邮箱 -->
+        <text class="name">你好, {{userInfo.name || userInfo.email || '用户'}}</text>
+        <!-- 如果 userInfo 中包含 contact_phone，也可以显示 -->
+        <!-- <text class="phone">{{userInfo.contact_phone || userInfo.phone || '未绑定手机'}}</text> -->
+        <!-- 或者根据租户信息显示 -->
+        <text class="tenant-name">租户: {{userInfo.name || '未知租户'}}</text>
       </view>
       <button class="logout-btn" bindtap="handleLogout">退出登录</button>
     </block>
     <block wx:else>
-      <button class="login-btn" bindtap="handleLogin">微信一键登录</button>
+      <!-- 修改按钮文本和行为 -->
+      <button class="login-btn" bindtap="handleLogin">登录/注册</button>
     </block>
   </view>
 
