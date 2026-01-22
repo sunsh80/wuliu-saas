@@ -3,7 +3,7 @@ const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
   const { id } = c.request.params;
-  const { status, tenant_id } = c.request.body; // ← 解构 tenant_id
+  const { status, tenant_id, carrier_id } = c.request.body; // ← 解构 tenant_id 和 carrier_id
 
   // 🔧 扩展状态白名单（包含 pending_claim）
   const validStatuses = [
@@ -25,21 +25,39 @@ module.exports = async (c) => {
   let result;
 
   try {
-    if (tenant_id !== undefined) {
-      // ✅ 同时更新 status 和 tenant_id
+    if (carrier_id !== undefined && tenant_id !== undefined) {
+      // ✅ 同时更新 status、tenant_id 和 carrier_id（管理员指派给特定承运商）
+      console.log(`[updateOrderStatus] Updating order ${id} to status=${status}, tenant_id=${tenant_id}, carrier_id=${carrier_id}`);
+      result = await database.run(
+        `UPDATE orders
+         SET status = ?, tenant_id = ?, carrier_id = ?, updated_at = datetime('now')
+         WHERE id = ?`,
+        [status, tenant_id, carrier_id, id]
+      );
+    } else if (tenant_id !== undefined) {
+      // ✅ 同时更新 status 和 tenant_id（仅更新租户，不指定承运商）
       console.log(`[updateOrderStatus] Updating order ${id} to status=${status}, tenant_id=${tenant_id}`);
       result = await database.run(
-        `UPDATE orders 
-         SET status = ?, tenant_id = ?, updated_at = datetime('now') 
+        `UPDATE orders
+         SET status = ?, tenant_id = ?, updated_at = datetime('now')
          WHERE id = ?`,
         [status, tenant_id, id]
       );
+    } else if (carrier_id !== undefined) {
+      // ✅ 同时更新 status 和 carrier_id（仅更新承运商）
+      console.log(`[updateOrderStatus] Updating order ${id} to status=${status}, carrier_id=${carrier_id}`);
+      result = await database.run(
+        `UPDATE orders
+         SET status = ?, carrier_id = ?, updated_at = datetime('now')
+         WHERE id = ?`,
+        [status, carrier_id, id]
+      );
     } else {
       // ✅ 仅更新 status（如取消订单）
-      console.log(`[updateOrderStatus] Updating order ${id} to status=${status} (no tenant change)`);
+      console.log(`[updateOrderStatus] Updating order ${id} to status=${status} (no tenant/carrier change)`);
       result = await database.run(
-        `UPDATE orders 
-         SET status = ?, updated_at = datetime('now') 
+        `UPDATE orders
+         SET status = ?, updated_at = datetime('now')
          WHERE id = ?`,
         [status, id]
       );

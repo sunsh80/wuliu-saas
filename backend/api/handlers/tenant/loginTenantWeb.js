@@ -11,10 +11,10 @@ module.exports = async (c) => {
     if (email && password) {
       console.log('🔐 尝试租户登录:', email);
       const user = await db.get(`
-        SELECT u.id, u.email, u.password_hash, u.tenant_id, t.name AS tenant_name, t.roles, t.status AS tenant_status
+        SELECT u.id, u.email, u.password_hash, u.tenant_id, u.roles, u.role, t.name AS tenant_name, t.roles AS tenant_roles, t.status AS tenant_status
         FROM users u
         LEFT JOIN tenants t ON u.tenant_id = t.id
-        WHERE u.email = ? AND u.user_type = 'tenant_user' AND t.status = 'active'
+        WHERE u.email = ? AND u.user_type = 'tenant_user'
       `, [email.toLowerCase().trim()]);
 
       if (!user) {
@@ -34,11 +34,64 @@ module.exports = async (c) => {
         };
       }
 
+      // 设置会话信息 - 这是关键修复
+      if (!c.request.session) {
+        console.error('❌ 会话对象不存在');
+        return {
+          statusCode: 500,
+          body: { success: false, error: 'SESSION_ERROR' }
+        };
+      }
+      c.request.session.userId = user.id;
+      c.request.session.tenantId = user.tenant_id;
+      c.request.session.userType = 'tenant_user'; // 添加用户类型
+      console.log('🔐 会话已设置:', { userId: user.id, tenantId: user.tenant_id, userType: 'tenant_user' });
+
+      // 解析角色 - 优先使用用户的角色，如果没有则使用租户的角色
+      let roles = [];
+      if (user.roles) {
+        try {
+          roles = JSON.parse(user.roles);
+          if (!Array.isArray(roles)) {
+            roles = [String(roles)];
+          }
+        } catch (e) {
+          console.error('解析用户角色失败:', e.message);
+          // 如果用户角色解析失败，尝试使用租户角色
+          if (user.tenant_roles) {
+            try {
+              roles = JSON.parse(user.tenant_roles);
+              if (!Array.isArray(roles)) {
+                roles = [String(roles)];
+              }
+            } catch (tenantRoleError) {
+              console.error('解析租户角色失败:', tenantRoleError.message);
+              roles = [user.role || 'user'].filter(r => r);
+            }
+          } else {
+            roles = [user.role || 'user'].filter(r => r);
+          }
+        }
+      } else if (user.tenant_roles) {
+        // 如果用户没有角色，尝试使用租户的角色
+        try {
+          roles = JSON.parse(user.tenant_roles);
+          if (!Array.isArray(roles)) {
+            roles = [String(roles)];
+          }
+        } catch (tenantRoleError) {
+          console.error('解析租户角色失败:', tenantRoleError.message);
+          roles = [user.role || 'user'].filter(r => r);
+        }
+      } else {
+        roles = [user.role || 'user'].filter(r => r);
+      }
+
       const userId = user.id;
       const data = {
         tenant_id: user.tenant_id,
         name: user.tenant_name,
-        roles: Array.isArray(user.roles) ? user.roles : JSON.parse(user.roles || '[]'),
+        roles: roles,
         type: 'tenant'
       };
       console.log('📤 Login response:', { userId, data });
@@ -78,6 +131,17 @@ module.exports = async (c) => {
         };
       }
 
+      // 设置会话信息 - 这是关键修复
+      if (!c.request.session) {
+        console.error('❌ 会话对象不存在');
+        return {
+          statusCode: 500,
+          body: { success: false, error: 'SESSION_ERROR' }
+        };
+      }
+      c.request.session.userId = user.id;
+      console.log('🔐 会话已设置:', { userId: user.id });
+
       const userId = user.id;
       const data = { phone: user.phone, type: 'customer' };
       console.log('📤 Login response:', { userId, data });
@@ -113,6 +177,17 @@ module.exports = async (c) => {
         const newCustomerId = await createCustomerUser(phone);
         customer = { id: newCustomerId };
       }
+
+      // 设置会话信息 - 这是关键修复
+      if (!c.request.session) {
+        console.error('❌ 会话对象不存在');
+        return {
+          statusCode: 500,
+          body: { success: false, error: 'SESSION_ERROR' }
+        };
+      }
+      c.request.session.userId = customer.id;
+      console.log('🔐 会话已设置:', { userId: customer.id });
 
       const userId = customer.id;
       const data = { phone: phone, type: 'customer' };

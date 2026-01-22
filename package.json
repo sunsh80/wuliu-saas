@@ -7,7 +7,10 @@
     "prod": "NODE_ENV=production node server.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.2.0",
     "ajv-formats": "^3.0.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -15,7 +18,9 @@
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.17.3",
     "helmet": "^7.0.0",
-    "openapi-backend": "^5.9.0"
+    "openapi-backend": "^5.9.0",
+    "sqlite3": "^5.1.7",
+    "tough-cookie": "^6.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.0"

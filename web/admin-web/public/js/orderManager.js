@@ -74,7 +74,10 @@ function displayOrders(orders) {
 
         // 关键: 状态选项与后端 OpenAPI 定义完全一致
         const statusOptions = [
-            { value: 'created', label: '待处理' },
+            { value: 'pending', label: '待审核' },
+            { value: 'pending_claim', label: '待认领' },
+            { value: 'available', label: '可认领' },
+            { value: 'created', label: '已创建' },
             { value: 'claimed', label: '已认领' },
             { value: 'awarded', label: '已成交' },
             { value: 'dispatched', label: '已发货' },

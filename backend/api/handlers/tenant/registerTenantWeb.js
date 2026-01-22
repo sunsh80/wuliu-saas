@@ -145,18 +145,19 @@ console.log("### DEBUG: Loading CORRECTED registerTenantWeb.js - Should use user
   // Insert User (Link to Tenant)
   // CRITICAL: Ensure we are using 'user_type', NOT 'type'
   const userInsertQuery = `
-   INSERT INTO users (email, username, name, role, type,user_type, password_hash, tenant_id, created_at, updated_at)
-   VALUES (?, ?, ?,?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
+   INSERT INTO users (email, username, name, role, roles, type, user_type, password_hash, tenant_id, created_at, updated_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
 
   await db.run(userInsertQuery, [
     email.toLowerCase().trim(),    // ? 1 (email)
     contact_phone.trim(),          // ? 2 (username)
     contact_person.trim(),         // ? 3 (name)
-    roles[0],    
-    'user',                  // ? 4 (role - e.g., 'customer')
-    'user',                   // ? 5 (user_type - set to 'customer' for 小程序 signups) <<< USE 'user_type' COLUMN NAME
-    hashedPassword,               // ? 6 (password_hash)
-    newTenantId                   // ? 7 (tenant_id)
+    roles[0],                      // ? 4 (role - first role as primary)
+    JSON.stringify(roles),         // ? 5 (roles - all roles as JSON string)
+    'user',                        // ? 6 (type)
+    'tenant_user',                 // ? 7 (user_type - set to 'tenant_user' for tenant signups)
+    hashedPassword,                // ? 8 (password_hash)
+    newTenantId                    // ? 9 (tenant_id)
   ]);
 
     // --- COMMIT TRANSACTION ---

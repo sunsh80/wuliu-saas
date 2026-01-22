@@ -27,6 +27,17 @@ module.exports = async (c) => {
     console.log('🟢 [applyPcTenant] 密码加密成功');
 
     const rolesJson = JSON.stringify(roles);
+
+    // 检查邮箱是否已存在于 tenants 表或 users 表中
+    const db = require('../../../db/index.js').getDb();
+    const existingTenant = await db.get('SELECT id FROM tenants WHERE email = ?', [email]);
+    const existingUser = await db.get('SELECT id FROM users WHERE email = ?', [email]);
+
+    if (existingTenant || existingUser) {
+      console.log('⚠️ [applyPcTenant] 邮箱已存在');
+      return { statusCode: 409, body: { success: false, error: 'EMAIL_ALREADY_REGISTERED' } };
+    }
+
     console.log('🟡 [applyPcTenant] 开始调用 createTenant 创建租户...');
     const newTenant = await createTenant({
       name,
@@ -42,7 +53,6 @@ module.exports = async (c) => {
 
     // 🔧 增容修复：自动创建 users 表记录（关键新增逻辑）
     console.log('🟡 [applyPcTenant] 开始创建关联用户记录...');
-    const db = require('../../../db/index.js').getDb(); // 获取数据库实例
 
     // 生成 username（使用邮箱前缀）
     const username = email.split('@')[0];
@@ -56,14 +66,15 @@ module.exports = async (c) => {
     // 插入 users 记录
     await db.run(`
       INSERT INTO users (
-        username, email, name, role, type,
+        username, email, name, role, roles, type,
         password_hash, tenant_id, user_type, is_active, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `, [
       username,
       email,
       name,
       mainRole,
+      rolesJson,  // 添加 roles 字段
       'tenant',
       password_hash,
       newTenant.id,
@@ -90,7 +101,8 @@ module.exports = async (c) => {
     return response;
   } catch (error) {
     console.error('💥 [applyPcTenant] 执行过程中发生异常:', error.message || error.stack || error);
-    if (error.message?.includes?.('UNIQUE constraint failed: tenants.email')) {
+    if (error.message?.includes?.('UNIQUE constraint failed: tenants.email') ||
+        error.message?.includes?.('UNIQUE constraint failed: users.email')) {
       console.log('⚠️ [applyPcTenant] 邮箱已存在');
       return { statusCode: 409, body: { success: false, error: 'EMAIL_ALREADY_REGISTERED' } };
     }

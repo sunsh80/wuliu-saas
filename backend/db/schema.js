@@ -70,6 +70,7 @@ const CORE_TABLES = {
       email TEXT UNIQUE NOT NULL,
       name TEXT NOT NULL,
       role TEXT NOT NULL,
+      roles TEXT,
       type TEXT NOT NULL,
       organization_id TEXT,
       organization_name TEXT,
@@ -153,12 +154,32 @@ class DatabaseSchema {
         }
       }
 
+      // 检查并添加缺失的列
+      await this.ensureColumnsExist(db);
+      
       await this.createDefaultAdmin(db);
       console.log('🎉 数据库表结构初始化完成');
       return true;
     } catch (error) {
       console.error('💥 数据库初始化失败:', error);
       throw error;
+    }
+  }
+
+  async ensureColumnsExist(db) {
+    console.log('🔍 检查并添加缺失的列...');
+    
+    // 检查 users 表是否已有 roles 列
+    const columns = await db.all(`
+      PRAGMA table_info(users);
+    `);
+    
+    const columnNames = columns.map(col => col.name);
+    
+    // 添加缺失的 roles 列
+    if (!columnNames.includes('roles')) {
+      await db.run('ALTER TABLE users ADD COLUMN roles TEXT;');
+      console.log('✅ 已添加 users.roles 列');
     }
   }
 
@@ -180,14 +201,15 @@ class DatabaseSchema {
     if (!adminExists) {
       await db.run(
         `INSERT INTO users (
-          username, email, name, role, type, organization_id, organization_name, 
+          username, email, name, role, roles, type, organization_id, organization_name,
           organization_type, password_hash, user_type, is_active, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           'admin',
           'admin@example.com',
           'Administrator',
           'super_admin',
+          JSON.stringify(['super_admin']),
           'admin',
           defaultOrgId,
           'Logistics Admin',

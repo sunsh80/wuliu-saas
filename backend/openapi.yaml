@@ -922,6 +922,74 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /api/customer/orders/{orderId}/quotes:
+    get:
+      tags:
+        - customer-order
+      summary: 获取订单的报价列表
+      operationId: getOrderQuotes
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 订单ID
+      responses:
+        '200':
+          description: 报价列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      order_id:
+                        type: string
+                        example: "order_123"
+                      quotes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            carrier:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                tenant_name:
+                                  type: string
+                            price:
+                              type: number
+                              example: 150.0
+                            delivery_time:
+                              type: string
+                              format: date-time
+                              example: "2026-01-14T18:00:00Z"
+                            remarks:
+                              type: string
+                              example: "可加急，但需额外费用"
+                            status:
+                              type: string
+                              example: "pending"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2026-01-13T10:00:00Z"
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /api/setup/status:
     get:
       tags:
@@ -1420,6 +1488,55 @@ paths:
       responses:
         '200':
           description: 完成成功
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/carrier/orders/{order_id}/start-delivery:
+    put:
+      tags:
+        - carrier-order
+      summary: 承运方开始配送订单
+      operationId: startDelivery
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 订单ID
+      responses:
+        '200':
+          description: 开始配送成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Delivery started successfully"
+                  data:
+                    type: object
+                    properties:
+                      order_id:
+                        type: string
+                        example: "order_123"
+                      status:
+                        type: string
+                        example: "in_transit"
+        '400':
+          description: 订单状态不允许开始配送
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':

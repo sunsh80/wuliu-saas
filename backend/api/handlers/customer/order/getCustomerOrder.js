@@ -1,44 +1,83 @@
 // api/handlers/customer/order/getCustomerOrder.js
 const { getDb } = require('../../../../db/index.js');
 
-module.exports = async (c, req, res) => {
+module.exports = async (c) => {
   try {
     const db = getDb();
-    const userId = c.context?.id; // 👈 来自 session
-
-    const orderId = c.request.params?.id;
+    const orderId = c.request.params?.orderId;
 
     // 📥 验证订单 ID
-    if (!orderId || typeof orderId !== 'string') {
-      return { statusCode: 400, body: { success: false, error: 'Invalid order ID' } };
+    if (!orderId) {
+      return { status: 400, body: { success: false, error: 'Invalid order ID' } };
     }
 
-    // 🔍 获取当前用户所属组织
-    const user = await db.get('SELECT organization_id FROM users WHERE id = ?', [userId]);
-    if (!user) {
-      return { statusCode: 403, body: { success: false, error: 'User not found' } };
-    }
-    const { organization_id } = user;
-
-    // 🔐 查询订单（必须属于当前组织）
+    // 🔐 查询订单（必须属于当前客户租户）
     const order = await db.get(
-      `SELECT id, tracking_number, sender_info, receiver_info, status, customer_id, created_at, updated_at
-       FROM orders WHERE id = ? AND organization_id = ?`,
-      [orderId, organization_id]
+      `SELECT * FROM orders WHERE id = ? AND tenant_id = ?`,
+      [orderId, c.context.tenantId]
     );
     if (!order) {
-      return { statusCode: 404, body: { success: false, error: 'Order not found or access denied' } };
+      return { status: 404, body: { success: false, error: 'Order not found or access denied' } };
+    }
+
+    // 解析 JSON 字段
+    let senderInfo = {}, receiverInfo = {};
+    try { senderInfo = JSON.parse(order.sender_info); } catch (e) {}
+    try { receiverInfo = JSON.parse(order.receiver_info); } catch (e) {}
+
+    // 获取承运商信息（如果已分配）
+    let carrierInfo = null;
+    if (order.carrier_id) {
+      const carrierUser = await db.get(
+        `SELECT u.name as carrier_name, u.email, t.name as tenant_name, t.contact_person, t.contact_phone
+         FROM users u
+         LEFT JOIN tenants t ON u.tenant_id = t.id
+         WHERE u.id = ?`,
+        [order.carrier_id]
+      );
+
+      if (carrierUser) {
+        carrierInfo = {
+          id: order.carrier_id,
+          name: carrierUser.carrier_name || carrierUser.tenant_name,
+          email: carrierUser.email,
+          tenant_name: carrierUser.tenant_name,
+          contact_person: carrierUser.contact_person,
+          contact_phone: carrierUser.contact_phone
+        };
+      }
+    }
+
+    // 构建响应对象
+    const orderData = {
+      id: order.id,
+      tracking_number: order.tracking_number,
+      sender_info: senderInfo,
+      receiver_info: receiverInfo,
+      status: order.status,
+      created_at: order.created_at,
+      updated_at: order.updated_at,
+      carrier: carrierInfo
+    };
+
+    // 如果订单有报价信息，也一并返回
+    if (order.quote_price) {
+      orderData.quote = {
+        price: order.quote_price,
+        delivery_time: order.quote_delivery_time,
+        remarks: order.quote_remarks
+      };
     }
 
     // ✅ 返回订单详情
     return {
-      statusCode: 200,
-      body: { success: true, data: order },
+      status: 200,
+      body: { success: true, data: orderData },
     };
   } catch (error) {
     console.error('Error in getCustomerOrder:', error);
     return {
-      statusCode: 500,
+      status: 500,
       body: { success: false, error: 'Failed to fetch order', details: error.message },
     };
   }

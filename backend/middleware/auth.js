@@ -1,11 +1,14 @@
 // backend/middleware/auth.js
-const db = require('../db'); // 确保引入数据库实例
+const { getDb } = require('../db'); // 确保引入数据库实例
+const { jwt } = require('../utils');
 
 module.exports = {
   // 登录请求强制新session
   loginSessionReset: (req, res, next) => {
-    if (req.path === '/api/tenant-web/login') {
+    if (req.path === '/api/tenant-web/login' || req.path === '/api/admin/login') {
       next(); // 安全：不干预登录请求
+    } else {
+      next(); // 对于非登录请求，继续执行中间件
     }
   },
 
@@ -16,41 +19,67 @@ module.exports = {
       console.log(' → Path:', c.request.path);
       console.log(' → Method:', c.request.method);
       console.log(' → Operation:', c.operation?.operationId);
-      
+
       const session = c.request.session;
       console.log(' → Session ID:', c.request.sessionID);
       console.log(' → Session exists?', !!session);
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log(' → Session content:', JSON.stringify(session || {}, null, 2));
       }
 
       const security = c.operation?.security;
-      
+
       // 不需要认证的接口
       if (Array.isArray(security) && security.length === 0) {
         console.log(' → ✅ 此端点不需要认证 (security: [])');
         if (session?.userId) {
           // 对于免认证接口，仍可注入基础上下文
-          c.context = { 
-            id: session.userId, 
-            tenantId: session.tenantId 
+          c.context = {
+            id: session.userId,
+            tenantId: session.tenantId
           };
         }
         return true;
       }
 
+      let userId = null;
+
+      // 检查 session 中的 userId
+      if (session?.userId) {
+        userId = session.userId;
+        console.log(' → 使用 Session 中的 userId:', userId);
+      }
+      // 如果没有 session，尝试从 Authorization header 解析 JWT token
+      else {
+        const authHeader = c.request.headers?.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          try {
+            const token = authHeader.substring(7);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_for_testing');
+            userId = decoded.id;
+            console.log(' → 从 JWT Token 解析出 userId:', userId);
+          } catch (err) {
+            console.log(' → ❌ JWT Token 验证失败:', err.message);
+            return [401, { success: false, error: 'UNAUTHORIZED' }];
+          }
+        }
+      }
+
       // 需要认证的接口
-      if (!session?.userId) {
-        console.log(' → ❌ 认证失败：没有用户ID');
+      if (!userId) {
+        console.log(' → ❌ 认证失败：没有用户ID (session 或 token)');
         return [401, { success: false, error: 'UNAUTHORIZED' }];
       }
 
       // ✅ 关键修复：从数据库获取用户完整信息
       try {
+        const db = getDb();
         const user = await db.get(
-          `SELECT tenant_id, roles FROM users WHERE id = ?`,
-          [session.userId]
+          `SELECT u.tenant_id, u.roles, u.role, u.user_type, t.roles as tenant_roles FROM users u
+           LEFT JOIN tenants t ON u.tenant_id = t.id
+           WHERE u.id = ?`,
+          [userId]
         );
 
         if (!user) {
@@ -59,15 +88,58 @@ module.exports = {
         }
 
         // ✅ 正确注入上下文（含 roles）
+        // 优先使用 users 表中的 roles（JSON格式），如果没有则使用 role（单个角色）或从 tenants 表获取
+        let roles = [];
+        if (user.roles) {
+          try {
+            roles = JSON.parse(user.roles);
+            if (!Array.isArray(roles)) {
+              console.warn(' → ⚠️ 用户 roles 字段不是数组，尝试转换:', roles);
+              roles = [String(roles)]; // 确保是字符串数组
+            }
+          } catch (parseError) {
+            console.error(' → ❌ 解析用户 roles 失败:', parseError.message);
+            // 如果解析失败，尝试使用单个角色
+            if (user.role) {
+              roles = [user.role];
+            } else if (user.tenant_roles) {
+              try {
+                roles = JSON.parse(user.tenant_roles);
+                if (!Array.isArray(roles)) {
+                  roles = [String(roles)];
+                }
+              } catch (tenantParseError) {
+                console.error(' → ❌ 解析租户 roles 失败:', tenantParseError.message);
+                roles = []; // 最后兜底为空数组
+              }
+            } else {
+              roles = [user.role || 'user'].filter(r => r); // 使用单个角色作为备选
+            }
+          }
+        } else if (user.role) {
+          roles = [user.role]; // 单个角色转换为数组
+        } else if (user.tenant_roles) {
+          try {
+            roles = JSON.parse(user.tenant_roles);
+            if (!Array.isArray(roles)) {
+              roles = [String(roles)];
+            }
+          } catch (tenantParseError) {
+            console.error(' → ❌ 解析租户 roles 失败:', tenantParseError.message);
+            roles = [user.role || 'user'].filter(r => r); // 使用单个角色作为备选
+          }
+        }
+
         c.context = {
-          id: session.userId,
+          id: userId,
           tenantId: user.tenant_id,
-          roles: JSON.parse(user.roles || '[]')
+          roles: roles,
+          userType: user.user_type // 添加用户类型到上下文中
         };
-        
-        console.log(' → ✅ 认证通过，userId:', session.userId, 'roles:', c.context.roles);
+
+        console.log(' → ✅ 认证通过，userId:', userId, 'roles:', c.context.roles);
         return true;
-        
+
       } catch (error) {
         console.error(' → 🚨 数据库查询失败:', error.message);
         return [500, { success: false, error: 'INTERNAL_ERROR' }];

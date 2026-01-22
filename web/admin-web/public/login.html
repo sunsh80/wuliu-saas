@@ -3,9 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理员登录</title>
+    <title>管理员登录 - 物流管理系统</title>
     <!-- 引入 CSS 文件 -->
     <link rel="stylesheet" href="/admin/css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2d3436;
+        }
+
+        form div {
+            margin-bottom: 20px;
+        }
+
+        #message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+        }
+
+        .error {
+            background-color: #ffeaa7;
+            color: #d63031;
+            border: 1px solid #fdcb6e;
+        }
+
+        .success {
+            background-color: #55efc4;
+            color: #00b894;
+            border: 1px solid #00b894;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,11 +63,11 @@
         <form id="loginForm">
             <div>
                 <label for="username">用户名:</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required placeholder="请输入用户名">
             </div>
             <div>
                 <label for="password">密码:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required placeholder="请输入密码">
             </div>
             <button type="submit">登录</button>
         </form>
@@ -26,6 +76,85 @@
 
     <!-- 引入 JS 文件 -->
     <script src="/admin/js/main.js"></script> <!-- 必须首先引入 main.js -->
-    <script src="/admin/js/login.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const messageDiv = document.getElementById('message');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    const username = document.getElementById('username').value.trim();
+                    const password = document.getElementById('password').value;
+
+                    // 简单的前端验证
+                    if (!username || !password) {
+                        showMessage('用户名和密码不能为空', true);
+                        return;
+                    }
+
+                    try {
+                        // 显示加载状态
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.textContent;
+                        submitBtn.textContent = '登录中...';
+                        submitBtn.disabled = true;
+
+                        // 发送登录请求
+                        const response = await fetch('/api/admin/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+
+                            // 存储 token
+                            if (data.data && data.data.token) {
+                                localStorage.setItem('adminToken', data.data.token);
+
+                                showMessage('登录成功！正在跳转...', false);
+
+                                // 跳转到主页
+                                setTimeout(() => {
+                                    window.location.href = '/admin/index.html';
+                                }, 1000);
+                            } else {
+                                throw new Error('登录响应中未包含有效 token');
+                            }
+                        } else {
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(errorData.message || errorData.error || '登录失败');
+                        }
+                    } catch (error) {
+                        console.error('登录错误:', error);
+                        showMessage(error.message || '登录失败，请稍后重试', true);
+                    } finally {
+                        // 恢复按钮状态
+                        const submitBtn = loginForm.querySelector('button[type="submit"]');
+                        submitBtn.textContent = '登录';
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+
+            // 显示消息的辅助函数
+            function showMessage(text, isError = false) {
+                if (messageDiv) {
+                    messageDiv.textContent = text;
+                    messageDiv.className = isError ? 'error' : 'success';
+                    messageDiv.style.display = 'block';
+
+                    // 3秒后自动隐藏
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        });
+    </script>
 </body>
 </html>

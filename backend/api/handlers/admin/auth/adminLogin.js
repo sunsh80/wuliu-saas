@@ -29,7 +29,7 @@ module.exports = async (c) => {
     const user = await db.get(
         `SELECT id, username, email, name, role, type, password_hash, organization_id, organization_name, organization_type, is_active
          FROM users
-         WHERE username = ? AND user_type = 'admin_user'`,
+         WHERE LOWER(username) = LOWER(?) AND user_type = 'admin_user'`,
         [username]
     );
 
@@ -89,6 +89,7 @@ module.exports = async (c) => {
         status: 200,
         body: {
             success: true,
+            userId: user.id, // 为了兼容 session 设置
             data: {
                 token,
                 user: {

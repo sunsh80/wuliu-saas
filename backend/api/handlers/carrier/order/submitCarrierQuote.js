@@ -79,11 +79,10 @@ if (!c.context.roles.includes('carrier')) {
   return { status: 403, body: { success: false, error: 'NOT_A_CARRIER' } };
 }
 const carrierTenantId = c.context.tenantId;
-    // Check if order exists and is in 'created' status (or 'claimed' if that's the stage before customer awards)
-    // Adjust the allowed statuses based on your specific business logic for when quotes can be submitted
+    // Check if order exists and is in 'pending_claim' or 'claimed' status (allowing quotes)
     const order = await new Promise((resolve, reject) => {
       db.get(
-        `SELECT id, status FROM orders WHERE id = ? AND status IN ('created', 'claimed')`, // Allow quoting for both created and claimed orders
+        `SELECT id, status, carrier_id FROM orders WHERE id = ? AND status IN ('pending_claim', 'claimed')`,
         [orderId],
         (err, row) => {
           if (err) {
@@ -97,60 +96,63 @@ const carrierTenantId = c.context.tenantId;
     });
 
     if (!order) {
-      console.log("Order not found or not in a status allowing quotes (e.g., 'created', 'claimed'):", orderId);
+      console.log("Order not found or not in a status allowing quotes (e.g., 'pending_claim', 'claimed'):", orderId);
       return {
-        status: 404, // Not Found or Conflict
+        status: 404, // Not Found
         body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_QUOTABLE' }
       };
     }
 
-    // Optional: Check if this carrier has already quoted for this order
-    // This depends on whether multiple quotes per carrier per order are allowed
-    const existingQuote = await new Promise((resolve, reject) => {
-      db.get(
-        `SELECT id FROM quotes WHERE order_id = ? AND carrier_id = ?`,
-        [orderId, carrierTenantId],
-        (err, row) => {
-          if (err) {
-            console.error('Database error checking existing quote:', err.message);
-            reject(err);
-          } else {
-            resolve(row);
-          }
-        }
-      );
-    });
-
-    if (existingQuote) {
-      console.log("Carrier (tenantId:", carrierTenantId, ") has already quoted for order:", orderId);
+    // Check if this carrier is the assigned carrier (if order has a specific carrier_id)
+    // If the order has a specific carrier_id, only that carrier can quote
+    if (order.carrier_id && order.carrier_id != userId) {
+      console.log("Order is assigned to a specific carrier. Current user cannot quote.");
       return {
-        status: 409, // Conflict
-        body: { success: false, error: 'CARRIER_HAS_ALREADY_QUOTED_FOR_THIS_ORDER' }
+        status: 403, // Forbidden
+        body: { success: false, error: 'ORDER_ASSIGNED_TO_ANOTHER_CARRIER' }
       };
     }
 
-    // Insert the quote into the quotes table
+    // Update the order with the quote information
     await new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO quotes (order_id, carrier_id, amount, estimated_delivery_time, remarks, status)
-         VALUES (?, ?, ?, ?, ?, 'pending')`, // Default status for quote is 'pending'
-        [orderId, carrierTenantId, price, deliveryTime, remarks || null], // Use null for empty remarks
+        `UPDATE orders
+         SET quote_price = ?, quote_delivery_time = ?, quote_remarks = ?, updated_at = datetime('now')
+         WHERE id = ?`,
+        [price, deliveryTime, remarks || null, orderId],
         function (err) {
           if (err) {
-            console.error('Database error inserting quote:', err.message);
+            console.error('Database error updating order with quote:', err.message);
             reject(err);
           } else {
-            console.log("Successfully inserted quote for order ID:", orderId, "by carrier ID:", carrierTenantId);
+            console.log("Successfully updated order with quote for order ID:", orderId);
             resolve();
           }
         }
       );
     });
 
-    // Do NOT update the main orders table status here
+    // Optionally update the order status to 'quoted' to indicate it has received a quote
+    await new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE orders
+         SET status = 'quoted', updated_at = datetime('now')
+         WHERE id = ?`,
+        [orderId],
+        function (err) {
+          if (err) {
+            console.error('Database error updating order status to quoted:', err.message);
+            reject(err);
+          } else {
+            console.log("Successfully updated order status to quoted for order ID:", orderId);
+            resolve();
+          }
+        }
+      );
+    });
 
     return {
-      status: 201, // Created - Successfully created a quote record
+      status: 201, // Created - Successfully submitted a quote
       body: {
         success: true,
         message: 'Quote submitted successfully',
@@ -161,7 +163,7 @@ const carrierTenantId = c.context.tenantId;
                 deliveryTime: deliveryTime,
                 remarks: remarks || null
             },
-            carrierId: carrierTenantId
+            carrierId: userId // Return the actual user ID who quoted
         }
       }
     };

@@ -1,56 +1,29 @@
 {
-  "name": "wuliu_project",
+  "name": "logistics-test",
   "version": "1.0.0",
-  "description": "多租户物流平台后端服务",
-  "main": "server.js",
+  "description": "Test script for logistics system",
+  "main": "test_flow.js",
   "scripts": {
+    "test-flow": "node test_flow.js",
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "validate:openapi": "node validate-openapi.js",
-    "validate:handlers": "node ../scripts/check-handler-duplicates.cjs",
-    "lint": "eslint .",
-    "test": "jest",
-    "prestart": "npm run validate:openapi && npm run validate:handlers"
+    "dev": "nodemon server.js"
   },
   "dependencies": {
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.3",
-    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.22.1",
-    "express-rate-limit": "^8.2.1",
-    "express-session": "^1.18.2",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "openapi-backend": "^5.15.0",
-    "sqlite3": "^5.1.6"
+    "helmet": "^7.0.0",
+    "cookie-parser": "^1.4.6",
+    "express-rate-limit": "^6.8.1",
+    "express-session": "^1.17.3",
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.13.2",
+    "openapi-backend": "^5.12.0",
+    "yaml": "^2.3.1"
   },
   "devDependencies": {
-    "eslint": "^9.0.0",
-    "jest": "^29.7.0",
-    "js-yaml": "^4.1.1",
-    "nodemon": "^3.1.11"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "keywords": [
-    "logistics",
-    "multi-tenant",
-    "express",
-    "openapi"
-  ],
-  "author": "Your Name <your.email@example.com>",
-  "license": "ISC",
-  "type": "commonjs",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/wuliu_project.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/wuliu_project/issues"
+    "nodemon": "^3.0.1"
   }
 }

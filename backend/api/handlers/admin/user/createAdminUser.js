@@ -22,13 +22,25 @@ module.exports = async (c) => {
 
   // 创建用户
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 处理角色 - 如果传入的是字符串，转换为数组；如果是数组，直接使用
+  let rolesArray = [];
+  if (typeof role === 'string') {
+    rolesArray = [role];
+  } else if (Array.isArray(role)) {
+    rolesArray = role;
+  } else {
+    rolesArray = ['user']; // 默认角色
+  }
+
   const newUser = {
     id: require('crypto').randomUUID(),
     username,
     email: email || null,
     phone: phone || null,
     name: name || username,
-    role: role || 'user',
+    role: rolesArray[0], // 使用第一个角色作为主要角色
+    roles: JSON.stringify(rolesArray), // 存储所有角色
     type: 'admin',
     organization_id: adminOrgId,
     organization_name: 'Logistics Admin',
@@ -38,8 +50,8 @@ module.exports = async (c) => {
   };
 
   await database.run(
-    `INSERT INTO users (id, username, email, phone, name, role, type, organization_id, organization_name, organization_type, password_hash, is_active)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO users (id, username, email, phone, name, role, roles, type, organization_id, organization_name, organization_type, password_hash, is_active)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     Object.values(newUser)
   );
 
