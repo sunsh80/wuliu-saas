@@ -1,0 +1,38 @@
+<!-- pages/company-register/company-register.wxml -->
+<view class="container">
+  <form bindsubmit="submitRegisterOrPrompt"> <!-- 注意：如果使用form，button的form-type应为submit -->
+
+    <!-- 手机号 (始终显示) -->
+    <view class="input-group">
+      <text class="label">手机号 *</text>
+      <input class="input-field" type="number" placeholder="请输入联系人手机号" value="{{contact_phone}}" bindinput="bindContactPhoneInput" />
+    </view>
+
+    <!-- 密码 (仅当选择customer时才真正需要) -->
+    <view class="input-group">
+      <text class="label">密码 *</text>
+      <input class="input-field" password placeholder="请输入登录密码" value="{{password}}" bindinput="bindPasswordInput" />
+    </view>
+
+    <!-- 确认密码 (仅当选择customer时才真正需要) -->
+    <view class="input-group">
+      <text class="label">确认密码 *</text>
+      <input class="input-field" password placeholder="请再次输入密码" value="{{confirmPassword}}" bindinput="bindConfirmPasswordInput" />
+    </view>
+
+    <!-- 身份选择 -->
+    <view class="input-group">
+      <text class="label">身份 *</text>
+      <radio-group bindchange="onRoleChange">
+        <label wx:for="{{roleOptions}}" wx:key="value" class="radio-label">
+          <radio value="{{item.value}}" checked="{{selectedRole === item.value}}"/> {{item.label}}
+        </label>
+      </radio-group>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" bindtap="submitRegisterOrPrompt">{{ selectedRole === 'carrier' ? '前往PC端申请' : '提交注册' }}</button>
+    <!-- 按钮文字根据选择的角色动态变化 -->
+
+  </form>
+</view>

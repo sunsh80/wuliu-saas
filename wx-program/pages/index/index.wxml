@@ -1,12 +1,47 @@
 <!-- pages/index/index.wxml -->
 <view class="container">
-  <text class="title">欢迎使用物流小程序</text>
-  <text class="subtitle">便捷下单，高效配送</text>
+  <!-- Header Section: 简化标题区域 -->
+  <view class="header">
+    <text class="title">节省每一段路</text>
+  </view>
 
-  <view class="button-group">
-    <button class="nav-btn" bindtap="goToOrder">订单提交</button>
-    <button class="nav-btn" bindtap="goToLogs">查看日志</button>
-    <!-- 新增登录按钮 -->
-    <button class="nav-btn" bindtap="goToLogin">用户登录</button>
+  <!-- Main Content Section -->
+  <view class="content">
+    <!-- Quick Actions Section -->
+    <view class="section quick-actions-section">
+      <text class="section-title">快速操作</text>
+      <view class="button-grid">
+        <!-- 保留 "订单提交" 按钮 -->
+        <button class="action-btn primary" bindtap="goToOrder">
+          <text class="btn-text">订单提交</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- Service Features Section -->
+    <view class="section service-features-section">
+      <text class="section-title">服务介绍</text>
+      <view class="feature-list">
+        <view class="feature-item">
+          <text class="feature-text">高效订单管理</text>
+        </view>
+        <view class="feature-item">
+          <text class="feature-text">实时物流追踪</text>
+        </view>
+        <view class="feature-item">
+          <text class="feature-text">全链流程再造</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Company Registration Section (新增) -->
+    <view class="section company-registration-section">
+      <text class="section-title">公司合作</text>
+      <view class="registration-button">
+        <button class="action-btn secondary" bindtap="goToRegister">
+          <text class="btn-text">立即入驻</text>
+        </button>
+      </view>
+    </view>
   </view>
 </view>

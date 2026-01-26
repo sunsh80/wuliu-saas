@@ -1,73 +1,14 @@
 // backend/db/schema.js
 const bcrypt = require('bcryptjs');
 
-// 基础表定义
+// 核心表定义
 const CORE_TABLES = {
-  customers: `
-    CREATE TABLE IF NOT EXISTS customers (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      phone TEXT NOT NULL,
-      address TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `,
-  customer_applications: `
-    CREATE TABLE IF NOT EXISTS customer_applications (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      phone TEXT NOT NULL,
-      address TEXT,
-      status TEXT NOT NULL DEFAULT 'pending',
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `,
-  orders: `
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_id TEXT,
-      carrier_id TEXT,
-      tenant_id INTEGER,
-      tracking_number TEXT UNIQUE NOT NULL,
-      sender_info TEXT NOT NULL,
-      receiver_info TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'created',
-      completed_at TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      quote_price REAL,
-      quote_delivery_time TEXT,
-      quote_remarks TEXT,
-      quote_deadline TEXT,
-      customer_phone TEXT,
-      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
-    );
-  `,
-  user_sessions: `
-    CREATE TABLE IF NOT EXISTS user_sessions (
-      session_id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      expires_at TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `,
-  organizations: `
-    CREATE TABLE IF NOT EXISTS organizations (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      type TEXT NOT NULL CHECK (type IN ('tenant', 'admin')),
-      status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `,
   users: `
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
+      phone TEXT NOT NULL,
       name TEXT NOT NULL,
       role TEXT NOT NULL,
       roles TEXT,
@@ -109,28 +50,71 @@ const CORE_TABLES = {
       rejected_at DATETIME,
       rejection_notes TEXT
     );
+  `,
+  customers: `
+    CREATE TABLE IF NOT EXISTS customers (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  customer_applications: `
+    CREATE TABLE IF NOT EXISTS customer_applications (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      address TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  orders: `
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id TEXT,
+      carrier_id TEXT,
+      tenant_id INTEGER,
+      tracking_number TEXT UNIQUE NOT NULL,
+      sender_info TEXT NOT NULL,
+      receiver_info TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'created',
+      completed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      quote_price REAL,
+      quote_delivery_time TEXT,
+      quote_remarks TEXT,
+      quote_deadline TEXT,
+      customer_phone TEXT,
+      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
+    );
   `
 };
 
-// 扩展表定义（原 customers 表已移除，此处可添加其他扩展表）
+// 扩展表定义
 const EXTENDED_TABLES = {
-  // 示例：如果需要 tenant_customers 表
-  /*
-  tenant_customers: `
-    CREATE TABLE IF NOT EXISTS tenant_customers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tenant_id INTEGER NOT NULL,
-      name TEXT,
-      phone TEXT,
-      email TEXT,
-      address TEXT,
-      remarks TEXT,
+  user_sessions: `
+    CREATE TABLE IF NOT EXISTS user_sessions (
+      session_id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  organizations: `
+    CREATE TABLE IF NOT EXISTS organizations (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('tenant', 'admin')),
+      status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `
-  */
 };
 
 class DatabaseSchema {
@@ -156,7 +140,7 @@ class DatabaseSchema {
 
       // 检查并添加缺失的列
       await this.ensureColumnsExist(db);
-      
+
       await this.createDefaultAdmin(db);
       console.log('🎉 数据库表结构初始化完成');
       return true;
@@ -168,14 +152,14 @@ class DatabaseSchema {
 
   async ensureColumnsExist(db) {
     console.log('🔍 检查并添加缺失的列...');
-    
+
     // 检查 users 表是否已有 roles 列
     const columns = await db.all(`
       PRAGMA table_info(users);
     `);
-    
+
     const columnNames = columns.map(col => col.name);
-    
+
     // 添加缺失的 roles 列
     if (!columnNames.includes('roles')) {
       await db.run('ALTER TABLE users ADD COLUMN roles TEXT;');
@@ -185,7 +169,6 @@ class DatabaseSchema {
 
   async createDefaultAdmin(db) {
     const defaultOrgId = 'admin_org_id_001';
-    const defaultUserId = 'admin_user_id_001';
     const defaultPasswordHash = await bcrypt.hash('admin123', 10);
 
     const orgExists = await db.get('SELECT id FROM organizations WHERE id = ?', [defaultOrgId]);

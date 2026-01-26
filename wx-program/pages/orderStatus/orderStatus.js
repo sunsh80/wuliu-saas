@@ -30,7 +30,7 @@ Page({
     try {
       const res = await new Promise((resolve, reject) => {
         wx.request({
-          url: `http://localhost:3000/api/customer/orders/${orderId}`,
+          url: `http://192.168.2.250/api/customer/orders/${orderId}`,
           method: 'GET',
           header: {
             'Authorization': `Bearer ${token}`,

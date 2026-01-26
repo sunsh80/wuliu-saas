@@ -2,7 +2,7 @@
 
 // 注意：BASE_URL 和 apiRequest 函数在此文件中似乎未被使用，如果确实不需要，可以考虑删除。
 // 如果未来需要调用租户相关的 API，可能需要调整 BASE_URL 和 token 的获取方式。
-// const BASE_URL = 'http://localhost:3000/api';
+// const BASE_URL = 'http://192.168.2.250/api';
 
 // function apiRequest(url, options = {}) { 
 //   const token = wx.getStorageSync('token'); 

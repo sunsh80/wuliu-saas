@@ -1,46 +1,31 @@
 // pages/login/login.js
-Page({
 
-  /**
-   * 页面的初始数据
-   */
+Page({
   data: {
-    loginMethod: 'email', // 'email' or 'phone'
+    loginMethod: 'email', // 默认登录方式 'email' 或 'phone'
     email: '',
     phone: '',
     password: ''
   },
 
-  /**
-   * 监听邮箱输入
-   */
+  // 输入框绑定函数
   bindEmailInput(e) {
     this.setData({
       email: e.detail.value
     });
   },
-
-  /**
-   * 监听手机号输入
-   */
   bindPhoneInput(e) {
     this.setData({
       phone: e.detail.value
     });
   },
-
-  /**
-   * 监听密码输入
-   */
   bindPasswordInput(e) {
     this.setData({
       password: e.detail.value
     });
   },
 
-  /**
-   * 切换登录方式
-   */
+  // 切换登录方式
   toggleLoginMethod(e) {
     const method = e.currentTarget.dataset.method;
     this.setData({
@@ -48,15 +33,12 @@ Page({
     });
   },
 
-  /**
-   * 登录处理函数
-   */
+  // 登录处理
   login() {
-    const { loginMethod, email, phone, password } = this.data;
-    const trimmedPassword = password.trim();
+    let value = '';
+    const password = this.data.password;
 
-    // 前端基础验证
-    if (!trimmedPassword) {
+    if (!password || !password.trim()) {
       wx.showToast({
         title: '请输入密码',
         icon: 'none'
@@ -64,41 +46,34 @@ Page({
       return;
     }
 
-    let identifierValue = '';
-    let identifierType = '';
-
-    if (loginMethod === 'email') {
-      identifierValue = email.trim();
-      identifierType = '邮箱';
-      if (!identifierValue) {
+    if (this.data.loginMethod === 'email') {
+      value = this.data.email.trim();
+      if (!value) {
         wx.showToast({
           title: '请输入邮箱',
           icon: 'none'
         });
         return;
       }
-      // 邮箱格式简单校验
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(identifierValue)) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+ $ /;
+      if (!emailRegex.test(value)) {
         wx.showToast({
           title: '邮箱格式不正确',
           icon: 'none'
         });
         return;
       }
-    } else if (loginMethod === 'phone') {
-      identifierValue = phone.trim();
-      identifierType = '手机号';
-      if (!identifierValue) {
+    } else if (this.data.loginMethod === 'phone') {
+      value = this.data.phone.trim();
+      if (!value) {
         wx.showToast({
           title: '请输入手机号',
           icon: 'none'
         });
         return;
       }
-      // 手机号格式校验
-      const phoneRegex = /^1[3-9]\d{9}$/;
-      if (!phoneRegex.test(identifierValue)) {
+      const phoneRegex = /^1[3-9]\d{9} $ /;
+      if (!phoneRegex.test(value)) {
         wx.showToast({
           title: '手机号格式不正确',
           icon: 'none'
@@ -106,88 +81,93 @@ Page({
         return;
       }
     } else {
-      // 防止意外的 loginMethod 值
       wx.showToast({
-        title: '登录方式错误',
+        title: '无效的登录方式',
         icon: 'none'
       });
       return;
     }
 
+    // 显示加载提示
     wx.showLoading({
-      title: '登录中...'
+      title: '登录中...',
     });
 
-    // 调用登录 API
+    // 发起登录请求
     wx.request({
-      url: 'http://localhost:3000/api/tenant/loginTenantWeb', // 请确保 URL 正确
+      url: 'http://192.168.2.250/api/tenant/loginTenantWeb', // 替换为你的实际API地址
       method: 'POST',
       header: {
-        'Content-Type': 'application/json'
+        'content-type': 'application/json'
       },
       data: {
-        // 根据选择的登录方式发送对应的字段
-        [loginMethod]: identifierValue, // 动态键名，如果是 'email'，则发送 { email: value }；如果是 'phone'，则发送 { phone: value }
-        password: trimmedPassword
+        [this.data.loginMethod]: value, // 动态键名，如 { email: 'xxx' } 或 { phone: 'xxx' }
+        password: password
       },
       success: (res) => {
         wx.hideLoading();
-        console.log('登录响应:', res);
-
-        if (res.statusCode === 200) {
-          if (res.data.success) {
-            // 登录成功：后端通过 Set-Cookie 设置 session
-            // 小程序无法直接使用 Cookie，故用本地标记表示已登录
-            wx.setStorageSync('isLoggedIn', true);
-            // 如果后端返回了 token，也可以存储
-            if (res.data.data && res.data.data.token) {
-                 wx.setStorageSync('token', res.data.data.token);
-            }
-            // 可选：存储用户信息
-            if (res.data.data) {
-                wx.setStorageSync('userInfo', res.data.data);
-            }
-
-            wx.showToast({
-              title: '登录成功',
-              icon: 'success'
-            });
-
-            // 跳转到首页（tabBar 页面必须用 switchTab）
-            wx.switchTab({
-              url: '/pages/index/index',
-              success: () => {
-                console.log('跳转到首页成功');
-              },
-              fail: (err) => {
-                console.error('跳转失败:', err);
-              }
-            });
-          } else {
-            // 处理登录失败 (res.data.success === false)
-            const errMsg = res.data?.error || '登录失败，请稍后重试';
-            wx.showToast({
-              title: errMsg,
-              icon: 'none'
-            });
-          }
-        } else {
-          // 处理 HTTP 错误状态码
-          const errMsg = res.data?.error || `登录失败 (${res.statusCode})`;
+        if (res.statusCode === 200 && res.data.success) {
           wx.showToast({
-            title: errMsg,
+            title: '登录成功',
+            icon: 'success',
+            duration: 2000
+          });
+          // 登录成功后保存状态和token
+          wx.setStorageSync('isLoggedIn', true);
+          if (res.data.token) {
+            wx.setStorageSync('token', res.data.token);
+          }
+          if (res.data.data) {
+             wx.setStorageSync('userInfo', res.data.data); // 假设返回用户信息
+          }
+          // 跳转到首页
+          wx.switchTab({
+            url: '/pages/index/index', // 替换为你想要跳转的页面
+          });
+        } else {
+          // 处理后端返回的错误
+          const errorMessage = res.data.message || res.data.error || '登录失败，请稍后重试';
+          wx.showToast({
+            title: errorMessage,
             icon: 'none'
           });
         }
       },
       fail: (err) => {
         wx.hideLoading();
-        console.error('请求失败:', err);
+        console.error('登录请求失败:', err);
         wx.showToast({
-          title: '网络错误，请检查连接',
+          title: '网络错误，请检查网络连接',
           icon: 'none'
         });
       }
     });
+  },
+
+  // 新增：跳转到注册页面
+  goToRegister() {
+    wx.navigateTo({
+      url: '/pages/company-register/company-register' // 注册页的路径
+    });
+  },
+
+  // 页面加载时检查登录状态
+  onLoad() {
+     // 检查本地是否有登录状态
+     if (wx.getStorageSync('isLoggedIn')) {
+         // 如果已登录，可以直接跳转到首页
+         wx.switchTab({
+           url: '/pages/index/index',
+         });
+     }
   }
+
+  // 或者使用 onShow，每次页面显示都检查（更频繁）
+  // onShow() {
+  //   if (wx.getStorageSync('isLoggedIn')) {
+  //       wx.switchTab({
+  //         url: '/pages/index/index',
+  //       });
+  //   }
+  // }
 });

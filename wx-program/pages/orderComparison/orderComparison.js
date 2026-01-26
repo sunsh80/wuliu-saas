@@ -17,7 +17,7 @@ Page({
 
     // 假设后端有一个 API 返回订单和关联的报价
     wx.request({
-      url: 'http://localhost:3000/api/tenant/orders-with-bids', // 需要后端实现此API
+      url: 'http://192.168.2.250/api/tenant/orders-with-bids', // 需要后端实现此API
       method: 'GET',
       header: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ Page({
     console.log(`用户选择订单 ${orderId} 的报价 ${bidId}`);
 
     // wx.request({
-    //   url: `http://localhost:3000/api/orders/${orderId}/select-bid`,
+    //   url: `http://192.168.2.250/api/orders/${orderId}/select-bid`,
     //   method: 'POST',
     //   data: { bidId: bidId },
     //   header: {

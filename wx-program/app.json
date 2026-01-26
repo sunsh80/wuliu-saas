@@ -8,7 +8,9 @@
     "pages/orderComparison/orderComparison",
     "pages/orderList/orderList",
     "pages/orderStatus/orderStatus",
-    "pages/orderTrack/orderTrack"
+    "pages/orderTrack/orderTrack",
+    "pages/company-register/company-register"
+    
   ],
   "window": {
     "backgroundTextStyle": "light",

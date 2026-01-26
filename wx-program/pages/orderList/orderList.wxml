@@ -1,31 +1,46 @@
 <!-- pages/orderList/orderList.wxml -->
 <view class="container">
-  <!-- 提交新订单按钮 -->
-  <button class="submit-order-btn" bindtap="navigateToSubmitOrder">提交新订单</button>
+  <view class="header">
+    <text class="title">我的订单</text>
+  </view>
 
-  <!-- 订单列表 -->
-  <view class="order-list">
+  <view class="orders-list">
     <block wx:for="{{orders}}" wx:key="id">
-      <view class="order-item" bindtap="navigateToOrderDetail" data-id="{{item.id}}">
+      <view class="order-item" bindtap="goToDetail" data-id="{{item.id}}">
         <view class="order-header">
-          <text class="order-number">订单号: {{item.order_number}}</text>
-          <text class="order-status">状态: {{item.status}}</text>
+          <text class="order-id">订单号: {{item.id}}</text>
+          <text class="status status-{{item.status}}">{{getStatusText(item.status)}}</text>
         </view>
-        <view class="order-details">
-          <text class="detail">重量: {{item.weight}}kg</text>
-          <text class="detail">体积: {{item.volume}}m³</text>
-          <text class="detail">起点: {{item.origin}}</text>
-          <text class="detail">终点: {{item.destination_first}}</text>
-          <text class="detail">客户: {{item.customer_name}}</text>
-          <text class="detail">电话: {{item.customer_phone}}</text>
+        <view class="order-info">
+          <view class="info-row">
+            <text class="label">货物:</text>
+            <text class="value">{{item.goods_description || '待填写'}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">取货:</text>
+            <text class="value">{{item.pickup_location && item.pickup_location.address ? item.pickup_location.address : '待填写'}}</text>
+
+          </view>
+          <view class="info-row">
+            <text class="label">派送:</text>
+            <text class="value">{{item.delivery_location && item.delivery_location.address ? item.delivery_location.address : '待填写'}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">创建时间:</text>
+            <text class="value">{{item.created_at}}</text>
+          </view>
         </view>
       </view>
     </block>
 
-    <block wx:if="{{orders.length === 0 && !loading}}">
-      <view class="empty-list">暂无订单</view>
-    </block>
+    <!-- 空列表提示 -->
+    <view wx:if="{{!loading && orders.length === 0}}" class="empty-tips">
+      <text>暂无订单</text>
+    </view>
   </view>
 
-  <button class="refresh-btn" bindtap="onRefresh" loading="{{loading}}">刷新</button>
+  <!-- 加载提示 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
 </view>

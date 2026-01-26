@@ -3,72 +3,103 @@
   padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
-.submit-order-btn {
-  width: 100%;
-  background-color: #007aff;
-  color: #ffffff;
+.header {
+  padding: 20rpx 0;
+  text-align: center;
+  background-color: #fff;
   margin-bottom: 20rpx;
   border-radius: 10rpx;
-  font-size: 32rpx;
-  padding: 20rpx 0;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
 }
 
-.order-list {
-  margin-bottom: 20rpx;
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
 
 .order-item {
-  background-color: #ffffff;
-  padding: 20rpx;
-  margin-bottom: 15rpx;
+  background-color: #fff;
   border-radius: 10rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  padding: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
 }
 
 .order-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10rpx;
+  margin-bottom: 15rpx;
+  border-bottom: 1rpx solid #eee;
+  padding-bottom: 10rpx;
 }
 
-.order-number {
-  font-weight: bold;
-  font-size: 30rpx;
+.order-id {
+  font-size: 28rpx;
   color: #333;
+  font-weight: bold;
 }
 
-.order-status {
-  font-size: 26rpx;
-  color: #007aff;
+.status {
+  font-size: 24rpx;
+  padding: 5rpx 15rpx;
+  border-radius: 20rpx;
+  color: #fff;
+  background-color: #999;
 }
 
-.order-details {
+.status-created { background-color: #999; } /* 待发布 */
+.status-published { background-color: #FFA500; } /* 已发布 */
+.status-matching { background-color: #007AFF; } /* 匹配中 */
+.status-quoting { background-color: #32CD32; } /* 报价中 */
+.status-accepted { background-color: #32CD32; } /* 已接受 */
+.status-in_transit { background-color: #1E90FF; } /* 运输中 */
+.status-delivered { background-color: #2E8B57; } /* 已送达 */
+.status-cancelled { background-color: #8B0000; } /* 已取消 */
+.status-expired { background-color: #696969; } /* 已过期 */
+
+.order-info {
   display: flex;
   flex-direction: column;
+  gap: 10rpx;
 }
 
-.detail {
+.info-row {
+  display: flex;
   font-size: 26rpx;
   color: #666;
-  margin-bottom: 5rpx;
 }
 
-.empty-list {
+.info-row .label {
+  width: 120rpx;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.info-row .value {
+  flex: 1;
+  word-break: break-all; /* 防止长地址溢出 */
+}
+
+.empty-tips {
   text-align: center;
+  padding: 100rpx 0;
   color: #999;
-  padding: 60rpx 0;
   font-size: 28rpx;
 }
 
-.refresh-btn {
-  width: 100%;
-  background-color: #007aff;
-  color: #ffffff;
-  border-radius: 10rpx;
-  font-size: 32rpx;
+.loading {
+  text-align: center;
   padding: 20rpx 0;
-  margin-top: 20rpx;
+  color: #999;
+  font-size: 28rpx;
 }

@@ -1,123 +1,146 @@
-<!-- pages/orderTrack/orderTrack.wxml -->
+<!-- miniprogram/pages/orderTrack/orderTrack.wxml -->
 <view class="container">
-  <!-- 页面标题 -->
-  <view class="page-title">订单跟踪</view>
-
-  <!-- 订单编号 -->
-  <view class="order-id-container">
-    <text class="order-id-text">订单编号: {{ order.id }}</text>
-  </view>
-
-  <!-- 加载状态 -->
-  <view wx:if="{{ loading }}" class="loading-container">
+  <!-- 加载指示器 -->
+  <view wx:if="{{ loading }}" class="loading">
     <text>加载中...</text>
   </view>
 
-  <!-- 错误状态 -->
-  <view wx:elif="{{ error }}" class="error-container">
+  <!-- 错误信息 -->
+  <view wx:if="{{ error }}" class="error-container">
     <text class="error-text">{{ error }}</text>
-    <button class="retry-btn" bindtap="onRefresh">重新加载</button>
+    <button class="retry-btn" type="default" size="mini" bindtap="onRefresh">重试</button>
   </view>
 
-  <!-- 登录提示 -->
-  <view wx:elif="{{ showLoginPrompt }}" class="login-prompt">
-    <text>该订单已被承运商报价或接单，请登录以查看详细信息并进行操作。</text>
-    <button bindtap="onLoginClick">去登录</button>
-  </view>
-
-  <!-- 报价选择状态 -->
-  <view wx:elif="{{ order && order.status === 'quoted' }}" class="quotes-section">
-    <!-- 说明文字 -->
-    <view class="instructions">
-      <text>以下承运商已报价，请选择您满意的方案：</text>
+  <!-- 订单信息区域 -->
+  <view wx:if="{{ !loading && !error && order }}" class="order-info-section">
+    <view class="order-header">
+      <text class="order-id">订单号: {{ order.id }}</text>
+      <text class="status-tag status-{{ order.status }}">{{ getStatusText(order.status) }}</text>
     </view>
 
-    <!-- 承运商报价卡片列表 -->
-    <view class="quote-card-wrapper">
+    <!-- 倒计时区域 (仅在 claimed 状态且有截止时间时显示) -->
+    <view wx:if="{{ order.status === 'claimed' && order.quote_deadline && timeRemaining }}" class="deadline-countdown">
+      <text class="countdown-text">{{ timeRemaining }}</text>
+    </view>
+
+    <view class="info-item">
+      <label>发货地址:</label>
+      <text>{{ order.pickup_address }}</text>
+    </view>
+    <view class="info-item">
+      <label>收货地址:</label>
+      <text>{{ order.delivery_address }}</text>
+    </view>
+    <view class="info-item">
+      <label>重量:</label>
+      <text>{{ order.weight_kg }} kg</text>
+    </view>
+    <!-- 显示体积 (v1.0.2-safe 新增字段) -->
+    <view class="info-item" wx:if="{{ order.volume_m3 }}">
+      <label>体积:</label>
+      <text>{{ order.volume_m3 }} m³</text>
+    </view>
+    <!-- 显示要求送达时间 (v1.0.2-safe 新增字段) -->
+    <view class="info-item" wx:if="{{ order.required_delivery_time }}">
+      <label>要求送达:</label>
+      <text>{{ formatTime(order.required_delivery_time) }}</text>
+    </view>
+    <view class="info-item">
+      <label>创建时间:</label>
+      <text>{{ formatTime(order.created_at) }}</text>
+    </view>
+    <!-- 显示客户信息 (如果已绑定) -->
+    <view class="info-item" wx:if="{{ order.customer_tenant_name }}">
+      <label>客户:</label>
+      <text>{{ order.customer_tenant_name }}</text>
+    </view>
+    <!-- 显示承运方信息 (如果已绑定) -->
+    <view class="info-item" wx:if="{{ order.carrier_tenant_name }}">
+      <label>承运方:</label>
+      <text>{{ order.carrier_tenant_name }}</text>
+    </view>
+  </view>
+
+  <!-- 登录提示区域 -->
+  <view wx:if="{{ showLoginPrompt && !isCustomerView }}" class="login-prompt-section">
+    <text class="prompt-text">此订单状态需要登录才能查看详情或进行操作。</text>
+    <button class="login-btn" type="primary" size="default" bindtap="onLoginClick">登录</button>
+  </view>
+
+  <!-- 报价列表区域 (仅在 claimed 状态且客户已登录时显示) -->
+  <view wx:if="{{ order && order.status === 'claimed' && isCustomerView && sortedQuotes && sortedQuotes.length > 0 }}" class="quotes-section">
+    <view class="section-header">
+      <text class="section-title">承运方报价</text>
+      <!-- 排序选项 -->
+      <view class="sort-options">
+        <button class="sort-btn {{ sortingOption === 'time' ? 'active' : '' }}" data-option="time" bindtap="onSortChange">按时间</button>
+        <button class="sort-btn {{ sortingOption === 'price' ? 'active' : '' }}" data-option="price" bindtap="onSortChange">按价格</button>
+        <button class="sort-btn {{ sortingOption === 'rating' ? 'active' : '' }}" data-option="rating" bindtap="onSortChange">按评分</button>
+      </view>
+    </view>
+
+    <view class="quotes-list">
       <view
         class="quote-card {{ selectedCarrierId === quote.carrier_tenant_id ? 'selected' : '' }}"
-        wx:for="{{ carrierQuotes }}"
-        wx:key="carrier_tenant_id"
+        wx:for="{{ sortedQuotes }}"
+        wx:key="id"
         bindtap="onQuoteCardTap"
         data-carrier-id="{{ quote.carrier_tenant_id }}"
       >
-        <!-- 承运商名称 -->
-        <view class="carrier-name">
-          <text>{{ quote.carrier_tenant_name || '未知承运商' }}</text>
+        <view class="card-header">
+          <text class="carrier-name">{{ quote.carrier_tenant_name || '未知承运商' }}</text>
+          <!-- 显示评分 (v1.0.2-safe 新增字段) -->
+          <text wx:if="{{ quote.avg_rating }}" class="rating">⭐{{ quote.avg_rating.toFixed(1) }}</text>
         </view>
-
-        <!-- 报价金额 -->
-        <view class="quote-price">
-          <text class="price-label">报价:</text>
-          <text class="price-amount">¥{{ quote.price.toFixed(2) }}</text>
-        </view>
-
-        <!-- 预计送达时间 -->
-        <view class="delivery-time" wx:if="{{ quote.estimated_arrival }}">
-          <text class="time-label">预计送达:</text>
-          <text class="time-value">{{ formatTime(quote.estimated_arrival) }}</text>
-        </view>
-
-        <!-- 备注 -->
-        <view class="remarks" wx:if="{{ quote.note }}">
-          <text class="remarks-label">备注:</text>
-          <text class="remarks-content">{{ quote.note }}</text>
-        </view>
-
-        <!-- 选中状态图标 -->
-        <view class="selection-icon" wx:if="{{ selectedCarrierId === quote.carrier_tenant_id }}">
-          <text class="icon-selected">✓</text>
+        <view class="card-body">
+          <view class="price-item">
+            <label>价格:</label>
+            <text class="price">¥{{ quote.price }}</text>
+          </view>
+          <view class="time-item">
+            <label>预计到达:</label>
+            <text>{{ formatTime(quote.estimated_arrival) || formatTime(quote.created_at) }}</text>
+          </view>
+          <view class="eta-item" wx:if="{{ quote.estimated_hours }}">
+            <label>预计耗时:</label>
+            <text>{{ quote.estimated_hours }} 小时</text>
+          </view>
+          <!-- 显示匹配分数 (v1.0.2-safe 新增字段) -->
+          <view class="match-score-item" wx:if="{{ quote.match_score }}">
+            <label>匹配度:</label>
+            <text>{{ quote.match_score }}</text>
+          </view>
+          <!-- 显示备注 (v1.0.2-safe 新增字段) -->
+          <view class="note-item" wx:if="{{ quote.note }}">
+            <label>备注:</label>
+            <text>{{ quote.note }}</text>
+          </view>
         </view>
       </view>
     </view>
 
-    <!-- 确认选择按钮 -->
-    <view class="action-buttons">
-      <button
-        class="confirm-btn {{ selectedCarrierId ? 'active' : 'disabled' }}"
-        bindtap="onConfirmTap"
-        disabled="{{ !selectedCarrierId }}"
-      >
-        确认选择
-      </button>
-    </view>
+    <!-- 选择按钮 -->
+    <button
+      wx:if="{{ selectedCarrierId }}"
+      class="select-btn"
+      type="primary"
+      bindtap="onSelectCarrier"
+      disabled="{{ timeRemaining === '已截止' }}" 
+    >
+      确认选择 {{ getCarrierNameById(selectedCarrierId) }}
+    </button>
+    <button
+      wx:else
+      class="select-btn disabled"
+      disabled="true"
+    >
+      请选择承运方
+    </button>
   </view>
 
-  <!-- 其他订单状态的原有跟踪逻辑 -->
-  <view wx:elif="{{ order }}" class="order-tracking-details">
-    <!-- 订单状态 -->
-    <view class="status-section">
-      <text class="status-text">当前状态: {{ getStatusText(order.status) }}</text>
-    </view>
-
-    <!-- 订单详细信息 -->
-    <view class="order-details">
-      <view class="detail-item">
-        <text class="label">起点:</text>
-        <text class="value">{{ order.from_address }}</text>
-      </view>
-      <view class="detail-item">
-        <text class="label">终点:</text>
-        <text class="value">{{ order.to_address }}</text>
-      </view>
-      <view class="detail-item">
-        <text class="label">货物描述:</text>
-        <text class="value">{{ order.goods_description }}</text>
-      </view>
-      <view class="detail-item">
-        <text class="label">下单时间:</text>
-        <text class="value">{{ formatTime(order.created_at) }}</text>
-      </view>
-      <!-- 可能还有承运商信息、物流节点等... -->
-      <view class="detail-item" wx:if="{{ order.claimed_at }}">
-        <text class="label">被接单时间:</text>
-        <text class="value">{{ formatTime(order.claimed_at) }}</text>
-      </view>
-      <view class="detail-item" wx:if="{{ order.claimed_by_carrier_name }}">
-        <text class="label">承运商:</text>
-        <text class="value">{{ order.claimed_by_carrier_name }}</text>
-      </view>
-      <!-- ... 其他状态特有信息 ... -->
-    </view>
+  <!-- 没有报价时的提示 (可选) -->
+  <view wx:if="{{ order && order.status === 'claimed' && isCustomerView && (!sortedQuotes || sortedQuotes.length === 0) }}" class="no-quotes-section">
+    <text class="no-quotes-text">暂无承运方报价，请稍后再试。</text>
   </view>
+
 </view>
