@@ -20,6 +20,8 @@
     "helmet": "^7.0.0",
     "openapi-backend": "^5.9.0",
     "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "tough-cookie": "^6.0.0"
   },
   "devDependencies": {
