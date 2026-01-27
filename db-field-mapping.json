@@ -1,0 +1,27 @@
+{
+  "users": {
+    "username": "username",
+    "email": "email",
+    "phone": "phone",
+    "name": "name"
+  },
+  "tenants": {
+    "name": "name",
+    "contact_person": "contact_person",
+    "contact_phone": "contact_phone",
+    "email": "email",
+    "address": "address"
+  },
+  "customers": {
+    "name": "name",
+    "phone": "phone",
+    "address": "address"
+  },
+  "orders": {
+    "customer_phone": "customer_phone"
+  },
+  "tenant_vehicles": {
+    "driver_name": "driver_name",
+    "driver_phone": "driver_phone"
+  }
+}

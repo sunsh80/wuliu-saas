@@ -1,0 +1,9 @@
+{
+  "validation_system": "shared_validation_library",
+  "validation_file": "./validation-rules.js",
+  "database_schema": "./backend/db/schema.js",
+  "api_spec": "./backend/openapi.yaml",
+  "validation_mapping": "./validation-metadata.json",
+  "field_mapping": "./db-field-mapping.json",
+  "validation_docs": "./validation-spec.md"
+}
