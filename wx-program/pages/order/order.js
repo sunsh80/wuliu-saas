@@ -199,6 +199,21 @@ Page({
 
   // 提交订单
   submitOrder() {
+    // 检查登录状态
+    const isLoggedIn = wx.getStorageSync('isLoggedIn') || wx.getStorageSync('token');
+    if (!isLoggedIn) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        wx.redirectTo({
+          url: '/pages/login/login',
+        });
+      }, 1500);
+      return;
+    }
+
     const { selectedCargoType, cargoRemark, goodsWeight, length, width, height, volume, departureAddress, departureName, departurePhone, destinationAddress, destinationName, destinationPhone, selectedVehicleType, pickupTime } = this.data;
 
     // 验证必填项
