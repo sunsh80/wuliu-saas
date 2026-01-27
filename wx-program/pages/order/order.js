@@ -237,8 +237,9 @@ Page({
       url: 'http://192.168.2.250:3000/api/customer/orders', // 使用正确的后端API地址
       method: 'POST',
       header: {
-        'Authorization': 'Bearer ' + wx.getStorageSync('token'),
         'Content-Type': 'application/json'
+        // 注意：后端使用的是基于Session的认证，会自动带上Cookie
+        // 不需要手动设置Authorization头
       },
       data: orderData,
       success: (res) => {
