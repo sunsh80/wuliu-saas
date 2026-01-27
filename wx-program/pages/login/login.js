@@ -55,7 +55,7 @@ Page({
         });
         return;
       }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+ $ /;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
         wx.showToast({
           title: '邮箱格式不正确',
@@ -72,8 +72,8 @@ Page({
         });
         return;
       }
-      description = /^1[3-9]\d{9} $ /;
-      if (!phoneRegex.test(value)) {
+      const { validatePhone } = require('../../utils/validation-rules.js');
+      if (!validatePhone(value)) {
         wx.showToast({
           title: '手机号格式不正确',
           icon: 'none'

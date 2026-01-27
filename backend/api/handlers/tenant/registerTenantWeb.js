@@ -2,6 +2,7 @@
 const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken'); // 如果需要返回 JWT Token
 const { getDb } = require('../../../db/index.js'); // 使用项目提供的数据库获取方法
+const { validatePhone, validateEmail, validatePassword } = require('../../../../validation-rules.js'); // 引入共享验证规则
 
 // --- 添加这行调试日志 ---
 console.log("### DEBUG: Loading CORRECTED registerTenantWeb.js - Handling customer vs carrier registration ###");
@@ -37,9 +38,9 @@ module.exports = async (c /*, req, res */) => {
             };
         }
         // 为新客户设置默认值
-        const defaultName = `Customer_ $ {contact_phone}`;
-        const defaultContactPerson = `User_ $ {contact_phone}`;
-        const defaultEmail = `customer_ $ {contact_phone}@example.com`;
+        const defaultName = `Customer_${contact_phone}`;
+        const defaultContactPerson = `User_${contact_phone}`;
+        const defaultEmail = `customer_${contact_phone}@example.com`;
         const defaultAddress = null;
 
         // 重新赋值为默认值，避免后续使用未定义变量
@@ -105,11 +106,8 @@ module.exports = async (c /*, req, res */) => {
         console.log("### DEBUG: registerTenantWeb.js - FULL Registration - All Required Fields Present ###");
     }
 
-    // Phone & Email format validation (using the same regex as defined in openapi.yaml)
-    const phoneRegex = /^1[3-9]\d{9}$/; // Same as defined in openapi.yaml
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!phoneRegex.test(contact_phone)) {
+    // 使用共享验证库进行格式验证
+    if (!validatePhone(contact_phone)) {
         console.log("### DEBUG: registerTenantWeb.js - Validation FAILED: Invalid phone format ###");
         return {
             statusCode: 400,
@@ -121,7 +119,21 @@ module.exports = async (c /*, req, res */) => {
         };
     }
 
-    if (!emailRegex.test(finalEmail)) { // 验证最终的邮箱（可能是默认的）
+    // 使用共享验证库验证密码强度
+    if (!validatePassword(password)) {
+        console.log("### DEBUG: registerTenantWeb.js - Validation FAILED: Weak password ###");
+        return {
+            statusCode: 400,
+            body: {
+                success: false,
+                error: 'WEAK_PASSWORD',
+                message: 'Password must be at least 6 characters long.'
+            }
+        };
+    }
+
+    // 对于客户注册，使用默认邮箱，应验证其格式；对于完整租户注册，验证提供的邮箱格式
+    if (!isCustomerOnly && !validateEmail(finalEmail)) { // 验证最终的邮箱（可能是默认的）
         console.log("### DEBUG: registerTenantWeb.js - Validation FAILED: Invalid email format for finalEmail:", finalEmail);
         return {
             statusCode: 400,
@@ -129,6 +141,19 @@ module.exports = async (c /*, req, res */) => {
                 success: false,
                 error: 'INVALID_EMAIL_FORMAT',
                 message: 'Email format is incorrect.'
+            }
+        };
+    }
+
+    // 对于客户注册，验证默认邮箱的格式
+    if (isCustomerOnly && !validateEmail(finalEmail)) {
+        console.log("### DEBUG: registerTenantWeb.js - Validation FAILED: Invalid default email format for customer registration:", finalEmail);
+        return {
+            statusCode: 400,
+            body: {
+                success: false,
+                error: 'INVALID_EMAIL_FORMAT',
+                message: 'Generated email format is incorrect.'
             }
         };
     }

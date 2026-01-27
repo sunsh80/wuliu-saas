@@ -65,7 +65,7 @@ components:
       properties:
        contact_phone:
         type: string
-        pattern: '^1[3-9][0-9]{9}$' # 中国手机号格式
+        pattern: '^1[3-9]\d{9}$' # 中国手机号格式
       example: "13800138000"
     password:
       type: string
@@ -77,22 +77,6 @@ components:
         type: string
         enum: [customer]
       example: ["customer"]
-    # --- 通用验证模式 ---
-    Username:
-      type: string
-      pattern: '^[a-zA-Z0-9_-]{3,20}$' # 用户名格式：字母、数字、下划线、连字符，长度3-20
-      example: "user_name_123"
-
-    Name:
-      type: string
-      pattern: '^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,50}$' # 名称格式：支持中文、英文、数字、下划线、连字符，长度1-50
-      example: "张三"
-
-    Address:
-      type: string
-      pattern: '^[\u4e00-\u9fa5a-zA-Z0-9\s\S]{1,200}$' # 地址格式：支持中文、英文、数字、空格及任意字符，长度1-200
-      example: "北京市朝阳区某某街道123号"
-
     # --- 租户相关 ---
     TenantApplication:
       type: object
@@ -105,12 +89,14 @@ components:
         - roles
       properties:
         name:
-          $ref: '#/components/schemas/Name'
+          type: string
+          example: "ABC 物流公司"
         contact_person:
-          $ref: '#/components/schemas/Name'
+          type: string
+          example: "张三"
         contact_phone:
           type: string
-          pattern: '^1[3-9][0-9]{9}$'
+          pattern: '^1[3-9]\d{9}$'
         email:
           type: string
           format: email
@@ -126,7 +112,8 @@ components:
           example: ["customer", "carrier"]
         # === 新增：可选能力字段（不影响旧逻辑）===
         address:
-          $ref: '#/components/schemas/Address'
+          type: string
+          example: "上海市浦东新区XX路XX号"
         service_radius_km:
           type: integer
           minimum: 1
@@ -149,9 +136,9 @@ components:
         id:
           type: string
         name:
-          $ref: '#/components/schemas/Name'
+          type: string
         contact_person:
-          $ref: '#/components/schemas/Name'
+          type: string
         roles:
           type: array
           items:
@@ -159,7 +146,7 @@ components:
             enum: [customer, carrier]
         # === 新增：可选能力字段 ===
         address:
-          $ref: '#/components/schemas/Address'
+          type: string
         service_radius_km:
           type: integer
         capacity_kg:
@@ -256,7 +243,8 @@ components:
           example: "2026-01-14T10:00:00Z"
         # 原有字段
         customer_name:
-          $ref: '#/components/schemas/Name'
+          type: string
+          example: "李四"
         customer_phone:
           type: string
           pattern: '^1[3-9]\d{9}$'
@@ -335,15 +323,13 @@ components:
         id:
           type: integer
         name:
-          $ref: '#/components/schemas/Name'
+          type: string
         contact_person:
-          $ref: '#/components/schemas/Name'
+          type: string
         contact_phone:
           type: string
-          pattern: '^1[3-9][0-9]{9}$'
         email:
           type: string
-          format: email
         status:
           type: string
           enum: [pending, approved, rejected, active, inactive]
@@ -1069,7 +1055,9 @@ paths:
                 - platform_name
               properties:
                 username:
-                  $ref: '#/components/schemas/Username'
+                  type: string
+                  minLength: 3
+                  example: "superadmin"
                 password:
                   type: string
                   minLength: 8
@@ -1131,7 +1119,8 @@ paths:
                 - password
               properties:
                 username:
-                  $ref: '#/components/schemas/Username'
+                  type: string
+                  example: "superadmin"
                 password:
                   type: string
                   example: "SecurePass123!"
@@ -1215,7 +1204,8 @@ paths:
                 - email
               properties:
                 username:
-                  $ref: '#/components/schemas/Username'
+                  type: string
+                  minLength: 3
                 password:
                   type: string
                   minLength: 8
@@ -1830,7 +1820,7 @@ paths:
                   example: "user@example.com"
                 phone:
                   type: string
-                  pattern: '^1[3-9][0-9]{9}$' # 中国手机号格式
+                  pattern: '^1[3-9]\d{9}$' # 中国手机号格式
                   description: "租户/客户注册手机号"
                   example: "13800138000"
                 password:
@@ -1964,7 +1954,7 @@ paths:
                   type: string
                 customer_phone:
                   type: string
-                  pattern: '^1[3-9][0-9]{9}$'
+                  pattern: '^1[3-9]\d{9}$'
                 address:
                   type: string
                 weight:

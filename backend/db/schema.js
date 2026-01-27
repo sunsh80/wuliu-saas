@@ -92,6 +92,26 @@ const CORE_TABLES = {
       customer_phone TEXT,
       FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
     );
+  `,
+  tenant_vehicles: `
+    CREATE TABLE IF NOT EXISTS tenant_vehicles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER NOT NULL,
+      plate_number TEXT NOT NULL,
+      type TEXT NOT NULL,
+      length REAL,
+      width REAL,
+      height REAL,
+      max_weight REAL,
+      volume REAL,
+      status TEXT DEFAULT 'active',
+      driver_name TEXT,
+      driver_phone TEXT,
+      image_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
+    );
   `
 };
 

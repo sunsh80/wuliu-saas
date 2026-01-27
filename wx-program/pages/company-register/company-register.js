@@ -44,13 +44,13 @@ Page({
       return;
     }
 
-    // --- 使用与后端一致的手机号验证规则 ---
+    // --- 使用共享验证库进行手机号验证 ---
     const cleanedPhoneNumber = contact_phone.trim();
     console.log("Debug - Input phone:", contact_phone, "Cleaned phone:", cleanedPhoneNumber);
 
-    // 使用与openapi.yaml和后端一致的正则表达式：^1[3-9]\d{9}$
-    const phoneRegex = /^1[3-9]\d{9}$/;
-    let isPhoneValid = phoneRegex.test(cleanedPhoneNumber);
+    // 使用共享验证库验证手机号
+    const { validatePhone } = require('../../utils/validation-rules.js');
+    let isPhoneValid = validatePhone(cleanedPhoneNumber);
 
     if (!isPhoneValid) {
       wx.showToast({ title: '手机号格式不正确', icon: 'none' });
