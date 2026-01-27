@@ -210,23 +210,23 @@ Page({
       return;
     }
 
-    // 构建要发送的数据对象
+    // 构建要发送的数据对象，映射到后端API期望的字段名
     const orderData = {
-      cargoType: selectedCargoType,
-      cargoRemark: cargoRemark, // 包含货物备注
-      goodsWeight: parseFloat(goodsWeight),
-      length: parseFloat(length),
-      width: parseFloat(width),
-      height: parseFloat(height),
-      volume: parseFloat(volume), // 使用计算出的体积
-      departureAddress: departureAddress,
-      departureName: departureName,
-      departurePhone: departurePhone,
-      destinationAddress: destinationAddress,
-      destinationName: destinationName,
-      destinationPhone: destinationPhone,
-      vehicleType: selectedVehicleType,
-      pickupTime: pickupTime,
+      cargo_type: selectedCargoType, // 货物类型
+      cargo_remark: cargoRemark, // 货物备注
+      weight_kg: parseFloat(goodsWeight), // 重量
+      length: parseFloat(length), // 长度
+      width: parseFloat(width), // 宽度
+      height: parseFloat(height), // 高度
+      volume_m3: parseFloat(volume), // 体积
+      pickup_address: departureAddress, // 发货地址
+      delivery_address: destinationAddress, // 收货地址
+      shipper_name: departureName, // 发货人姓名
+      shipper_phone: departurePhone, // 发货人电话
+      recipient_name: destinationName, // 收货人姓名
+      recipient_phone: destinationPhone, // 收货人电话
+      vehicle_type: selectedVehicleType, // 车型
+      pickup_time: pickupTime, // 取货时间
       estimatedPrice: null // 缺省状态
     };
 

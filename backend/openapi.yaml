@@ -241,7 +241,42 @@ components:
           format: float
           minimum: 0.1
           example: 25.5
-        # === 新增可选字段 ===
+        # === 小程序端特有字段 ===
+        cargo_type:
+          type: string
+          enum: [家具家电, 装修建材, 办公用品, 快递包裹, 其他]
+          description: "货物类型"
+          example: "家具家电"
+        cargo_remark:
+          type: string
+          description: "货物备注"
+          example: "易碎品，请小心搬运"
+        length:
+          type: number
+          minimum: 0.01
+          description: "货物长度(米)"
+          example: 1.2
+        width:
+          type: number
+          minimum: 0.01
+          description: "货物宽度(米)"
+          example: 0.8
+        height:
+          type: number
+          minimum: 0.01
+          description: "货物高度(米)"
+          example: 0.6
+        vehicle_type:
+          type: string
+          enum: [无人车, 有人车]
+          description: "车型要求"
+          example: "有人车"
+        pickup_time:
+          type: string
+          format: date-time
+          description: "预约取货时间"
+          example: "2026-01-15T10:00:00Z"
+        # === 现有可选字段 ===
         volume_m3:
           type: number
           minimum: 0.01
