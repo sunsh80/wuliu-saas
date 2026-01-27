@@ -249,7 +249,7 @@ Page({
 
     // 发送网络请求提交订单
     wx.request({
-      url: 'http://localhost:3000/api/customer/orders', // 使用正确的后端API地址
+      url: 'http://192.168.2.250:3000/api/customer/orders', // 使用正确的后端API地址
       method: 'POST',
       header: {
         'Content-Type': 'application/json'
