@@ -72,7 +72,7 @@ Page({
         });
         return;
       }
-      const phoneRegex = /^1[3-9]\d{9} $ /;
+      description = /^1[3-9]\d{9} $ /;
       if (!phoneRegex.test(value)) {
         wx.showToast({
           title: '手机号格式不正确',

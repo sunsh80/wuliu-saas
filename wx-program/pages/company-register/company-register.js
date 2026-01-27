@@ -1,209 +1,164 @@
 // pages/company-register/company-register.js
-
 Page({
   data: {
-    name: '', // 公司/租户名称
-    email: '', // 邮箱
-    contact_person: '', // 联系人
-    contact_phone: '', // 手机号
-    password: '', // 密码
-    confirmPassword: '', // 确认密码
-    selectedRole: null, // 选中的角色 ("carrier" 或 "customer")
+    contact_phone: '',
+    password: '',
+    confirmPassword: '',
+    selectedRole: null,
     roleOptions: [
-      { label: '租户承运商', value: 'carrier' },
-      { label: '租户客户', value: 'customer' }
+      { label: '我是客户', value: 'customer' },
+      { label: '我是承运商', value: 'carrier' }
     ]
   },
 
-  // 输入框绑定函数
-  bindNameInput(e) {
-    this.setData({
-      name: e.detail.value
-    });
-  },
-  bindEmailInput(e) {
-    this.setData({
-      email: e.detail.value
-    });
-  },
-  bindContactPersonInput(e) {
-    this.setData({
-      contact_person: e.detail.value
-    });
-  },
   bindContactPhoneInput(e) {
-    this.setData({
-      contact_phone: e.detail.value
-    });
+    this.setData({ contact_phone: e.detail.value });
   },
   bindPasswordInput(e) {
-    this.setData({
-      password: e.detail.value
-    });
+    this.setData({ password: e.detail.value });
   },
   bindConfirmPasswordInput(e) {
-    this.setData({
-      confirmPassword: e.detail.value
-    });
+    this.setData({ confirmPassword: e.detail.value });
   },
-
-  // 单选按钮选择角色
   onRoleChange(e) {
-    const selectedValue = e.detail.value;
-    this.setData({
-      selectedRole: selectedValue
-    });
+    this.setData({ selectedRole: e.detail.value });
   },
 
-  // 提交注册
   submitRegister() {
-    const { name, email, contact_person, contact_phone, password, confirmPassword, selectedRole } = this.data;
+    const { contact_phone, password, confirmPassword, selectedRole } = this.data;
 
-    // 前端基础验证
-    if (!name || !name.trim()) {
-      wx.showToast({
-        title: '请输入公司/租户名称',
-        icon: 'none'
-      });
-      return;
-    }
-    if (!email || !email.trim()) {
-      wx.showToast({
-        title: '请输入邮箱',
-        icon: 'none'
-      });
-      return;
-    }
-    if (!contact_person || !contact_person.trim()) {
-      wx.showToast({
-        title: '请输入联系人',
-        icon: 'none'
-      });
-      return;
-    }
     if (!contact_phone || !contact_phone.trim()) {
-      wx.showToast({
-        title: '请输入手机号',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入手机号', icon: 'none' });
       return;
     }
     if (!password) {
-      wx.showToast({
-        title: '请输入密码',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请输入密码', icon: 'none' });
       return;
     }
     if (!confirmPassword) {
-      wx.showToast({
-        title: '请再次输入密码',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请再次输入密码', icon: 'none' });
       return;
     }
     if (!selectedRole) {
-      wx.showToast({
-        title: '请选择公司类别',
-        icon: 'none'
-      });
+      wx.showToast({ title: '请选择用户类型', icon: 'none' });
       return;
     }
 
-    // 验证邮箱格式
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+ $ /;
-    if (!emailRegex.test(email)) {
-      wx.showToast({
-        title: '邮箱格式不正确',
-        icon: 'none'
-      });
+    // --- 使用与后端一致的手机号验证规则 ---
+    const cleanedPhoneNumber = contact_phone.trim();
+    console.log("Debug - Input phone:", contact_phone, "Cleaned phone:", cleanedPhoneNumber);
+
+    // 使用与openapi.yaml和后端一致的正则表达式：^1[3-9]\d{9}$
+    const phoneRegex = /^1[3-9]\d{9}$/;
+    let isPhoneValid = phoneRegex.test(cleanedPhoneNumber);
+
+    if (!isPhoneValid) {
+      wx.showToast({ title: '手机号格式不正确', icon: 'none' });
+      console.log("Debug - Manual Phone validation FAILED for:", cleanedPhoneNumber);
       return;
+    } else {
+       console.log("Debug - Manual Phone validation PASSED for:", cleanedPhoneNumber);
     }
 
-    // 验证手机号格式
-    const phoneRegex = /^1[3-9]\d{9} $ /;
-    if (!phoneRegex.test(contact_phone)) {
-      wx.showToast({
-        title: '手机号格式不正确',
-        icon: 'none'
-      });
-      return;
-    }
-
-    // 验证密码长度
     if (password.length < 6) {
-      wx.showToast({
-        title: '密码长度至少为6位',
-        icon: 'none'
-      });
+      wx.showToast({ title: '密码长度至少为6位', icon: 'none' });
       return;
     }
-
-    // 验证密码一致性
     if (password !== confirmPassword) {
-      wx.showToast({
-        title: '两次输入的密码不一致',
-        icon: 'none'
-      });
+      wx.showToast({ title: '两次输入的密码不一致', icon: 'none' });
       return;
     }
 
-    // 显示加载提示
-    wx.showLoading({
-      title: '提交中...',
-    });
+    // 调用后端接口进行最终验证和注册
+    if (selectedRole === 'customer') {
+      this.handleCustomerRegistration(cleanedPhoneNumber, password);
+    } else if (selectedRole === 'carrier') {
+      this.handleCarrierRegistration();
+    }
+  },
 
-    // 发起注册请求
+  handleCustomerRegistration(phone, password) {
+    wx.showLoading({ title: '注册中...' });
+
     wx.request({
-      url: 'http://192.168.2.250/api/tenant-web/register', // 替换为你的实际API地址
+      url: 'http://localhost:3000/api/tenant-web/register', // 使用与openapi.yaml一致的URL
       method: 'POST',
-      header: {
-        'content-type': 'application/json'
-      },
       data: {
-        name: name.trim(),
-        email: email.trim(),
-        contact_person: contact_person.trim(),
-        contact_phone: contact_phone.trim(),
-        password: password,
-        roles: [selectedRole === 'carrier' ? 'carrier' : 'customer'] // 根据选择的角色确定
+        contact_phone: phone, // 符合CustomerWebRegistration schema
+        password: password,   // 符合CustomerWebRegistration schema
+        roles: ['customer']   // 符合CustomerWebRegistration schema
+      },
+      header: {
+        'Content-Type': 'application/json',
       },
       success: (res) => {
+        console.log('Backend Response:', res); // 调试日志 - 完整响应
+        // --- 新增：详细打印错误信息 ---
+        if (res.data && res.data.errors) {
+             console.log('Backend Validation Errors:', res.data.errors); // 打印具体的错误详情
+        }
+        // --- 新增结束 ---
         wx.hideLoading();
-        if (res.statusCode === 200 && res.data.success) {
-          wx.showToast({
-            title: '注册成功',
-            icon: 'success',
-            duration: 2000
-          });
-          // 注册成功后保存登录状态和可能的 token
-          wx.setStorageSync('isLoggedIn', true);
-          if (res.data.token) {
-            wx.setStorageSync('token', res.data.token);
+
+        if (res.statusCode === 201 || (res.statusCode === 200 && res.data && res.data.success)) {
+          if (res.data && res.data.success) {
+            wx.showToast({ title: res.data.message || '注册成功', icon: 'success' });
+            wx.setStorageSync('isLoggedIn', true);
+            // 保存 token 和 userInfo (如果后端返回)
+            // wx.setStorageSync('token', res.data.token);
+            // wx.setStorageSync('userInfo', res.data.userInfo);
+            wx.switchTab({ url: '/pages/index/index' });
+          } else {
+            // 显示后端返回的具体错误信息
+            // --- 修改：优先显示 errors 中的详细信息 ---
+            let errorMessage = res.data.message || '注册失败';
+            if (res.data.errors && res.data.errors.length > 0) {
+                // 假设 errors 是一个对象数组，每个对象有 param 和 msg
+                errorMessage = res.data.errors.map(err => err.param + ': ' + err.msg).join(', ');
+            }
+            wx.showToast({ title: errorMessage, icon: 'none' });
+            // --- 修改结束 ---
           }
-          if (res.data.data) {
-             wx.setStorageSync('userInfo', res.data.data); // 假设返回用户信息
-          }
-          // 跳转到首页或其他成功页面
-          wx.switchTab({
-            url: '/pages/index/index', // 替换为你想要跳转的页面
-          });
         } else {
-          // 处理后端返回的错误
-          const errorMessage = res.data.message || res.data.error || '注册失败，请稍后重试';
-          wx.showToast({
-            title: errorMessage,
-            icon: 'none'
-          });
+          // 处理 HTTP 错误状态码
+          let errorMsg = '服务器错误 (' + res.statusCode + ')';
+          if (res.data && res.data.message) {
+            errorMsg = res.data.message;
+          }
+          wx.showToast({ title: errorMsg, icon: 'none' });
         }
       },
       fail: (err) => {
+        console.error('Network Error:', err); // 调试日志
         wx.hideLoading();
-        console.error('注册请求失败:', err);
-        wx.showToast({
-          title: '网络错误，请检查网络连接',
-          icon: 'none'
-        });
+        wx.showToast({ title: '网络连接失败', icon: 'none' });
+      }
+    });
+  },   
+  handleCarrierRegistration() {
+    wx.showModal({
+      title: '前往PC端注册',
+      content: '承运商注册需要更多信息，请前往PC端进行注册。',
+      showCancel: false,
+      confirmText: '我知道了',
+      success: (modalRes) => {
+        if (modalRes.confirm) {
+          wx.showModal({
+            title: '提示',
+            content: '请打开电脑浏览器，访问 https://your-pc-site.com/register-carrier 进行注册',
+            showCancel: false,
+            confirmText: '复制链接',
+            success: (copyRes) => {
+              if (copyRes.confirm) {
+                wx.setClipboardData({
+                  data: 'https://your-pc-site.com/register-carrier', // 替换为实际链接
+                  success: () => wx.showToast({ title: '链接已复制', icon: 'none' }),
+                  fail: () => wx.showToast({ title: '复制失败，请手动复制', icon: 'none' })
+                });
+              }
+            }
+          });
+        }
       }
     });
   }

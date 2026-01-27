@@ -31,7 +31,7 @@
     </view>
 
     <!-- 提交按钮 -->
-    <button class="submit-btn" bindtap="submitRegisterOrPrompt">{{ selectedRole === 'carrier' ? '前往PC端申请' : '提交注册' }}</button>
+<button class="submit-btn" bindtap="submitRegister">提交注册</button>
     <!-- 按钮文字根据选择的角色动态变化 -->
 
   </form>

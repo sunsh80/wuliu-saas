@@ -184,12 +184,13 @@ class DatabaseSchema {
     if (!adminExists) {
       await db.run(
         `INSERT INTO users (
-          username, email, name, role, roles, type, organization_id, organization_name,
+          username, email, phone, name, role, roles, type, organization_id, organization_name,
           organization_type, password_hash, user_type, is_active, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           'admin',
           'admin@example.com',
+          '13800138000',  // 添加默认电话号码
           'Administrator',
           'super_admin',
           JSON.stringify(['super_admin']),

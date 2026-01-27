@@ -55,6 +55,28 @@ components:
       name: connect.sid
       description: 租户登录后自动携带（由 Express Session 管理）
   schemas:
+   # 为 Web 端客户注册专用 ---
+    CustomerWebRegistration:
+      type: object
+      required:
+      - contact_phone
+      - password
+      - roles
+      properties:
+       contact_phone:
+        type: string
+        pattern: '^1[3-9]\\d{9}$ ' # 中国手机号格式
+      example: "13800138000"
+    password:
+      type: string
+      minLength: 6
+      example: "password123"
+    roles:
+      type: array
+      items:
+        type: string
+        enum: [customer]
+      example: ["customer"]
     # --- 租户相关 ---
     TenantApplication:
       type: object
@@ -1723,7 +1745,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TenantApplication' # 复用已定义的 TenantApplication
+              $ref: '#/components/schemas/CustomerWebRegistration'
       responses:
         '201':
           description: 注册成功
