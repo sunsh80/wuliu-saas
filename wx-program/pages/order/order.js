@@ -234,7 +234,7 @@ Page({
 
     // 发送网络请求提交订单
     wx.request({
-      url: 'https://your-api.com/orders', // 替换为您的API地址
+      url: 'http://192.168.2.250:3000/api/customer/orders', // 使用正确的后端API地址
       method: 'POST',
       header: {
         'Authorization': 'Bearer ' + wx.getStorageSync('token'),
@@ -242,7 +242,7 @@ Page({
       },
       data: orderData,
       success: (res) => {
-        if (res.statusCode === 200) {
+        if (res.statusCode === 201 || res.statusCode === 200) {
           wx.showToast({
             title: '订单创建成功',
             icon: 'success'
