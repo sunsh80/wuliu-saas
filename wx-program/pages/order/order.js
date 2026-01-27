@@ -241,6 +241,10 @@ Page({
         // 注意：后端使用的是基于Session的认证，会自动带上Cookie
         // 不需要手动设置Authorization头
       },
+      // 启用Cookie，确保会话信息被发送
+      enableHttp2: true,
+      enableQuic: true,
+      enableCache: false,
       data: orderData,
       success: (res) => {
         if (res.statusCode === 201 || res.statusCode === 200) {
