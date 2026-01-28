@@ -15,7 +15,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#4CAF50",
-    "navigationBarTitleText": "物流小程序",
+    "navigationBarTitleText": "蚁到达无人物流",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
