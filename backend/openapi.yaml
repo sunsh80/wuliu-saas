@@ -914,7 +914,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/customer/orders/{orderId}:
+  /api/customer/orders/{order_id}:
     get:
       tags:
         - customer-order
@@ -923,7 +923,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -947,7 +947,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -980,7 +980,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -993,7 +993,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/customer/orders/{orderId}/quotes:
+  /api/customer/orders/{order_id}/quotes:
     get:
       tags:
         - customer-order
@@ -1002,7 +1002,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -1609,7 +1609,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  /api/carrier/orders/{orderId}/quote:
+  /api/carrier/orders/{order_id}/quote:
     post:
       operationId: submitCarrierQuote
       summary: 承运商为指定订单提交报价
@@ -1623,7 +1623,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -1671,7 +1671,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      orderId:
+                      order_id:
                         type: integer
                         example: 123
                       quote:
@@ -2159,7 +2159,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/tenant-web/orders/{orderId}/claim:
+  /api/tenant-web/orders/{order_id}/claim:
     put:
       tags:
         - auth
@@ -2168,7 +2168,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:
@@ -2183,7 +2183,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/tenant-web/orders/{orderId}/complete:
+  /api/tenant-web/orders/{order_id}/complete:
     put:
       tags:
         - auth
@@ -2192,7 +2192,7 @@ paths:
       security:
         - TenantSessionAuth: []
       parameters:
-        - name: orderId
+        - name: order_id
           in: path
           required: true
           schema:

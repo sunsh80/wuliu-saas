@@ -1,5 +1,12 @@
 # 验证规范文档
 
+## API参数命名规范
+
+- 前端JavaScript变量使用camelCase（如orderId, carrierId）
+- 后端API路径参数使用snake_case（如order_id, carrier_id）
+- 数据库字段使用snake_case（如order_id, carrier_id）
+- 请求体参数使用camelCase（如orderId, carrierId）
+
 ## 手机号验证
 - 模式: `^1[3-9][0-9]{9}$`
 - 用途: 中国手机号格式验证

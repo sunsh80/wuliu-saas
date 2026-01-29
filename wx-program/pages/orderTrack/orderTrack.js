@@ -46,7 +46,7 @@ Page({
     try {
       const res = await new Promise((resolve, reject) => {
         wx.request({
-          url: `http://192.168.2.250/api/public/orders/ $ {orderId}`, // 请替换为您的实际API地址
+          url: `http://192.168.2.250/api/public/orders/${orderId}`, // 请替换为您的实际API地址
           method: 'GET',
           header: { 'Content-Type': 'application/json' },
           success: resolve,
@@ -96,7 +96,7 @@ Page({
     try {
       const res = await new Promise((resolve, reject) => {
         wx.request({
-          url: `http://192.168.2.250/api/customer/orders/ $ {orderId}`, // 请替换为您的实际API地址
+          url: `http://192.168.2.250/api/customer/orders/${orderId}`, // 请替换为您的实际API地址
           method: 'GET',
           header: {
             'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ Page({
     try {
       const res = await new Promise((resolve, reject) => {
         wx.request({
-          url: `http://192.168.2.250/api/customer/orders/ $ {orderId}/quotes`, // 请替换为您的实际API地址
+          url: `http://192.168.2.250/api/customer/orders/${orderId}/quotes`, // 请替换为您的实际API地址
           method: 'GET',
           header: {
             'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ Page({
 
     try {
       const res = wx.request({
-        url: `http://192.168.2.250/api/customer/orders/ $ {orderId}/select-carrier`, // 请替换为您的实际API地址
+        url: `http://192.168.2.250/api/customer/orders/${orderId}/award`, // 请替换为您的实际API地址
         method: 'POST',
         header: { 'Content-Type': 'application/json' },
         data: { carrier_tenant_id: selectedCarrierId },

@@ -63,13 +63,6 @@ wuliu_project/
 2. **数据存储**: 业务逻辑 → 数据库模型 → 数据库
 3. **响应返回**: 业务逻辑 → API响应 → 客户端
 
-## API参数命名规范
-
-根据OpenAPI规范，所有路径参数统一使用snake_case命名约定：
-- `{order_id}` 而不是 `{orderId}`
-- `{carrier_id}` 而不是 `{carrierId}`
-- `{customer_id}` 而不是 `{customerId}`
-
 ## 验证规则应用层级
 
 1. **前端验证**: 微信小程序使用验证库进行即时验证

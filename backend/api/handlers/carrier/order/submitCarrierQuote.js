@@ -47,10 +47,10 @@ module.exports = async (c) => { // Use 'c' for consistency with openapi-backend 
       };
     }
 
-    // Extract orderId from path parameters
-    const orderId = c.request.params.orderId;
-    if (!orderId) {
-      console.log("Missing order ID in request parameters:", { orderId });
+    // Extract order_id from path parameters
+    const order_id = c.request.params.orderId;
+    if (!order_id) {
+      console.log("Missing order ID in request parameters:", { order_id });
       return {
         status: 400, // Bad Request
         body: { success: false, error: 'MISSING_ORDER_ID' }
@@ -83,7 +83,7 @@ const carrierTenantId = c.context.tenantId;
     const order = await new Promise((resolve, reject) => {
       db.get(
         `SELECT id, status, carrier_id FROM orders WHERE id = ? AND status IN ('pending_claim', 'claimed')`,
-        [orderId],
+        [order_id],
         (err, row) => {
           if (err) {
             console.error('Database error checking order status for quote submission:', err.message);
@@ -96,7 +96,7 @@ const carrierTenantId = c.context.tenantId;
     });
 
     if (!order) {
-      console.log("Order not found or not in a status allowing quotes (e.g., 'pending_claim', 'claimed'):", orderId);
+      console.log("Order not found or not in a status allowing quotes (e.g., 'pending_claim', 'claimed'):", order_id);
       return {
         status: 404, // Not Found
         body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_QUOTABLE' }
@@ -119,13 +119,13 @@ const carrierTenantId = c.context.tenantId;
         `UPDATE orders
          SET quote_price = ?, quote_delivery_time = ?, quote_remarks = ?, updated_at = datetime('now')
          WHERE id = ?`,
-        [price, deliveryTime, remarks || null, orderId],
+        [price, deliveryTime, remarks || null, order_id],
         function (err) {
           if (err) {
             console.error('Database error updating order with quote:', err.message);
             reject(err);
           } else {
-            console.log("Successfully updated order with quote for order ID:", orderId);
+            console.log("Successfully updated order with quote for order ID:", order_id);
             resolve();
           }
         }
@@ -138,13 +138,13 @@ const carrierTenantId = c.context.tenantId;
         `UPDATE orders
          SET status = 'quoted', updated_at = datetime('now')
          WHERE id = ?`,
-        [orderId],
+        [order_id],
         function (err) {
           if (err) {
             console.error('Database error updating order status to quoted:', err.message);
             reject(err);
           } else {
-            console.log("Successfully updated order status to quoted for order ID:", orderId);
+            console.log("Successfully updated order status to quoted for order ID:", order_id);
             resolve();
           }
         }
@@ -157,7 +157,7 @@ const carrierTenantId = c.context.tenantId;
         success: true,
         message: 'Quote submitted successfully',
         data: {
-            orderId: parseInt(orderId, 10), // Ensure numeric type
+            order_id: parseInt(order_id, 10), // Ensure numeric type
             quote: {
                 price: price,
                 deliveryTime: deliveryTime,

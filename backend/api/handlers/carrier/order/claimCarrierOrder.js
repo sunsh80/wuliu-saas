@@ -50,8 +50,8 @@ module.exports = async (c) => {
     dbConnection = await getDb();
     console.log("Database connection acquired.");
 
-    const orderId = c.request.params.order_id;
-    if (!orderId) {
+    const order_id = c.request.params.order_id;
+    if (!order_id) {
       console.warn("⚠️ Missing order_id in path parameters");
       return { status: 400, body: { success: false, error: 'MISSING_ORDER_ID' } };
     }
@@ -81,11 +81,11 @@ if (!c.context.roles.includes('carrier')) {
 const userTenantId = c.context.tenantId;
 
     // 🔍 STEP 2: 获取订单信息（校验 tenant_id 匹配）
-    console.log(`🔍 [STEP 2] Fetching order ID ${orderId} for tenant ID ${userTenantId}`);
+    console.log(`🔍 [STEP 2] Fetching order ID ${order_id} for tenant ID ${userTenantId}`);
     const order = await safeDbOperation(() => new Promise((resolve, reject) => {
       dbConnection.get(
         `SELECT id, status, carrier_id, tenant_id FROM orders WHERE id = ? AND tenant_id = ?`,
-        [orderId, userTenantId],
+        [order_id, userTenantId],
         (err, row) => {
           if (err) {
             console.error('❌ Database error during order lookup:', err.message);
@@ -111,11 +111,11 @@ const userTenantId = c.context.tenantId;
     }
 
     // 🔍 STEP 3: 更新订单为已认领
-    console.log(`🔍 [STEP 3] Updating order ${orderId} to claimed by user ${userId}`);
+    console.log(`🔍 [STEP 3] Updating order ${order_id} to claimed by user ${userId}`);
     const updateResult = await safeDbOperation(() => new Promise((resolve, reject) => {
       dbConnection.run(
         `UPDATE orders SET carrier_id = ?, status = 'claimed', updated_at = datetime('now') WHERE id = ? AND tenant_id = ?`,
-        [userId, orderId, userTenantId],
+        [userId, order_id, userTenantId],
         function(err) {
           if (err) {
             console.error('❌ Database error during order update:', err.message);
@@ -138,7 +138,7 @@ const userTenantId = c.context.tenantId;
       body: {
         success: true,
         message: 'Order claimed successfully',
-        data: { orderId, userId, status: 'claimed' }
+        data: { order_id, userId, status: 'claimed' }
       }
     };
 

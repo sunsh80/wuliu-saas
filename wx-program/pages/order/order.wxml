@@ -17,9 +17,9 @@
               <text class="picker-arrow">></text>
             </view>
           </picker>
-          <input type="text" placeholder="货物备注" bindinput="onCargoRemarkInput" style="width: 100%; padding: 8rpx; border: 1rpx solid #ddd; border-radius: 4rpx; font-size: 24rpx;" />
+          <input type="text" placeholder="货物备注" value="{{ cargoRemark }}" bindinput="onCargoRemarkInput" style="width: 100%; padding: 8rpx; border: 1rpx solid #ddd; border-radius: 4rpx; font-size: 24rpx;" />
         </view>
-      </view>
+       </view>
       <view class="form-item">
         <text class="label">货物重量 (kg)</text>
         <input type="number" placeholder="请输入货物重量" bindinput="onGoodsWeightInput" />

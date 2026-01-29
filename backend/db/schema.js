@@ -81,7 +81,7 @@ const CORE_TABLES = {
       tracking_number TEXT UNIQUE NOT NULL,
       sender_info TEXT NOT NULL,
       receiver_info TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'created',
+      status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'pending_claim', 'claimed', 'quoted', 'awarded', 'dispatched', 'in_transit', 'delivered', 'cancelled')),
       completed_at TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),

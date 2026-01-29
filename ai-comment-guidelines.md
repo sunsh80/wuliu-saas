@@ -140,6 +140,13 @@ async function registerUser(userData) {
 }
 ```
 
+## API参数命名规范
+
+- 前端JavaScript变量使用camelCase（如orderId, carrierId）
+- 后端API路径参数使用snake_case（如order_id, carrier_id）
+- 数据库字段使用snake_case（如order_id, carrier_id）
+- 请求体参数使用camelCase（如orderId, carrierId）
+
 ## 重要提醒
 
 1. 保持注释简洁但信息丰富

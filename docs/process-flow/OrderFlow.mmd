@@ -1,0 +1,27 @@
+```mermaid
+graph TD
+    A[用户登录] --> B[创建订单]
+    B --> C[订单池]
+    C --> D[总后台处置]
+    D --> E[承运商查看订单]
+    E --> F[承运商认领订单]
+    F --> G[承运商报价]
+    G --> H[客户查看报价]
+    H --> I[客户选择承运商]
+    I --> J[承运商开始配送]
+    J --> K[订单完成]
+    K --> L[客户查询历史订单]
+
+    A -.-> A1[文件: login.js, loginTenantWeb.js<br/>条件: 凭证验证<br/>断点: 无凭证无法登录]
+    B -.-> B1[文件: order.js<br/>条件: 用户登录<br/>断点: 未登录无法创建]
+    C -.-> C1[文件: fetchPublicOrder.js<br/>条件: 状态非completed/cancelled<br/>断点: 无]
+    D -.-> D1[文件: updateOrderStatus.js<br/>条件: 有效状态值<br/>断点: 需管理员权限]
+    E -.-> E1[文件: listCarrierOrders.js<br/>条件: carrier角色, 状态pending_claim等<br/>断点: 需承运商权限]
+    F -.-> F1[文件: claimCarrierOrder.js<br/>条件: carrier角色, 状态pending_claim<br/>断点: 需承运商权限]
+    G -.-> G1[文件: submitCarrierQuote.js<br/>条件: carrier角色, 状态pending_claim/claimed<br/>断点: 需承运商权限]
+    H -.-> H1[文件: orderTrack.js<br/>条件: 客户登录, 状态quoted<br/>断点: 需客户登录]
+    I -.-> I1[文件: orderTrack.js, awardOrderToCarrier.js<br/>条件: 客户登录, 状态quoted<br/>断点: 需客户登录选择]
+    J -.-> J1[文件: startDelivery.js, updateOrderStatus.js<br/>条件: 承运商登录, 状态awarded<br/>断点: 需承运商登录]
+    K -.-> K1[文件: completeCarrierOrder.js<br/>条件: 承运商登录, 状态in_transit<br/>断点: 需承运商登录]
+    L -.-> L1[文件: orderTrack.js<br/>条件: 客户登录, 状态delivered/cancelled<br/>断点: 需客户登录]
+```

@@ -133,6 +133,13 @@ npm start
 - **工作流程文档**: `ai-development-workflow.md` 详细说明AI辅助开发流程
 - **项目结构**: `project-structure.md` 帮助AI理解项目架构
 
+## API参数命名规范
+
+- 前端JavaScript变量使用camelCase（如orderId, carrierId）
+- 后端API路径参数使用snake_case（如order_id, carrier_id）
+- 数据库字段使用snake_case（如order_id, carrier_id）
+- 请求体参数使用camelCase（如orderId, carrierId）
+
 ## 技术栈
 
 - **后端**: Node.js, Express, SQLite, OpenAPI

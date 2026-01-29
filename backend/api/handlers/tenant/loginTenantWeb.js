@@ -105,39 +105,39 @@ module.exports = async (c) => {
       };
     }
 
-    // === 模式 2: 客户登录（手机号 + 密码）===
+      // === 模式 2: 客户登录（手机号 + 密码）===
     if (phone && password) {
-      console.log('📱 尝试客户密码登录:', phone);
-      const user = await db.get(`
-        SELECT id, phone, password_hash, user_type
-        FROM users
-        WHERE phone = ? AND user_type = 'user'
-      `, [phone]);
+    console.log('🔍 Login attempt for phone:', phone);
+   try { // 开始 try 块
+    console.log('🔍 Attempting customer password login for:', phone);
+    // 注意：这里原来的代码使用的是 db.get 查询 SQLite
+    // 但调试日志注释里用了 Prisma 的 db.user.findUnique
+    // 我们保留原代码的 db.get 方式，并添加调试信息
+    const user = await db.get(
+      `SELECT id, phone, password_hash FROM users WHERE phone = ? AND user_type = 'tenant_user'`,
+      [phone]
+    );
 
-      if (!user) {
-        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
-        return {
-          statusCode: 401,
-          body: { success: false, error: 'INVALID_CREDENTIALS' }
-        };
-      }
+    console.log('🔍 Retrieved user from DB (SQLite):', user); // 输出查询到的用户对象
 
-      const isValid = await bcrypt.compare(password, user.password_hash);
-      if (!isValid) {
-        console.log('📤 Login response:', { success: false, error: 'INVALID_CREDENTIALS' });
-        return {
-          statusCode: 401,
-          body: { success: false, error: 'INVALID_CREDENTIALS' }
-        };
-      }
+    if (!user) {
+      console.log('❌ User not found in DB for phone:', phone);
+      return { statusCode: 401, body: { success: false, error: 'INVALID_CREDENTIALS' } };
+    }
+
+    console.log('🔍 Stored password hash from DB:', user.password_hash); // 输出数据库中的哈希值
+    console.log('🔍 Input password for comparison:', password); // 输出用户输入的密码
+
+    const isValid = await bcrypt.compare(password, user.password_hash); // 进行比对
+    console.log('🔍 Bcrypt compare result:', isValid); // 输出比对结果
+
+    if (isValid) {
+      console.log('✅ Login successful for phone:', phone);
 
       // 设置会话信息 - 这是关键修复
       if (!c.request.session) {
         console.error('❌ 会话对象不存在');
-        return {
-          statusCode: 500,
-          body: { success: false, error: 'SESSION_ERROR' }
-        };
+        return { statusCode: 500, body: { success: false, error: 'SESSION_ERROR' } };
       }
       c.request.session.userId = user.id;
       console.log('🔐 会话已设置:', { userId: user.id });
@@ -145,15 +145,17 @@ module.exports = async (c) => {
       const userId = user.id;
       const data = { phone: user.phone, type: 'customer' };
       console.log('📤 Login response:', { userId, data });
-      return {
-        statusCode: 200,
-        body: {
-          success: true,
-          userId: user.id,
-          data: data
-        }
-      };
+      return { statusCode: 200, body: { success: true, userId: user.id, data: data } };
+    } else {
+      console.log('❌ Password verification failed for phone:', phone);
+      return { statusCode: 401, body: { success: false, error: 'INVALID_CREDENTIALS' } };
     }
+  } catch (error) { // 必须有 catch 块
+    console.error('Error during customer login:', error.message);
+    console.error('Full error stack:', error.stack); // 添加堆栈追踪
+    return { statusCode: 500, body: { success: false, error: 'INTERNAL_ERROR' } };
+  }
+}
 
     // === 模式 3: 客户登录（手机号 + 验证码）===
     if (phone && code) {
@@ -168,7 +170,7 @@ module.exports = async (c) => {
       }
 
       let customer = await db.get(
-        `SELECT id FROM users WHERE phone = ? AND user_type = 'user'`,
+        `SELECT id FROM users WHERE phone = ? AND user_type = 'tenant_user'`,
         [phone]
       );
 

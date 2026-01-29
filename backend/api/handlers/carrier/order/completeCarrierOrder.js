@@ -10,13 +10,13 @@ if (!roles.includes('carrier')) {
   return { status: 403, body: { success: false, error: 'NOT_A_CARRIER' } };
 }
 
-  // 从 URL 路径获取 orderId（OpenAPI 定义为路径参数）
-  const { orderId } = c.req.param();
+  // 从 URL 路径获取 order_id（OpenAPI 定义为路径参数）
+  const { order_id } = c.req.param();
 
-  if (!orderId) {
+  if (!order_id) {
     return {
       status: 400,
-      body: { success: false, error: 'Missing orderId' }
+      body: { success: false, error: 'Missing order_id' }
     };
   }
 
@@ -25,7 +25,7 @@ if (!roles.includes('carrier')) {
   // 检查订单是否存在、状态为 'in_transit'、且属于当前租户
   const order = await db.get(
     `SELECT id FROM orders WHERE id = ? AND status = 'in_transit' AND carrier_id = ?`,
-    [orderId, tenantId]
+    [order_id, tenantId]
   );
 
   if (!order) {
@@ -37,18 +37,18 @@ if (!roles.includes('carrier')) {
 
   // 执行完成：状态改为 'delivered'，记录 completed_at
   await db.run(
-    `UPDATE orders 
-     SET status = 'delivered', 
-         completed_at = datetime('now'), 
-         updated_at = datetime('now') 
+    `UPDATE orders
+     SET status = 'delivered',
+         completed_at = datetime('now'),
+         updated_at = datetime('now')
      WHERE id = ?`,
-    [orderId]
+    [order_id]
   );
 
   // 查询更新后的订单（返回关键字段）
   const updatedOrder = await db.get(
     `SELECT id, status, carrier_id, completed_at FROM orders WHERE id = ?`,
-    [orderId]
+    [order_id]
   );
 
   // 返回成功响应（对齐 OpenAPI 建议结构）

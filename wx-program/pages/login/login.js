@@ -95,7 +95,7 @@ Page({
 
     // 发起登录请求
     wx.request({
-      url: 'http://localhost:3000/api/tenant/loginTenantWeb', // 使用正确的后端API地址
+      url: 'http://192.168.2.250:3000/api/tenant-web/login', // 使用正确的后端API地址
       method: 'POST',
       header: {
         'content-type': 'application/json'

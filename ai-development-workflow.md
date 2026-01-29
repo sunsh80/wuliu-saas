@@ -3,6 +3,15 @@
 ## 目的
 本文档描述了在项目中进行AI辅助开发的标准工作流程。
 
+## API参数命名规范
+
+在进行API开发时，请遵循以下命名规范：
+
+- 前端JavaScript变量使用camelCase（如orderId, carrierId）
+- 后端API路径参数使用snake_case（如order_id, carrier_id）
+- 数据库字段使用snake_case（如order_id, carrier_id）
+- 请求体参数使用camelCase（如orderId, carrierId）
+
 ## 1. 代码生成前的准备
 
 ### 1.1. 理解项目结构
@@ -155,3 +164,43 @@
 // 4. Use the validation system consistently
 // 5. Add meaningful comments for future reference
 // 6. Keep the big picture in mind when making changes
+
+## 语义流程指导
+
+当开发新功能时，请遵循以下语义流程：
+
+1. **查阅项目规范**：
+   - 首先查看 `ai-development-workflow.md` 了解标准开发流程
+   - 阅读 `ai-comment-guidelines.md` 了解注释规范
+   - 检查 `validation-spec.md` 了解现有验证规则
+
+2. **理解现有架构**：
+   - 查看 `PROJECT_STRUCTURE.md` 了解API端点模式
+   - 研究 `backend/openapi.yaml` 中的API定义
+   - 分析 `backend/db/schema.js` 中的数据结构
+
+3. **定位关键文件**：
+   - 根据功能类型确定需要修改的核心文件
+   - 检查相关处理程序和前端代码
+   - 确认依赖关系和数据流向
+
+4. **AI指令结构**：
+   - 明确说明新功能的需求和目标
+   - 指定使用现有验证规则
+   - 要求遵循API参数命名规范：路径参数使用snake_case，前端变量使用camelCase
+   - 强调需要更新OpenAPI规范文件
+
+5. **开发顺序**：
+   - 先更新OpenAPI规范定义新功能
+   - 再开发后端处理逻辑
+   - 最后更新相关文档和测试
+
+6. **质量要求**：
+   - 确保与现有验证系统一致
+   - 遵循数据库字段命名规范
+   - 添加适当的错误处理和日志记录
+   - 更新相关文档
+
+7. **测试验证**：
+   - 运行 `check-consistency.js` 验证规则一致性
+   - 确保新功能符合API参数命名规范

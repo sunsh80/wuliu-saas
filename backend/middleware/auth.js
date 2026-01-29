@@ -11,7 +11,7 @@ module.exports = {
       next(); // 对于非登录请求，继续执行中间件
     }
   },
-
+ 
   // OpenAPI安全处理器
   openApiSecurityHandler: (api) => {
     return async (c) => { // ← 必须是 async 函数
@@ -27,7 +27,7 @@ module.exports = {
       if (process.env.NODE_ENV === 'development') {
         console.log(' → Session content:', JSON.stringify(session || {}, null, 2));
       }
-
+      console.log(' → Session.userId value:', session?.userId); 
       const security = c.operation?.security;
 
       // 不需要认证的接口
