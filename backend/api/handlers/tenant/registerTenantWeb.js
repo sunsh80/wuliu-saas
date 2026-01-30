@@ -270,7 +270,82 @@ module.exports = async (c /*, req, res */) => {
                 status: 'active'
             }
         };
+// --- Add session setting here ---
+// Note: This assumes 'c' is your context object which has access to req.session
+// If using Express-like req/res, it would be req.session.userId = ...
+// Since you're using a custom context 'c', you might need to access session differently
+// e.g., c.request.session.userId = newUserId;
+// However, based on the context pattern used elsewhere, it's likely you need to pass
+// session info through a different mechanism or ensure the calling framework handles it.
+// For now, assuming direct access via c.request.session if available.
 
+// Get the newly created user's ID from the insertion step.
+// In your code, the user was inserted with:
+// await db.run(userInsertQuery, [ ... ]);
+// The last line in the transaction block is:
+// const newTenantId = tenantResult.lastID;
+// But you also need the user's ID. The user insert doesn't capture its lastID.
+// You might need to get the user ID by querying back or modifying how the insertion works.
+// Option 1: Query the user ID back using the unique phone/email
+const newUserRecord = await db.get('SELECT id, tenant_id FROM users WHERE phone = ?', [contact_phone.trim()]);
+if (!newUserRecord) {
+    // This should ideally not happen if transaction succeeded
+    console.error('[registerTenantWeb] Critical: Could not find newly created user record.');
+    // Return error or handle gracefully, although transaction committed
+    // Let's assume user was created and proceed, but log the issue
+    // Or better, modify the insertion to capture user ID directly if possible
+    // For now, re-querying seems most reliable here.
+    // However, capturing the user ID from the INSERT statement itself is preferred.
+    // SQLite doesn't have a direct way to get the last inserted ID of a specific table within a multi-statement transaction
+    // unless you do it separately right after each INSERT.
+    // So, re-querying is the safest option here after COMMIT.
+    console.log("### DEBUG: registerTenantWeb.js - Attempting to fetch new user ID after COMMIT ###");
+    const newUserAfterCommit = await db.get('SELECT id, tenant_id FROM users WHERE phone = ?', [contact_phone.trim()]);
+    if (!newUserAfterCommit) {
+        throw new Error("Failed to fetch newly created user after registration commit.");
+    }
+    console.log("### DEBUG: registerTenantWeb.js - Fetched new user ID:", newUserAfterCommit.id, "for tenant:", newUserAfterCommit.tenant_id);
+
+    // IMPORTANT: You need to pass this session info back somehow.
+    // This depends heavily on how your API framework handles sessions.
+    // If c.setSession is available:
+    // c.setSession({ userId: newUserAfterCommit.id, tenantId: newUserAfterCommit.tenant_id });
+    // If c.request.session is available (like in Express):
+    // c.request.session.userId = newUserAfterCommit.id;
+    // c.request.session.tenantId = newUserAfterCommit.tenant_id;
+    // The original code uses c.req.session (as per TenantSessionAuth.js)
+    // So, let's use that.
+    if (c.req && c.req.session) {
+        c.req.session.userId = newUserAfterCommit.id;
+        c.req.session.tenantId = newUserAfterCommit.tenant_id;
+        console.log(`[registerTenantWeb] Login session set for user ${newUserAfterCommit.id}, tenant ${newUserAfterCommit.tenant_id} after registration.`);
+    } else {
+        console.warn("[registerTenantWeb] Warning: Could not set session, c.req.session not available in context.");
+        // Depending on your framework, you might need to handle session differently
+        // or return session info in the response body for the frontend to manage
+    }
+
+} else {
+    // This branch shouldn't be reached easily, but just in case
+    console.error('[registerTenantWeb] Unexpected state: newUserRecord found before COMMIT.');
+    // Should ideally not happen given the flow, but handle gracefully if needed.
+}
+
+// Option 2 (Preferred if possible): Modify the transaction to capture user ID immediately after INSERT
+// This requires changing the structure slightly to run user insert query and capture its ID right away.
+// Example (not fully implemented here, but conceptually):
+/*
+const userResult = await db.run(userInsertQuery, [ ... ]);
+const newUserId = userResult.lastID;
+// Then after COMMIT:
+if (c.req && c.req.session) {
+    c.req.session.userId = newUserId;
+    c.req.session.tenantId = newTenantId; // newTenantId is already available
+}
+*/
+// However, since the current code doesn't capture userResult.lastID, Option 1 is safer for now.
+
+// --- End Add session setting ---
         return {
             statusCode: 201, // Created
             body: responseBody

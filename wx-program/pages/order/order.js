@@ -196,11 +196,14 @@ Page({
       destinationPhone: e.detail.value
     });
   },
-
   // 提交订单
   submitOrder() {
     // 检查登录状态
-    const isLoggedIn = wx.getStorageSync('isLoggedIn') || wx.getStorageSync('token');
+    const isLoggedIn = wx.getStorageSync('isLoggedIn');
+    const token = wx.getStorageSync('token');
+    const storedConnectSid = wx.getStorageSync('connect.sid');// 新增调试日志
+  console.log('🔍 提交订单时，本地存储的 connect.sid:', storedConnectSid); // 调试日志
+  console.log('🔍 submitOrder - 检查登录状态 - isLoggedIn:', isLoggedIn, 'token:', token, 'connect.sid:', storedConnectSid);
     if (!isLoggedIn) {
       wx.showToast({
         title: '请先登录',
@@ -224,7 +227,7 @@ Page({
       });
       return;
     }
-
+     console.log('🔍 submitOrder - 即将发送请求,Cookie:', storedConnectSid);
     // 构建要发送的数据对象，映射到后端API期望的字段名
     const orderData = {
       cargo_type: selectedCargoType, // 货物类型

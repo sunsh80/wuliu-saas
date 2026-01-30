@@ -73,15 +73,15 @@ const CORE_TABLES = {
     );
   `,
   orders: `
-    CREATE TABLE IF NOT EXISTS orders (
+      CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_id TEXT,
+      customer_tenant_id INTEGER NOT NULL, -- 添加此行，引用 tenants.id
       carrier_id TEXT,
       tenant_id INTEGER,
       tracking_number TEXT UNIQUE NOT NULL,
       sender_info TEXT NOT NULL,
       receiver_info TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created', 'pending_claim', 'claimed', 'quoted', 'awarded', 'dispatched', 'in_transit', 'delivered', 'cancelled')),
+      status TEXT NOT NULL DEFAULT 'created' CHECK (status IN ('created','pending','pending_claim', 'claimed', 'quoted', 'awarded', 'dispatched', 'in_transit', 'delivered', 'cancelled')),
       completed_at TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -90,29 +90,32 @@ const CORE_TABLES = {
       quote_remarks TEXT,
       quote_deadline TEXT,
       customer_phone TEXT,
-      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE SET NULL
+      weight_kg REAL,
+      volume_m3 REAL,
+      required_delivery_time TEXT,
+      description TEXT,
+      FOREIGN KEY (customer_tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
     );
   `,
-  tenant_vehicles: `
-    CREATE TABLE IF NOT EXISTS tenant_vehicles (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tenant_id INTEGER NOT NULL,
-      plate_number TEXT NOT NULL,
-      type TEXT NOT NULL,
-      length REAL,
-      width REAL,
-      height REAL,
-      max_weight REAL,
-      volume REAL,
-      status TEXT DEFAULT 'active',
-      driver_name TEXT,
-      driver_phone TEXT,
-      image_url TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
-    );
-  `
+tenant_vehicles: ` CREATE TABLE IF NOT EXISTS tenant_vehicles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tenant_id INTEGER NOT NULL, -- 引用 tenants 表
+  plate_number TEXT NOT NULL UNIQUE,
+  type TEXT NOT NULL,
+  length REAL,
+  width REAL,
+  height REAL,
+  max_weight REAL,
+  volume REAL,
+  status TEXT DEFAULT 'active',
+  driver_name TEXT,
+  driver_phone TEXT,
+  image_url TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE -- 正确的外键约束
+); 
+`,
 };
 
 // 扩展表定义

@@ -1,11 +1,13 @@
 // api/handlers/customer/order/createCustomerOrder.js
-const { getDb } = require('../../../../db/index.js');
+const { getDb } = require('../../../../db/index.js'); // 确保路径正确
 const crypto = require('crypto');
 
 module.exports = async (c) => {
   try {
     const db = getDb();
     const userId = c.context?.id; // 从认证上下文获取用户ID
+
+    console.log(`[DEBUG] createCustomerOrder called for userId: ${userId}`);
 
     // 从前端接收完整的订单信息
     const {
@@ -36,9 +38,10 @@ module.exports = async (c) => {
       };
     }
 
-    // 2. 获取用户信息（关联 customer_id）
+    // 2. 获取用户信息（关联 tenant_id）
     const user = await db.get('SELECT id, organization_id, tenant_id FROM users WHERE id = ?', [userId]);
     if (!user) {
+      console.log(`[ERROR] User not found for userId: ${userId}`);
       return {
         statusCode: 403,
         body: {
@@ -49,10 +52,25 @@ module.exports = async (c) => {
       };
     }
 
+    // 确保用户属于一个租户
+    if (!user.tenant_id) {
+      console.log(`[ERROR] User ${userId} is not associated with a tenant`);
+      return {
+        statusCode: 403,
+        body: {
+          success: false,
+          error: 'USER_NOT_ASSOCIATED_WITH_TENANT',
+          message: 'User is not associated with a tenant'
+        }
+      };
+    }
+
+    console.log(`[DEBUG] Found user ${userId} associated with tenant ${user.tenant_id}`);
+
     // 3. 构造订单数据
     const tracking_number = `ORD-${Date.now()}`;
     const status = 'pending';
-    const order_id = crypto.randomUUID();
+    const order_id = crypto.randomUUID(); // 这个 ID 在数据库中可能不直接使用
 
     // 构造发货人信息
     const sender_info = JSON.stringify({
@@ -71,22 +89,20 @@ module.exports = async (c) => {
     });
 
     // 4. 插入数据库
+    // 修改：使用 user.tenant_id 作为 customer_tenant_id
     const result = await db.run(
       `INSERT INTO orders (
-         customer_id, tracking_number, sender_info, receiver_info, 
-         status, created_at, updated_at, quote_price, quote_delivery_time,
-         customer_phone, weight_kg, volume_m3, required_delivery_time, quote_deadline,
-         description
-       )
-       VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)`,
+         customer_tenant_id, -- 修改：使用 customer_tenant_id
+         tracking_number, sender_info, receiver_info, status,
+         created_at, updated_at,
+         quote_price, quote_delivery_time, customer_phone,
+         weight_kg, volume_m3, required_delivery_time, quote_deadline, description
+       ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        userId, // 使用用户ID作为customer_id
-        tracking_number,
-        sender_info,
-        receiver_info,
-        status,
+        user.tenant_id, // 修改：使用 user.tenant_id
+        tracking_number, sender_info, receiver_info, status,
         null, // quote_price (可选)
-        required_delivery_time || null,
+        required_delivery_time || null, // 注意：原始代码这里可能放错了位置，这里调整回来
         customer_phone || null,
         weight_kg || null,
         volume_m3 || null,
@@ -97,6 +113,7 @@ module.exports = async (c) => {
     );
 
     // 5. 返回成功
+    console.log(`[SUCCESS] Order created with ID: ${result.lastID}, Tracking Number: ${tracking_number}`);
     return {
       statusCode: 201,
       body: {
@@ -109,6 +126,7 @@ module.exports = async (c) => {
         }
       }
     };
+
   } catch (error) {
     console.error('Error in createCustomerOrder:', error);
     return {

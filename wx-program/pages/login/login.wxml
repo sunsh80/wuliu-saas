@@ -1,6 +1,6 @@
 <!-- pages/login/login.wxml -->
 <view class="container">
-  <form bindsubmit="login">
+  <form bindsubmit="login"> <!-- 改回 "login" -->
     <!-- 登录方式切换 -->
     <view class="method-toggle">
       <text class="toggle-item {{loginMethod === 'email' ? 'active' : ''}}" data-method="email" bindtap="toggleLoginMethod">邮箱登录</text>
