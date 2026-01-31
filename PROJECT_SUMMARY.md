@@ -11,12 +11,12 @@
 
 ## 订单流转流程
 
-### 1. 用户登录环节
+### 1. 用户登录环节-ok
 - 文件：@wx-program/pages/login/login.js, @backend/api/handlers/tenant/loginTenantWeb.js
 - 判断条件：邮箱/手机号和密码匹配，或手机号和验证码匹配
 - 断点：无有效凭证无法登录
 
-### 2. 订单创建环节
+### 2. 订单创建环节-ok
 - 文件：@wx-program/pages/order/order.js
 - 判断条件：用户登录状态验证
 - 断点：如果用户未登录，无法创建订单
@@ -35,8 +35,17 @@
 - 文件：@backend/api/handlers/admin/order/updateOrderStatus.js
 - 判断条件：有效的订单状态值，包括'pending_claim'（承运商可认领状态）
 - 断点：需要管理员权限操作
-
-### 6. 承运商查看订单环节
+### 6.查看承运商列表 ok
+### 6.审批承运商     ok
+- 文件：
+- 判断条件：‘carrier’/‘ customer ’身份申请
+- 
+### 7.承运商申请入驻环节
+- 文件：@apply.js
+- 判断条件：‘carrier’/‘ customer ’身份申请
+- 邮件，手机号不能为空
+### 6.承运商登录 ok
+### 8. 承运商查看订单环节
 - 文件：@backend/api/handlers/carrier/order/listCarrierOrders.js
 - 判断条件：用户具有'carrier'角色，订单状态为'pending_claim'、'claimed'或'quoted'
 - 断点：需要承运商角色权限

@@ -67,8 +67,8 @@ module.exports = async (c) => {
     await db.run(`
       INSERT INTO users (
         username, email, name, role, roles, type,
-        password_hash, tenant_id, user_type, is_active, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        password_hash, tenant_id, user_type, is_active, phone,created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `, [
       username,
       email,
@@ -79,7 +79,8 @@ module.exports = async (c) => {
       password_hash,
       newTenant.id,
       'tenant_user',
-      isActive
+      isActive,
+      contact_phone
     ]);
     console.log('🟢 [applyPcTenant] 关联用户创建成功，username:', username);
 
