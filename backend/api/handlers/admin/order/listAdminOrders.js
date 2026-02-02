@@ -10,15 +10,10 @@ const { getDb } = require('../../../../db/index.js');
 module.exports = async (c) => {
   try {
     const db = getDb();
+
+    // 修正 SQL 查询，使用数据库中存在的 'customer_tenant_id' 列
     const rows = await db.all(`
-      SELECT 
-        id, 
-        customer_id, 
-        tracking_number, 
-        sender_info, 
-        receiver_info, 
-        status, 
-        created_at 
+      SELECT id, customer_tenant_id, tracking_number, sender_info, receiver_info, status, created_at 
       FROM orders 
       ORDER BY created_at DESC
     `);
@@ -30,18 +25,18 @@ module.exports = async (c) => {
       try {
         sender = JSON.parse(row.sender_info);
       } catch (e) {
-        // 保留默认值
+        // console.error('解析发货人信息失败:', e.message); // 可选：记录解析错误
       }
-
       try {
         receiver = JSON.parse(row.receiver_info);
       } catch (e) {
-        // 保留默认值
+        // console.error('解析收货人信息失败:', e.message); // 可选：记录解析错误
       }
 
       return {
         id: row.id,
-        customerId: row.customer_id,
+        // 修正返回字段名，使其与数据库列名及业务逻辑一致
+        createdByTenantId: row.customer_tenant_id, // 表示创建订单的租户ID
         trackingNumber: row.tracking_number,
         sender,
         receiver,
@@ -59,6 +54,7 @@ module.exports = async (c) => {
     };
   } catch (err) {
     console.error('❌ listAdminOrders 失败:', err.message);
+    // 考虑返回更详细的错误信息（但在生产环境中要小心暴露内部细节）
     return {
       status: 500,
       body: {

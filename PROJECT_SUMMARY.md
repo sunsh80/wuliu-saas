@@ -31,7 +31,10 @@
 - 判断条件：通过跟踪号或客户电话查询订单
 - 断点：无明显断点
 
-### 5. 总后台处置环节
+### 5. 总后台查询订单ok
+### 5. 总后台调度订单ok
+### 5. 总后台调度订单的条件：没有设计规则
+
 - 文件：@backend/api/handlers/admin/order/updateOrderStatus.js
 - 判断条件：有效的订单状态值，包括'pending_claim'（承运商可认领状态）
 - 断点：需要管理员权限操作
@@ -40,17 +43,17 @@
 - 文件：
 - 判断条件：‘carrier’/‘ customer ’身份申请
 - 
-### 7.承运商申请入驻环节
+### 7.承运商申请入驻环节ok
 - 文件：@apply.js
 - 判断条件：‘carrier’/‘ customer ’身份申请
 - 邮件，手机号不能为空
 ### 6.承运商登录 ok
-### 8. 承运商查看订单环节
+### 8. 承运商查看订单环节ok，
 - 文件：@backend/api/handlers/carrier/order/listCarrierOrders.js
 - 判断条件：用户具有'carrier'角色，订单状态为'pending_claim'、'claimed'或'quoted'
 - 断点：需要承运商角色权限
 
-### 7. 承运商认领订单环节
+### 7. 承运商认领订单环节ok
 - 文件：@backend/api/handlers/carrier/order/claimCarrierOrder.js
 - 判断条件：用户具有'carrier'角色，订单状态为'pending_claim'，且未被其他承运商认领
 - 断点：需要承运商角色权限，订单需处于'pending_claim'状态

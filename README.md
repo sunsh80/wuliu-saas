@@ -149,6 +149,22 @@ npm start
 - **验证系统**: 统一验证库，前后端一致性
 - **AI支持**: 标准化文档、注释和配置
 
+## 脚本管理
+
+项目包含一套完整的脚本来管理开发和部署流程，所有脚本都位于 `scripts/` 目录中：
+
+- `full_stack_start.bat` - 完整的全栈启动脚本（前后端+OpenAPI对齐）
+- `quick_full_stack_start.bat` - 快速全栈启动脚本
+- `start_all_services.bat` - 启动所有项目服务
+- `quick_start.bat` - 快速启动后端服务
+- `check_status.bat` - 检查所有服务状态
+
+要使用脚本管理器，请运行：
+- `launch_scripts_manager.bat` (Windows批处理)
+- `launch_scripts_manager.ps1` (PowerShell)
+
+注意：已移除Redis依赖，现在使用内存存储会话。
+
 ## 推荐的解决方案：
 
 1. 强化应用层验证

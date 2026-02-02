@@ -100,54 +100,61 @@ login() {
           wx.setStorageSync('userInfo', res.data.data); // 假设返回用户信息
         }
 
-// --- 修改后的 Cookie 处理逻辑 ---
-// 尝试从响应头获取 Set-Cookie
+// --- 修改后的 Cookie 处理逻辑 ---//
 let rawCookieString = res.header['set-cookie'] || res.header['Set-Cookie'] || res.header['set-Cookie'.toLowerCase()];
-
 if (rawCookieString) {
-  // 检查 rawCookieString 是否是字符串
-  if (typeof rawCookieString === 'string') {
-    console.log('🔍 login.js - 获取到的 Set-Cookie 字符串:', rawCookieString);
-
-    // 尝试按换行符分割，应对可能合并的情况 (虽然通常在单个请求响应中不太可能)
-    let cookieLines = rawCookieString.split('\n').map(line => line.trim());
-
-    for (let line of cookieLines) {
-      // 检查每一行是否以 connect.sid= 开头
-      if (line.startsWith('connect.sid=')) {
-        // 提取 connect.sid=... 部分 (直到第一个分号)
-        const sessionId = line.split(';')[0];
-        console.log('🔍 login.js - 提取出的 sessionId:', sessionId);
-
-        if (sessionId) {
-          wx.setStorageSync('connect.sid', sessionId);
-          console.log('✅ 登录成功, Cookie 已保存到本地存储:', sessionId);
-          break; // 找到就退出循环
+    // 检查 rawCookieString 是否是字符串
+    if (typeof rawCookieString === 'string') {
+        console.log('🔍 login.js - 获取到的 Set-Cookie 字符串:', rawCookieString);
+        // 尝试按换行符分割，应对可能合并的情况 (虽然通常在单个请求响应中不太可能)
+        let cookieLines = rawCookieString.split('\n').map(line => line.trim());
+        for (let line of cookieLines) {
+            // 检查每一行是否以 connect.sid= 开头
+            if (line.startsWith('connect.sid=')) {
+                // 提取 connect.sid=... 部分 (直到第一个分号)
+                const fullKeyValue = line.split(';')[0]; // 例如: connect.sid=s%3Axxxxxx.xxxxx
+                // *** 修复点：进一步分割 "="，只取 value 部分 ***
+                const parts = fullKeyValue.split('=');
+                if (parts.length >= 2) {
+                    const sessionIdValue = parts.slice(1).join('='); // 使用 slice(1) 并 join('=') 以防 value 本身包含 '='
+                    console.log('🔍 login.js - 提取出的 sessionId VALUE:', sessionIdValue);
+                    if (sessionIdValue) {
+                        wx.setStorageSync('connect.sid', sessionIdValue); // 保存 VALUE 部分
+                        console.log('✅ 登录成功, Cookie VALUE 已保存到本地存储:', sessionIdValue);
+                        break; // 找到就退出循环
+                    }
+                }
+            }
         }
-      }
-    }
-  } else if (Array.isArray(rawCookieString)) {
-    // 如果是数组，按照原来的方式迭代
-    console.log('🔍 login.js - 获取到的 Set-Cookie 数组:', rawCookieString);
-    for (let cookieLine of rawCookieString) {
-      if (cookieLine && cookieLine.startsWith('connect.sid=')) {
-        const sessionId = cookieLine.split(';')[0];
-        console.log('🔍 login.js - 从数组项提取的 sessionId:', sessionId);
-        if (sessionId) {
-          wx.setStorageSync('connect.sid', sessionId);
-          console.log('✅ 登录成功, Cookie 已保存到本地存储:', sessionId);
-          break;
+    } else if (Array.isArray(rawCookieString)) {
+        // 如果是数组，按照原来的方式迭代
+        console.log('🔍 login.js - 获取到的 Set-Cookie 数组:', rawCookieString);
+        for (let cookieLine of rawCookieString) {
+            if (cookieLine && cookieLine.startsWith('connect.sid=')) {
+                const fullKeyValue = cookieLine.split(';')[0];
+                // *** 修复点：进一步分割 "="，只取 value 部分 ***
+                const parts = fullKeyValue.split('=');
+                if (parts.length >= 2) {
+                    const sessionIdValue = parts.slice(1).join('=');
+                    console.log('🔍 login.js - 从数组项提取的 sessionId VALUE:', sessionIdValue);
+                    if (sessionIdValue) {
+                        wx.setStorageSync('connect.sid', sessionIdValue); // 保存 VALUE 部分
+                        console.log('✅ 登录成功, Cookie VALUE 已保存到本地存储:', sessionIdValue);
+                        break;
+                    }
+                }
+            }
         }
-      }
+    } else {
+        console.warn('⚠️ login.js - Set-Cookie 响应头格式未知:', typeof rawCookieString, rawCookieString);
     }
-  } else {
-    console.warn('⚠️ login.js - Set-Cookie 响应头格式未知:', typeof rawCookieString, rawCookieString);
-  }
 } else {
-  console.warn('⚠️ login.js - 登录成功，但在响应头中未找到 Set-Cookie');
+    console.warn('⚠️ login.js - 登录成功，但在响应头中未找到 Set-Cookie');
 }
-// --- 修改结束 ---
-
+// --- 修改结束 ---//
+// 新增：在跳转前再次确认本地存储的 connect.sid
+const savedConnectSidAfterLogin = wx.getStorageSync('connect.sid');
+console.log('🔍 login.js - 登录成功，即将跳转前，本地存储的 connect.sid:', savedConnectSidAfterLogin);
         // 跳转到首页
         wx.switchTab({ url: '/pages/index/index', }); // 或者跳转到订单页，取决于您的应用逻辑
       } else {

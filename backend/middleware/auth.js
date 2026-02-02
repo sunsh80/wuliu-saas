@@ -11,34 +11,37 @@ module.exports = {
       next(); // 对于非登录请求，继续执行中间件
     }
   },
- 
+
   // OpenAPI安全处理器
   openApiSecurityHandler: (api) => {
-    return async (c) => { // ← 必须是 async 函数
+    return async (c) => { // 必须是 async 函数
       console.log('\n🛡️ [SECURITY HANDLER CALLED]');
       console.log(' → Path:', c.request.path);
       console.log(' → Method:', c.request.method);
       console.log(' → Operation:', c.operation?.operationId);
+      // console.log(' → Raw Request Headers:', c.req.raw.headers); // 移除这一行，它是错误的来源
+
+      // *** 添加这一行关键日志 ***
+      console.log(' → Session Check (c.request.session):', c.request.session);
+      console.log(' → Session User ID (c.request.session?.userId):', c.request.session?.userId);
 
       const session = c.request.session;
       console.log(' → Session ID:', c.request.sessionID);
       console.log(' → Session exists?', !!session);
-
       if (process.env.NODE_ENV === 'development') {
         console.log(' → Session content:', JSON.stringify(session || {}, null, 2));
       }
-      console.log(' → Session.userId value:', session?.userId); 
-      const security = c.operation?.security;
+      console.log(' → Session.userId value:', session?.userId);
 
+      const security = c.operation?.security;
       // 不需要认证的接口
       if (Array.isArray(security) && security.length === 0) {
         console.log(' → ✅ 此端点不需要认证 (security: [])');
         if (session?.userId) {
           // 对于免认证接口，仍可注入基础上下文
-          c.context = {
-            id: session.userId,
-            tenantId: session.tenantId
-          };
+          c.context = c.context || {};
+          c.context.id = session.userId;
+          c.context.tenantId = session.tenantId;
         }
         return true;
       }
@@ -76,9 +79,7 @@ module.exports = {
       try {
         const db = getDb();
         const user = await db.get(
-          `SELECT u.tenant_id, u.roles, u.role, u.user_type, t.roles as tenant_roles FROM users u
-           LEFT JOIN tenants t ON u.tenant_id = t.id
-           WHERE u.id = ?`,
+          `SELECT u.tenant_id, u.roles, u.role, u.user_type, t.roles as tenant_roles FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?`,
           [userId]
         );
 
@@ -130,16 +131,16 @@ module.exports = {
           }
         }
 
-        c.context = {
-          id: userId,
-          tenantId: user.tenant_id,
-          roles: roles,
-          userType: user.user_type // 添加用户类型到上下文中
-        };
+        // --- 🔧 问题修复：改用逐个属性设置，确保 c.context 被正确填充 ---
+        c.context = c.context || {}; // 确保 c.context 对象存在
+        c.context.id = userId;
+        c.context.tenantId = user.tenant_id;
+        c.context.roles = roles;
+        c.context.userType = user.user_type; // 添加用户类型到上下文中
+        // --- 🔧 修复结束 ---
 
         console.log(' → ✅ 认证通过，userId:', userId, 'roles:', c.context.roles);
         return true;
-
       } catch (error) {
         console.error(' → 🚨 数据库查询失败:', error.message);
         return [500, { success: false, error: 'INTERNAL_ERROR' }];

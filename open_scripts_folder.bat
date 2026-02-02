@@ -1,0 +1,3 @@
+@echo off
+echo 正在打开Scripts目录...
+explorer "C:\Users\Administrator\Desktop\wuliu_project\scripts"
