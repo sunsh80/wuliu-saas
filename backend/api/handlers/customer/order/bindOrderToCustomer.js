@@ -11,11 +11,13 @@ module.exports = async (c, req, res) => {
     const userId = c.context?.id;
     const db = getDb();
     const { order_id } = c.request.body;
-
+    console.log(' → order_id value:', order_id, 'type:', typeof order_id);
     // 📥 2. 参数校验
-    if (!order_id || typeof order_id !== 'string') {
-      return { statusCode: 400, body: { success: false, error: 'Valid order_id is required' } };
-    }
+   if (!order_id || (typeof order_id !== 'string' && typeof order_id !== 'number')) {
+    return { statusCode: 400, body: { success: false, error: 'Valid order_id is required' } };
+}
+// 可选：将 order_id 转换为字符串进行数据库查询
+// order_id = String(order_id);
 
     // 🔐 3. 查询用户组织（用于租户隔离）
     const userOrg = await db.get(

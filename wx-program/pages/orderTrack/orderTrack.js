@@ -234,41 +234,15 @@ Page({
     let sorted = [];
     switch (sortBy) {
       case 'price':
-        sorted = quotes.sort((a, b) => a.quote_price - b.quote_price); // 价格低到高
+        sorted = quotes.sort((a, b) => a.price - b.price); // 价格低到高
         break;
-      case 'rating':
-        sorted = quotes.sort((a, b) => b.rating - a.rating); // 评分高到低
+      case 'rating': 
+        sorted = quotes.sort((a, b) => b.avg_rating - a.avg_rating); // 评分高到低
         break;
       case 'time':
       default:
         // 假设有预计到达时间 estimated_arrival_time
-        sorted = quotes.sort((a, b) => new Date(a.estimated_arrival_time) - new Date(b.estimated_arrival_time)); // 时间早到晚
-        break;
-    }
-
-    this.setData({
-      sortedQuotes: sorted,
-      sortingOption: sortBy
-    });
-  },
-
-// --- 新增方法: 排序报价 ---
-  sortQuotes(option = null) {
-    const sortBy = option || this.data.sortingOption;
-    const quotes = [...this.data.carrierQuotes]; // 避免直接修改原数组
-
-    let sorted = [];
-    switch (sortBy) {
-      case 'price':
-        sorted = quotes.sort((a, b) => a.price - b.price); // 价格低到高
-        break;
-      case 'rating':
-        sorted = quotes.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0)); // 评分高到低
-        break;
-      case 'time':
-      default:
-        // 按预计到达时间排序
-        sorted = quotes.sort((a, b) => new Date(a.estimated_arrival || a.created_at) - new Date(b.estimated_arrival || b.created_at));
+        sorted = quotes.sort((a, b) => new Date(a.delivery_time) - new Date(b.delivery_time));时间早到晚
         break;
     }
 
@@ -284,12 +258,14 @@ Page({
     this.sortQuotes(option);
   },
 
-  // --- 新增方法: 选择承运商 (卡片点击) ---
-  onQuoteCardTap(e) {
-    const carrierId = e.currentTarget.dataset.carrierId;
-    console.log('Selected Carrier ID:', carrierId);
-    this.setData({ selectedCarrierId: carrierId });
-  },
+   // --- 新增方法: 选择承运商 (卡片点击) ---
+onQuoteCardTap(e) {
+  const carrierId = e.currentTarget.dataset.carrierId; // 这个ID在WXML中应该是 q.carrier.id
+  console.log('Selected Carrier ID:', carrierId);
+  this.setData({
+    selectedCarrierId: carrierId
+  });
+},
 
   // --- 新增方法: 确认选择 ---
   async onSelectCarrier() {
@@ -300,8 +276,8 @@ Page({
     }
 
     // 找到选中的报价
-    const selectedQuote = sortedQuotes.find(q => q.carrier_tenant_id === selectedCarrierId);
-    const carrierName = selectedQuote ? selectedQuote.carrier_tenant_name : '未知承运商';
+   const selectedQuote = sortedQuotes.find(q => q.carrier.id === selectedCarrierId);
+   const carrierName = selectedQuote ? (selectedQuote.carrier.name || selectedQuote.carrier.tenant_name || '未知承运商') : '未知承运商';
 
     wx.showModal({
       title: '确认选择',
@@ -394,9 +370,9 @@ Page({
 
   // --- 新增方法: 辅助函数 ---
   getCarrierNameById(id) {
-    const found = this.data.sortedQuotes.find(item => item.carrier_tenant_id === id);
-    return found ? (found.carrier_tenant_name || '未知承运商') : '未知承运商';
-  },
+   const found = this.data.sortedQuotes.find(item => item.carrier.id === id);
+   return found ? (found.carrier.name || found.carrier.tenant_name || '未知承运商') : '未知承运商';
+},
 
   // 下拉刷新生命周期（关键！）
   onPullDownRefresh() {

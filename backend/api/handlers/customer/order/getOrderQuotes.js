@@ -2,135 +2,103 @@
 const { getDb } = require('../../../../db/index.js');
 
 module.exports = async (c) => {
-  const { orderId } = c.request.params;
-  
-  console.log(`[getOrderQuotes] Fetching quotes for order ${orderId}`);
-  
-  if (!orderId) {
-    console.log('[getOrderQuotes] Missing order ID');
-    return {
-      status: 400,
-      body: {
-        success: false,
-        error: 'MISSING_ORDER_ID',
-        message: 'Order ID is required'
-      }
-    };
-  }
+    console.log("[getOrderQuotes] 开始处理客户订单报价查询");
 
-  const db = getDb();
-  
-  try {
-    // 首先检查订单是否属于当前客户
-    const order = await db.get(
-      `SELECT id, tenant_id, status FROM orders WHERE id = ?`,
-      [orderId]
-    );
-    
-    if (!order) {
-      console.log(`[getOrderQuotes] Order not found: ${orderId}`);
-      return {
-        status: 404,
-        body: {
-          success: false,
-          error: 'ORDER_NOT_FOUND',
-          message: 'Order not found'
-        }
-      };
-    }
-    
-    // 验证订单是否属于当前客户
-    if (order.tenant_id !== c.context.tenantId) {
-      console.log(`[getOrderQuotes] Order ${orderId} does not belong to current customer`);
-      return {
-        status: 403,
-        body: {
-          success: false,
-          error: 'FORBIDDEN',
-          message: 'This order does not belong to you'
-        }
-      };
-    }
-    
-    // 获取订单的所有报价信息
-    // 从订单表中获取报价信息（因为没有单独的 quotes 表）
-    const orderWithQuote = await db.get(
-      `SELECT 
-         quote_price, 
-         quote_delivery_time, 
-         quote_remarks,
-         carrier_id,
-         status
-       FROM orders 
-       WHERE id = ?`,
-      [orderId]
-    );
-    
-    if (!orderWithQuote || !orderWithQuote.quote_price) {
-      console.log(`[getOrderQuotes] No quotes found for order: ${orderId}`);
-      return {
-        status: 200,
-        body: {
-          success: true,
-          data: {
-            order_id: orderId,
-            quotes: []
-          }
-        }
-      };
-    }
-    
-    // 获取承运商信息
-    let carrierInfo = null;
-    if (orderWithQuote.carrier_id) {
-      const carrierUser = await db.get(
-        `SELECT u.name as carrier_name, t.name as tenant_name 
-         FROM users u 
-         LEFT JOIN tenants t ON u.tenant_id = t.id 
-         WHERE u.id = ?`,
-        [orderWithQuote.carrier_id]
-      );
-      
-      if (carrierUser) {
-        carrierInfo = {
-          id: orderWithQuote.carrier_id,
-          name: carrierUser.carrier_name || carrierUser.tenant_name,
-          tenant_name: carrierUser.tenant_name
+    // 1. 认证与授权检查
+    // 修改：优先从 c.request.session 获取 tenantId
+    const userId = c.context?.id || c.request.session?.userId; // 也可以从 session 获取
+    const tenantId = c.request.session?.tenantId || c.context?.tenantId; // 优先从 session 获取
+    if (!userId || !tenantId) {
+        console.warn("❌ 未授权: 在请求上下文或会话中找不到用户 ID 或租户 ID。", { contextId: c.context?.id, sessionId: c.request.session?.userId, contextTenantId: c.context?.tenantId, sessionTenantId: c.request.session?.tenantId });
+        return {
+            status: 401,
+            body: {
+                success: false,
+                error: 'UNAUTHORIZED',
+                message: '需要身份验证。'
+            }
         };
-      }
     }
-    
-    const quotes = [{
-      carrier: carrierInfo,
-      price: orderWithQuote.quote_price,
-      delivery_time: orderWithQuote.quote_delivery_time,
-      remarks: orderWithQuote.quote_remarks,
-      status: orderWithQuote.status,
-      created_at: order.created_at // 使用订单的创建时间作为报价时间
-    }];
-    
-    console.log(`[getOrderQuotes] Found ${quotes.length} quotes for order ${orderId}`);
-    
-    return {
-      status: 200,
-      body: {
-        success: true,
-        data: {
-          order_id: orderId,
-          quotes: quotes
+
+    console.log(`[getOrderQuotes] Authenticated - userId: ${userId}, tenantId: ${tenantId}`); // 添加调试日志
+
+    // 2. 提取路径参数
+    const req = c.request;
+    const orderId = req.params.order_id;
+    console.log("[getOrderQuotes] Fetching quotes for order:", orderId);
+
+    if (!orderId) {
+        console.warn("❌ 错误请求: 'order_id' 在请求路径参数中缺失。");
+        return {
+            status: 400,
+            body: {
+                success: false,
+                error: 'MISSING_ORDER_ID',
+                message: "'order_id' 路径参数是必需的。"
+            }
+        };
+    }
+
+    const db = getDb();
+    try {
+        // 3. 验证订单存在性及归属权
+        const orderSql = ` 
+            SELECT id FROM orders WHERE id = ? AND tenant_id = ? 
+        `;
+        console.log(`[getOrderQuotes] Executing query with params: [${orderId}, ${tenantId}]`); // 添加调试日志
+        const order = await db.get(orderSql, [orderId, tenantId]);
+        
+        if (!order) {
+            console.log("❌ 订单未找到或不属于当前租户。");
+            return {
+                status: 404,
+                body: {
+                    success: false,
+                    error: 'ORDER_NOT_FOUND',
+                    message: "订单未找到或您无权访问此订单。"
+                }
+            };
         }
-      }
-    };
-    
-  } catch (error) {
-    console.error('[getOrderQuotes] Database error:', error);
-    return {
-      status: 500,
-      body: {
-        success: false,
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'An error occurred while fetching quotes'
-      }
-    };
-  }
+
+        // 4. 从 quotes 表获取该订单的所有报价
+        const quotesSql = `
+            SELECT q.quote_price AS price, q.quote_delivery_time AS deliveryTime, q.quote_remarks AS remarks,
+                   u.id AS carrierId, u.name AS carrierName, u.phone AS carrierPhone
+            FROM quotes q
+            LEFT JOIN users u ON q.carrier_id = u.id
+            WHERE q.order_id = ?
+        `;
+        const quotes = await db.all(quotesSql, [orderId]);
+        console.log("[getOrderQuotes] 从 quotes 表成功获取到", quotes.length, "条报价记录。");
+
+        // 5. 返回成功响应
+        return {
+            status: 200,
+            body: {
+                success: true,
+                data: {
+                    order_id: parseInt(orderId, 10),
+                    quotes: quotes.map(q => ({
+                        price: q.price,
+                        deliveryTime: q.deliveryTime,
+                        remarks: q.remarks,
+                        carrierId: q.carrierId,
+                        carrierName: q.carrierName,
+                        carrierPhone: q.carrierPhone
+                    }))
+                }
+            }
+        };
+
+    } catch (error) {
+        console.error('💥 [获取订单报价处理器错误]:', error);
+        return {
+            status: 500,
+            body: {
+                success: false,
+                error: 'INTERNAL_SERVER_ERROR',
+                message: process.env.NODE_ENV === 'development' ? error.message : '发生内部服务器错误。'
+            }
+        };
+    }
 };

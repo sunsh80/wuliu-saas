@@ -23,6 +23,25 @@ class OpenApiMiddleware {
 
     autoRegisterHandlers(this.api);
     await this.api.init();
+   // --- 添加以下代码块用于调试 ---
+    console.log('--- DEBUG: OpenAPI Document Loaded ---');
+    // 打印所有路径
+    console.log('All Paths in Document:');
+    for (const [path, pathItem] of Object.entries(this.api.definition.paths)) {
+        console.log(`  Path: ${path}`);
+        // 检查是否存在 POST 方法
+        if (pathItem.post) {
+            console.log(`    -> Method: POST`);
+            console.log(`       OperationId: ${pathItem.post.operationId}`);
+            console.log(`       Has Parameters: ${!!pathItem.parameters || !!(pathItem.post.parameters && pathItem.post.parameters.length > 0)}`);
+            if (pathItem.post.parameters) {
+                console.log(`       Parameters:`, pathItem.post.parameters.map(p => p.name + (p.required ? '(required)' : '') + ` [${p.in}]`));
+            }
+        }
+    }
+    console.log('--- END DEBUG ---');
+    // --- 结束添加 ---
+
     console.log('🔧 OpenAPI中间件初始化完成');
     this.printRegisteredPaths();
     return this.api;

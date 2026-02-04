@@ -4,7 +4,7 @@ const { getDb } = require('../../../../db/index.js');
 module.exports = async (c) => {
   try {
     const db = getDb();
-    const userId = c.context?.id; // 从认证上下文获取用户ID
+    const tenantId = c.context?.tenantId;// 从认证上下文获取用户ID
 
     // 📥 获取查询参数（支持分页）
     const page = parseInt(c.request.query.page) || 1;
@@ -12,18 +12,16 @@ module.exports = async (c) => {
     const offset = (page - 1) * limit;
 
     // 📊 查询当前用户的订单总数
-    const totalResult = await db.get(
-      'SELECT COUNT(*) as total FROM orders WHERE customer_id = ?',
-      [userId]
-    );
+  const totalResult = await db.get(
+ 'SELECT COUNT(*) as total FROM orders WHERE customer_tenant_id = ?', [tenantId]
+);
     const total = totalResult?.total || 0;
 
     // 📋 查询订单列表
-    const orders = await db.all(
-      `SELECT * FROM orders WHERE customer_id = ?
-       ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [userId, limit, offset]
-    );
+const orders = await db.all(
+ `SELECT * FROM orders WHERE customer_tenant_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+ [tenantId, limit, offset]
+);
 
     // 处理订单数据
     const processedOrders = orders.map(order => {

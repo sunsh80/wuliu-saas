@@ -94,6 +94,7 @@ const CORE_TABLES = {
       volume_m3 REAL,
       required_delivery_time TEXT,
       description TEXT,
+      type_user INTEGER DEFAULT NULL,
       FOREIGN KEY (customer_tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
     );
   `,
@@ -120,14 +121,28 @@ tenant_vehicles: ` CREATE TABLE IF NOT EXISTS tenant_vehicles (
 
 // 扩展表定义
 const EXTENDED_TABLES = {
-  user_sessions: `
-    CREATE TABLE IF NOT EXISTS user_sessions (
-      session_id TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      expires_at TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `,
+user_sessions: `CREATE TABLE IF NOT EXISTS user_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    session_token TEXT NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`,
+  // --- NEW TABLE: quotes ---
+  quotes: `CREATE TABLE IF NOT EXISTS quotes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,           -- 关联订单ID
+    carrier_id INTEGER NOT NULL,         -- 关联承运商ID (来自 users 表)
+    quote_price REAL NOT NULL,           -- 报价金额
+    quote_delivery_time TEXT NOT NULL,   -- 预计送达时间
+    quote_remarks TEXT,                  -- 报价备注
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (carrier_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(order_id, carrier_id)         -- 一个承运商对一个订单只能报价一次
+  )`,
   organizations: `
     CREATE TABLE IF NOT EXISTS organizations (
       id TEXT PRIMARY KEY,
@@ -173,22 +188,20 @@ class DatabaseSchema {
     }
   }
 
-  async ensureColumnsExist(db) {
-    console.log('🔍 检查并添加缺失的列...');
-
-    // 检查 users 表是否已有 roles 列
-    const columns = await db.all(`
-      PRAGMA table_info(users);
-    `);
-
-    const columnNames = columns.map(col => col.name);
-
-    // 添加缺失的 roles 列
-    if (!columnNames.includes('roles')) {
-      await db.run('ALTER TABLE users ADD COLUMN roles TEXT;');
-      console.log('✅ 已添加 users.roles 列');
+async ensureColumnsExist(db) {
+    // Check for users.roles column
+    const userRolesCheck = await db.all("PRAGMA table_info(users);");
+    if (!userRolesCheck.some(col => col.name === 'roles')) {
+        await db.exec("ALTER TABLE users ADD COLUMN roles TEXT;");
     }
-  }
+
+    // Check for orders.type_user column
+    const orderTypeUserCheck = await db.all("PRAGMA table_info(orders);");
+    if (!orderTypeUserCheck.some(col => col.name === 'type_user')) {
+        await db.exec("ALTER TABLE orders ADD COLUMN type_user INTEGER DEFAULT NULL;");
+    }
+    // Add checks for other missing columns here as needed
+}
 
   async createDefaultAdmin(db) {
     const defaultOrgId = 'admin_org_id_001';

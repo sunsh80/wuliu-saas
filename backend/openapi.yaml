@@ -193,7 +193,7 @@ components:
           example: "2026-01-14T18:00:00Z"
         note:
           type: string
-          example: "自有车辆，24小时内装车"
+          example: "自有车辆,24小时内装车"
     QuoteItem:
       type: object
       properties:
@@ -333,7 +333,7 @@ components:
           format: date-time
         status:
           type: string # ⚠️ 严格保留原状态枚举！
-          enum: [created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
+          enum: [created, pending, pending_claim, claimed, quoted, awarded, dispatched, in_transit, delivered, cancelled]
         created_at:
           type: string
           format: date-time
@@ -831,7 +831,7 @@ paths:
       summary: 将订单绑定到客户（通过手机号）
       operationId: bindOrderToCustomer
       security:
-       []
+       - TenantSessionAuth: []
       requestBody:
         required: true
         content:
@@ -840,14 +840,10 @@ paths:
               type: object
               properties:
                 order_id:
-                  type: string
-                  example: "ORD123456"
-                customer_phone:
-                  type: string
-                  example: "13800138000"
+                  type: integer
+                  example: 123456
               required:
                 - order_id
-                - customer_phone
       responses:
         '200':
           description: 绑定成功

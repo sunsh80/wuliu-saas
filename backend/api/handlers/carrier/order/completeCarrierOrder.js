@@ -11,7 +11,7 @@ if (!roles.includes('carrier')) {
 }
 
   // 从 URL 路径获取 order_id（OpenAPI 定义为路径参数）
-  const { order_id } = c.req.param();
+  const { order_id } = c.request.params; 
 
   if (!order_id) {
     return {

@@ -99,9 +99,9 @@ module.exports = async (c) => {
     source: 'mobile_app'
   });
 
-  // 4. 插入数据库
-  const result = await db.run(
-    `INSERT INTO orders (
+ // 4. 插入数据库
+const result = await db.run(
+  `INSERT INTO orders (
       customer_tenant_id,
       tracking_number,
       sender_info,
@@ -116,24 +116,28 @@ module.exports = async (c) => {
       volume_m3,
       required_delivery_time,
       quote_deadline,
-      description
-    ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)`,
+      description,
+      tenant_id
+    ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      user.tenant_id,
-      tracking_number,
-      sender_info,
-      receiver_info,
-      status,
-      null, // quote_price (可选)
-      required_delivery_time || null, // 注意：原始代码这里可能放错了位置，这里调整回来
-      customer_phone || null,
-      weight_kg || null,
-      volume_m3 || null,
-      required_delivery_time || null,
-      quote_deadline || null,
-      description || null
+      user.tenant_id,             // 1st -> customer_tenant_id
+      tracking_number,            // 2nd -> tracking_number
+      sender_info,                // 3rd -> sender_info
+      receiver_info,              // 4th -> receiver_info
+      status,                     // 5th -> status
+      // 6th -> created_at (由 datetime('now') 填充)
+      // 7th -> updated_at (由 datetime('now') 填充)
+      null,                       // 8th -> quote_price
+      null,                       // 9th -> quote_delivery_time
+      customer_phone || null,     // 10th -> customer_phone
+      weight_kg || null,          // 11th -> weight_kg
+      volume_m3 || null,          // 12th -> volume_m3
+      required_delivery_time || null, // 13th -> required_delivery_time
+      quote_deadline || null,     // 14th -> quote_deadline
+      description || null,        // 15th -> description
+      user.tenant_id              // 16th -> tenant_id (这才是正确的！)
     ]
-  );
+);
 
   // 5. 返回成功
   console.log(`[SUCCESS] Order created with ID: ${result.lastID}, Tracking Number: ${tracking_number}`);
