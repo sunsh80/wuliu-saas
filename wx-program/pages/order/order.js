@@ -37,20 +37,22 @@ Page({
   },
 
   onLoad() {
-    // 检查登录状态并初始化数据
-    const isLoggedIn = wx.getStorageSync('isLoggedIn') || wx.getStorageSync('token');
-    if (!isLoggedIn) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/index/index',
-        });
-      }, 1500);
-      return;
-    }
+    // 不在页面加载时进行严格的认证检查，允许用户进入页面
+    // 认证检查将在提交订单时进行
+    console.log('=== 订单页面 onLoad 开始 ===');
+    console.log('订单页面加载，认证检查将在提交订单时进行');
+
+    // 检查认证信息
+    const isLoggedIn = wx.getStorageSync('isLoggedIn');
+    const token = wx.getStorageSync('token');
+    const connectSid = wx.getStorageSync('connect.sid');
+
+    console.log('认证信息检查:');
+    console.log('- isLoggedIn:', isLoggedIn);
+    console.log('- token:', token);
+    console.log('- connect.sid:', connectSid);
+
+    console.log('=== 订单页面 onLoad 结束 ===');
   },
 
   // 货物类型选择
@@ -196,31 +198,10 @@ Page({
       destinationPhone: e.detail.value
     });
   },
-  // 提交订单
   submitOrder() {
-    // 检查登录状态
-    const isLoggedIn = wx.getStorageSync('isLoggedIn');
-    const token = wx.getStorageSync('token');
-    // const storedConnectSid = wx.getStorageSync('connect.sid'); // 移除这个，放在下面统一获取
+    console.log('=== submitOrder 函数被调用 ===');
 
-    // 新增调试日志 (保留)
-    console.log('🔍 提交订单时，本地存储的 connect.sid:', wx.getStorageSync('connect.sid'));
-    // 调试日志 (保留)
-    console.log('🔍 submitOrder - 检查登录状态 - isLoggedIn:', isLoggedIn, 'token:', token, 'connect.sid:', wx.getStorageSync('connect.sid'));
-
-    if (!isLoggedIn) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      setTimeout(() => {
-        wx.redirectTo({
-          url: '/pages/login/login',
-        });
-      }, 1500);
-      return;
-    }
-
+    // 验证必填项
     const {
       selectedCargoType,
       cargoRemark,
@@ -239,7 +220,6 @@ Page({
       pickupTime
     } = this.data;
 
-    // 验证必填项
     if (
       !selectedCargoType ||
       !goodsWeight ||
@@ -284,68 +264,76 @@ Page({
 
     console.log('准备提交订单数据:', orderData);
 
-    // --- 合并并修正 Cookie 相关的声明和日志 ---//
-// 1. 统一获取一次 storedConnectSid (VALUE 部分)
-const storedConnectSidValue = wx.getStorageSync('connect.sid');
+    // 获取认证信息
+    const connectSid = wx.getStorageSync('connect.sid');
+    const token = wx.getStorageSync('token');
 
-// 2. 整合并保留必要的日志
-console.log('🔍 submitOrder - 即将发送请求, 从本地存储读取的 Cookie VALUE:', storedConnectSidValue);
+    // 构造请求头
+    const headers = {
+      'Content-Type': 'application/json',
+    };
 
-// 3. 构造 header.cookie，因为 login.js 保存的是 VALUE 部分
-let cookieHeaderValue = '';
-if (storedConnectSidValue) {
-  // 检查值是否已经包含前缀（以防 login.js 未修改或修改不彻底）
-  if (storedConnectSidValue.startsWith('connect.sid=')) {
-     cookieHeaderValue = storedConnectSidValue; // 已包含前缀，直接使用
-  } else {
-     cookieHeaderValue = `connect.sid=${storedConnectSidValue}`; // 添加前缀
-  }
-} else {
-  console.log('🔍 submitOrder - 本地存储中未找到 connect.sid');
-  cookieHeaderValue = ''; // 或者可以设为 undefined
-}
-
-// 添加新的日志，明确显示将要放入 header 的 cookie 值
-console.log('🔍 submitOrder - wx.request 将使用的 header.cookie:', cookieHeaderValue);
-// --- 修改结束 ---
-
-// 发送网络请求提交订单
-wx.request({
-  url: 'http://192.168.2.250:3000/api/customer/orders', // 使用正确的后端API地址
-  method: 'POST',
-  header: {
-    'Content-Type': 'application/json',
-    // 手动添加 connect.sid cookie
-    'cookie': cookieHeaderValue // 使用上面构造好的值
-  },
-  enableHttp2: true,
-  enableQuic: true,
-  enableCache: false,
-  data: orderData,
-  success: (res) => {
-    if (res.statusCode === 201 || res.statusCode === 200) {
-      wx.showToast({
-        title: '订单创建成功',
-        icon: 'success'
-      });
-      console.log('订单创建成功:', res.data);
-      // 可以选择跳转到订单详情页或返回首页
-    } else {
-      console.error('订单创建失败:', res);
-      wx.showToast({
-        title: '创建失败，请重试',
-        icon: 'none'
-      });
+    // 添加 Cookie
+    if (connectSid) {
+      headers['Cookie'] = `connect.sid=${connectSid}`;
     }
-  },
-  fail: (err) => {
-    console.error('提交订单请求失败:', err);
-    wx.showToast({
-      title: '网络异常',
-      icon: 'none'
+
+    // 添加 Authorization
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    console.log('准备发送订单请求，认证信息:', headers);
+
+    // 发送网络请求提交订单
+    wx.request({
+      url: 'http://192.168.2.250:3000/api/customer/orders', // 使用正确的后端API地址
+      method: 'POST',
+      header: headers,
+      data: orderData,
+      success: (res) => {
+        console.log('订单请求响应:', res);
+        if (res.statusCode === 201 || res.statusCode === 200) {
+          wx.showToast({
+            title: '订单创建成功',
+            icon: 'success'
+          });
+          console.log('订单创建成功:', res.data);
+          // 可以选择跳转到订单详情页或返回首页
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/index/index'
+            });
+          }, 1500);
+        } else if (res.statusCode === 401) {
+          // 认证失败，跳转到登录页面
+          wx.showToast({
+            title: '登录已过期，请重新登录',
+            icon: 'none'
+          });
+          setTimeout(() => {
+            wx.redirectTo({
+              url: '/pages/login/login',
+            });
+          }, 1500);
+        } else {
+          console.error('订单创建失败:', res);
+          wx.showToast({
+            title: '创建失败，请重试',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('提交订单请求失败:', err);
+        wx.showToast({
+          title: '网络异常',
+          icon: 'none'
+        });
+      }
     });
-  }
-});
+
+    console.log('=== submitOrder 函数执行完毕 ===');
   },
 
   // ... (其他函数)

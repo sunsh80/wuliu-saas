@@ -109,7 +109,7 @@ module.exports = async (c) => {
       // 如果 carrier_id 存储的是 tenant_id，则需要相应调整 JOIN 条件。
       // 当前假设 carrier_id 对应 users.id (INTEGER)
       const carrierSql = `
-       SELECT u.id AS carrier_user_id, u.name AS carrier_name, t.name AS carrier_tenant_name
+       SELECT u.id AS carrier_user_id, u.name AS carrier_name, t.name AS carrier_tenant_name, t.contact_phone
        FROM users u
        JOIN tenants t ON u.tenant_id = t.id
        WHERE u.id = CAST(? AS INTEGER) -- 将 TEXT 转换为 INTEGER 进行比较
@@ -118,7 +118,7 @@ module.exports = async (c) => {
 
       if (!carrierInfo) {
         console.warn(`⚠️ 订单 ${orderId} 关联的承运商 ID ${order.carrier_id} 在数据库中未找到。`);
-        carrierInfo = { carrier_user_id: order.carrier_id, carrier_name: 'Unknown Carrier', carrier_tenant_name: 'Unknown Tenant' };
+        carrierInfo = { carrier_user_id: order.carrier_id, carrier_name: 'Unknown Carrier', carrier_tenant_name: 'Unknown Tenant', contact_phone: null };
       }
     } else {
       console.log("🔍 步骤 4: 订单尚未分配承运商。");
@@ -150,8 +150,8 @@ module.exports = async (c) => {
       // awardTime: order.award_time, // 不存在
       // dispatchTime: order.dispatch_time, // 不存在
       deliveryTime: order.completed_at, // 可选：将 completed_at 映射为 deliveryTime
-      createdAt: order.created_at,
-      updatedAt: order.updated_at,
+      createdAt: order.created_at ? order.created_at.replace(' ', 'T') : new Date().toISOString(),
+      updatedAt: order.updated_at ? order.updated_at.replace(' ', 'T') : new Date().toISOString(),
       customer: {
         tenantId: order.customer_tenant_id,
         tenantName: customerTenantName,
@@ -160,13 +160,14 @@ module.exports = async (c) => {
         id: carrierInfo.carrier_user_id,
         name: carrierInfo.carrier_name,
         tenantName: carrierInfo.carrier_tenant_name,
+        phone: carrierInfo.contact_phone,  // 添加联系电话
       } : null,
       // 添加其他 schema.js 中存在的字段
       quotePrice: order.quote_price,
-      quoteDeliveryTime: order.quote_delivery_time,
+      quoteDeliveryTime: order.quote_delivery_time ? order.quote_delivery_time.replace(' ', 'T') : null,
       quoteRemarks: order.quote_remarks,
-      quoteDeadline: order.quote_deadline,
-      requiredDeliveryTime: order.required_delivery_time,
+      quoteDeadline: order.quote_deadline ? order.quote_deadline.replace(' ', 'T') : null,
+      requiredDeliveryTime: order.required_delivery_time ? order.required_delivery_time.replace(' ', 'T') : null,
       customerPhone: order.customer_phone,
       trackingNumber: order.tracking_number,
       // carrierTenantId: order.tenant_id, // 可选：如果需要暴露这个

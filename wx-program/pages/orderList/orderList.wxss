@@ -3,103 +3,92 @@
   padding: 20rpx;
   background-color: #f5f5f5;
   min-height: 100vh;
-  box-sizing: border-box;
 }
 
-.header {
-  padding: 20rpx 0;
-  text-align: center;
-  background-color: #fff;
-  margin-bottom: 20rpx;
-  border-radius: 10rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
-}
-
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-}
-
-.orders-list {
+.loading-container,
+.error-container,
+.empty-container {
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  justify-content: center;
+  align-items: center;
+  height: 40vh; /* 调整高度以适应不同内容 */
+  text-align: center;
 }
 
-.order-item {
-  background-color: #fff;
-  border-radius: 10rpx;
-  padding: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1);
+.error-text {
+  color: #ff4d4f;
+  margin-bottom: 20rpx;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
+  background-color: #007aff;
+  color: white;
+  border-radius: 8rpx;
+  padding: 20rpx 40rpx;
+  font-size: 28rpx;
+}
+
+.order-card {
+  background-color: white;
+  margin-bottom: 20rpx;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .order-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15rpx;
+  margin-bottom: 16rpx;
   border-bottom: 1rpx solid #eee;
-  padding-bottom: 10rpx;
+  padding-bottom: 16rpx;
 }
 
 .order-id {
-  font-size: 28rpx;
+  font-size: 32rpx;
+  font-weight: bold;
   color: #333;
-  font-weight: bold;
 }
 
-.status {
+.order-status {
   font-size: 24rpx;
-  padding: 5rpx 15rpx;
+  padding: 8rpx 16rpx;
   border-radius: 20rpx;
-  color: #fff;
-  background-color: #999;
+  color: white;
 }
 
-.status-created { background-color: #999; } /* 待发布 */
-.status-published { background-color: #FFA500; } /* 已发布 */
-.status-matching { background-color: #007AFF; } /* 匹配中 */
-.status-quoting { background-color: #32CD32; } /* 报价中 */
-.status-accepted { background-color: #32CD32; } /* 已接受 */
-.status-in_transit { background-color: #1E90FF; } /* 运输中 */
-.status-delivered { background-color: #2E8B57; } /* 已送达 */
-.status-cancelled { background-color: #8B0000; } /* 已取消 */
-.status-expired { background-color: #696969; } /* 已过期 */
+.status-created,
+.status-pending_claim { background-color: #faad14; } /* 待认领 */
+.status-claimed,
+.status-quoted { background-color: #1890ff; } /* 待选择 */
+.status-awarded,
+.status-dispatched { background-color: #52c41a; } /* 已分配/已发车 */
+.status-in_transit { background-color: #722ed1; } /* 运输中 */
+.status-delivered { background-color: #52c41a; } /* 已送达 */
+.status-cancelled { background-color: #f5222d; } /* 已取消 */
 
-.order-info {
+.order-details {
+  /* padding-top: 16rpx; */
+}
+
+.detail-row {
   display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-}
-
-.info-row {
-  display: flex;
-  font-size: 26rpx;
-  color: #666;
-}
-
-.info-row .label {
-  width: 120rpx;
-  flex-shrink: 0;
-  font-weight: bold;
-}
-
-.info-row .value {
-  flex: 1;
-  word-break: break-all; /* 防止长地址溢出 */
-}
-
-.empty-tips {
-  text-align: center;
-  padding: 100rpx 0;
-  color: #999;
+  margin-bottom: 12rpx;
   font-size: 28rpx;
+  line-height: 1.5;
 }
 
-.loading {
-  text-align: center;
-  padding: 20rpx 0;
+.label {
   color: #999;
-  font-size: 28rpx;
+  min-width: 140rpx; /* 固定标签宽度 */
+  margin-right: 16rpx;
+}
+
+.value {
+  color: #333;
+  flex: 1; /* 剩余空间由值填充 */
+  word-break: break-all; /* 长文本换行 */
 }

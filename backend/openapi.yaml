@@ -322,7 +322,6 @@ components:
           type: string
         weight_kg:
           type: number
-        # === 新增可选字段 ===
         volume_m3:
           type: number
         required_delivery_time:
@@ -332,8 +331,8 @@ components:
           type: string
           format: date-time
         status:
-          type: string # ⚠️ 严格保留原状态枚举！
-          enum: [created, pending, pending_claim, claimed, quoted, awarded, dispatched, in_transit, delivered, cancelled]
+          type: string
+          enum: [created, pending, pending_claim, claimed, quoted, awarded, dispatched, in_transit, delivered, cancelled] # ⚠️ 严格保留原状态枚举！
         created_at:
           type: string
           format: date-time
@@ -342,14 +341,94 @@ components:
           items:
             $ref: '#/components/schemas/QuoteItem'
           nullable: true
+        order_id:
+          type: string
+          example: "ORD-20260205-001"
+          description: 订单的唯一标识符，用于前端展示和跳转详情页
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-02-05T10:35:00Z"
+          description: 订单最后更新时间
+        sender_info:
+          type: string # 注意：这是 JSON 字符串，在前端被解析为对象
+          example: '{"name": "张三", "phone": "13800138000"}'
+          description: 发货人信息（JSON 字符串格式）
+        receiver_info:
+          type: string # 注意：这是 JSON 字符串，在前端被解析为对象
+          example: '{"name": "李四", "phone": "13900139000"}'
+          description: 收货人信息（JSON 字符串格式）
+        cargo_type:
+          type: string
+          example: "furniture"
+          description: 货物类型
+        length:
+          type: number
+          example: 1.2
+          description: 货物长度（米）
+        width:
+          type: number
+          example: 0.8
+          description: 货物宽度（米）
+        height:
+          type: number
+          example: 0.6
+          description: 货物高度（米）
+        description:
+          type: string
+          example: "请务必小心轻放"
+          description: 订单备注
+        total_price:
+          type: number
+          example: 299.99
+          description: 订单总价格
+      required:
+        - id
+        - order_id
+        - status
+        - created_at
+        - pickup_address
+        - delivery_address
+        - sender_info
+        - receiver_info
+        - cargo_type
+        - weight_kg
+        - length
+        - width
+        - height
+        - volume_m3
+        - total_price
+        # 注意：这里假设它们是必填的。
+        - customer_tenant_id
+        - customer_tenant_name
     OrderListResponse:
       type: object
       properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "获取成功"
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 5
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItem'
+      required:
+        - success
+        - data
     ErrorResponse:
       type: object
       required:
@@ -1144,6 +1223,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/auth/ping:
+    get:
+      summary: 检查当前会话是否有效
+      description: 用于验证用户登录状态（Session 是否有效）。
+      security:
+      - TenantSessionAuth: []
+      tags:
+        - auth 
+      responses:
+        '200':
+          description: Session 有效
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Session is valid"
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "user_123"
+                      name:
+                        type: string
+                        example: "张三"
+        '401':
+          description: Session 无效或未登录
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Session is invalid or not logged in"
   /api/admin/login:
     post:
       tags:

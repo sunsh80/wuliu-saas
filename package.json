@@ -25,6 +25,7 @@
     "tough-cookie": "^6.0.0"
   },
   "devDependencies": {
+    "eslint-plugin-weapp": "^0.0.1",
     "nodemon": "^2.0.0"
   }
 }

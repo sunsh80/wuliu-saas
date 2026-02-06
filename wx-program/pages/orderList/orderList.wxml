@@ -1,46 +1,47 @@
 <!-- pages/orderList/orderList.wxml -->
 <view class="container">
-  <view class="header">
-    <text class="title">我的订单</text>
+  <!-- 使用 wx:if 控制加载状态，基于 data.loading -->
+  <view wx:if="{{ loading }}" class="loading-container">
+    <text>加载中...</text>
   </view>
 
-  <view class="orders-list">
-    <block wx:for="{{orders}}" wx:key="id">
-      <view class="order-item" bindtap="goToDetail" data-id="{{item.id}}">
-        <view class="order-header">
-          <text class="order-id">订单号: {{item.id}}</text>
-          <text class="status status-{{item.status}}">{{getStatusText(item.status)}}</text>
-        </view>
-        <view class="order-info">
-          <view class="info-row">
-            <text class="label">货物:</text>
-            <text class="value">{{item.goods_description || '待填写'}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">取货:</text>
-            <text class="value">{{item.pickup_location && item.pickup_location.address ? item.pickup_location.address : '待填写'}}</text>
+  <view wx:elif="{{ error }}" class="error-container">
+    <text>{{ error }}</text>
+    <button wx:if="{{ showRetry }}" bindtap="onRetry">重试</button>
+  </view>
 
-          </view>
-          <view class="info-row">
-            <text class="label">派送:</text>
-            <text class="value">{{item.delivery_location && item.delivery_location.address ? item.delivery_location.address : '待填写'}}</text>
-          </view>
-          <view class="info-row">
+  <view wx:elif="{{ emptyTip }}" class="empty-container">
+    <text>{{ emptyTip }}</text>
+  </view>
+
+  <!-- 当 loading, error, emptyTip 都为假时，渲染订单列表 -->
+  <scroll-view wx:else scroll-y="true" class="order-list">
+    <!-- 如果订单数组长度大于 0，则渲染订单卡片列表 -->
+    <view wx:if="{{ orders.length > 0 }}">
+      <view class="order-card" wx:for="{{ orders }}" wx:key="id" bindtap="goToDetail" data-id="{{ item.id }}">
+        <view class="order-header">
+          <text class="order-id">订单号: {{ item.order_number || item.id }}</text>
+          <text class="order-status status-{{ item.status }}">{{ item.statusText }}</text>
+        </view>
+        <view class="order-details">
+          <view class="detail-row">
             <text class="label">创建时间:</text>
-            <text class="value">{{item.created_at}}</text>
+            <text class="value">{{ item.formattedCreatedAt }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="label">发货地:</text>
+            <text class="value">{{ item.senderInfoObj.province }}{{ item.senderInfoObj.city }}{{ item.senderInfoObj.district }}{{ item.senderInfoObj.address }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="label">收货地:</text>
+            <text class="value">{{ item.receiverInfoObj.province }}{{ item.receiverInfoObj.city }}{{ item.receiverInfoObj.district }}{{ item.receiverInfoObj.address }}</text>
           </view>
         </view>
       </view>
-    </block>
-
-    <!-- 空列表提示 -->
-    <view wx:if="{{!loading && orders.length === 0}}" class="empty-tips">
+    </view>
+    <!-- 如果订单数组长度为 0，且 emptyTip 为空（理论上这种情况在 JS 中已被处理为显示 emptyTip），这里作为兜底 -->
+    <view wx:else class="empty-container-inside-scroll">
       <text>暂无订单</text>
     </view>
-  </view>
-
-  <!-- 加载提示 -->
-  <view wx:if="{{loading}}" class="loading">
-    <text>加载中...</text>
-  </view>
+  </scroll-view>
 </view>

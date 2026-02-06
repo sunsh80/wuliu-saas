@@ -15,7 +15,9 @@ const sessionMiddleware = require('./middleware/session');
 const authMiddleware = require('./middleware/auth');
 const OpenApiMiddleware = require('./middleware/openapi');
 const errorMiddleware = require('./middleware/error');
-const debugMiddleware = require('./middleware/debug'); // 可选
+const debugMiddleware = require('./middleware/debug'); 
+const authRouter = require('./routes/auth');// 认证路由
+console.log('✅ 中间件模块加载成功');
 
 
 // 数据库
@@ -34,6 +36,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 app.use(rateLimit(config.security.rateLimit));
+app.use('/api/auth', authRouter);
 
 // ===== 启动函数 =====
 async function startServer() {

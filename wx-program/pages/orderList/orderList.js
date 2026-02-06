@@ -1,150 +1,162 @@
-// miniprogram/pages/orderList/orderList.js
+// pages/orderList/orderList.js
+const request = require('../../utils/request.js');
 
 Page({
   data: {
-    orders: [], // 存储订单列表
+    orders: [],
     loading: true,
-    refreshing: false, // 标记是否正在刷新
+    error: '',
+    showRetry: false,
+    emptyTip: ''
   },
 
-  onLoad() {
+  // 页面加载时执行
+  onLoad: function(options) {
+    console.log('[OrderList] 页面加载，开始获取订单数据');
     this.fetchOrders();
-    if (this.data.goodsMainCategory) {
-        this.updateMainCategoryIndex();
-    }
   },
 
-  onShow() {
-    // 页面显示时，通常也会刷新列表以获取最新状态
-    // 但如果用户刚从详情页返回，可能不需要立即刷新，可根据需求调整
-    // this.fetchOrders();
+  // 页面显示时执行（每次进入页面都会执行）
+  onShow: function() {
+    console.log('[OrderList] 页面显示，刷新订单数据');
+    // 每次进入页面都刷新数据
+    this.fetchOrders();
   },
 
-  /**
-   * 从后端API获取订单列表
-   */
   async fetchOrders() {
-    // 判断是否需要刷新状态来决定是否显示loading
-    const showLoading = !this.data.refreshing;
-
-    if (showLoading) {
-      wx.showLoading({ title: '加载中...' });
-    }
-
-    const token = wx.getStorageSync('authToken'); // 假设登录后存了token
-    if (!token) {
-      wx.hideLoading();
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none',
-        success: () => {
-          setTimeout(() => {
-            wx.navigateTo({ url: '/pages/login/login' }); // 假设登录页路径
-          }, 1500);
-        }
-      });
-      return;
-    }
+    console.log('[OrderList] 开始获取订单数据...');
+    // 设置加载状态
+    this.setData({
+      loading: true,
+      error: '',
+      showRetry: false,
+      emptyTip: ''
+    });
 
     try {
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'http://192.168.2.250/api/customer/orders', // 请替换为实际API地址
-          method: 'GET',
-          header: {
-            'Authorization': `Bearer  $ {token}`,
-            'Content-Type': 'application/json'
-          },
-          success: resolve,
-          fail: reject
-        });
+      console.log('[OrderList] 发起API请求: /api/customer/orders');
+      const res = await request({
+        url: '/api/customer/orders',
+        method: 'GET',
+        // showLoading: true // 这是默认值，可以省略
       });
 
-      wx.hideLoading();
+      console.log('[OrderList] API响应:', res);
 
-      if (res.statusCode === 200) {
-        // 假设后端返回的是订单数组
-        // 按照订单创建时间降序排列，最新的在前
-        const sortedOrders = (res.data || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        this.setData({ orders: sortedOrders, loading: false });
-      } else if (res.statusCode === 401) {
-        // Token失效，清除缓存并跳转登录
-        wx.removeStorageSync('authToken');
-        wx.showToast({
-          title: '登录已过期，请重新登录',
-          icon: 'none',
-          success: () => {
-            setTimeout(() => {
-              wx.navigateTo({ url: '/pages/login/login' });
-            }, 1500);
+      if (res.statusCode === 200 && res.data.success) {
+        const apiOrders = res.data.data?.orders;
+        console.log('[OrderList] 从API获取到的原始订单数据:', apiOrders);
+
+        if (Array.isArray(apiOrders)) {
+          console.log('[OrderList] 订单数量:', apiOrders.length);
+
+          // 如果订单数量为0，显示提示信息
+          if (apiOrders.length === 0) {
+            console.log('[OrderList] 用户没有订单数据');
+            this.setData({
+              orders: [],
+              loading: false,
+              emptyTip: '暂无订单'
+            });
+          } else {
+            const processedOrders = apiOrders.map(order => ({
+              ...order,
+              statusText: this.getStatusText(order.status),
+              formattedCreatedAt: this.formatTime(order.created_at)
+            })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            console.log('[OrderList] 处理后的订单数据:', processedOrders);
+
+            this.setData({
+              orders: processedOrders,
+              loading: false, // 请求完成后隐藏加载状态
+              emptyTip: ''
+            });
           }
-        });
+        } else {
+          console.error('[OrderList] Server success but data.orders format invalid:', apiOrders);
+          this.setData({
+            orders: [],
+            error: '服务器返回的数据格式有误',
+            showRetry: true,
+            loading: false
+          });
+        }
       } else {
-        const msg = res.data?.message || `加载失败 ( $ {res.statusCode})`;
-        wx.showToast({ title: msg, icon: 'none' });
-        this.setData({ loading: false });
+        console.log('[OrderList] API响应失败:', res);
+        let errorMessage = '未知错误';
+        if (typeof res.data?.message === 'string') {
+          errorMessage = res.data.message;
+        } else if (res.statusCode !== 200) {
+          errorMessage = `请求失败(${res.statusCode})`;
+        }
+        this.setData({
+          orders: [],
+          error: errorMessage,
+          showRetry: true,
+          loading: false
+        });
       }
     } catch (err) {
-      console.error('fetchOrders error:', err);
-      wx.hideLoading();
-      wx.showToast({ title: '网络错误', icon: 'none' });
-      this.setData({ loading: false });
+      console.error('fetchOrders request failed (rejected by request.js):', err);
+
+      let errorMessage = '网络错误';
+      if (err.message === '未登录') {
+        errorMessage = '请先登录';
+      } else if (err.message === '登录过期') {
+        errorMessage = '登录已过期，请重新登录';
+      }
+
+      this.setData({
+        orders: [],
+        error: errorMessage,
+        showRetry: true,
+        loading: false
+      });
+
+      // 显示错误提示
+      wx.showToast({
+        title: errorMessage,
+        icon: 'none'
+      });
     }
   },
 
-  /**
-   * 点击订单列表项，跳转到订单详情页
-   * @param {Object} e - 事件对象
-   */
+  // 订单详情跳转
   goToDetail(e) {
     const orderId = e.currentTarget.dataset.id;
-    if (orderId) {
-      // 跳转到订单详情页，传递订单ID
-      wx.navigateTo({
-        url: `/pages/orderTrack/orderTrack?id= $ {orderId}` // 使用 orderTrack 作为详情页
-      });
-    } else {
-      wx.showToast({ title: '订单信息异常', icon: 'none' });
-    }
-  },
-
-  /**
-   * 下拉刷新生命周期函数
-   */
-  onPullDownRefresh() {
-    this.setData({ refreshing: true });
-    this.fetchOrders().finally(() => {
-      // 停止下拉刷新动画
-      wx.stopPullDownRefresh();
-      this.setData({ refreshing: false });
+    wx.navigateTo({
+      url: `/pages/orderTrack/orderTrack?id=${orderId}`
     });
   },
 
-  /**
-   * 页面上拉触底事件，可用于加载更多订单（如果需要分页）
-   */
-  // onReachBottom() {
-  //   // 实现加载更多逻辑
-  // },
-
-  /**
-   * 辅助函数：根据状态码获取状态文本
-   * @param {string} status - 订单状态
-   * @returns {string} 状态文本
-   */
+  // 获取订单状态文本
   getStatusText(status) {
-    const map = {
-      created: '待发布',
-      published: '已发布',
-      matching: '匹配中',
-      quoting: '报价中',
-      accepted: '已接受',
-      in_transit: '运输中',
-      delivered: '已送达',
-      cancelled: '已取消',
-      expired: '已过期',
-      // 'quoted' 状态可能在 orderTrack.js 中更常见
+    const statusMap = {
+      'created': '已创建',
+      'pending': '待处理',
+      'pending_claim': '待认领',
+      'claimed': '已认领',
+      'quoted': '已报价',
+      'awarded': '已分配',
+      'dispatched': '已发车',
+      'in_transit': '运输中',
+      'delivered': '已送达',
+      'cancelled': '已取消'
     };
-    return map[status] || status;
+    return statusMap[status] || status;
+  },
+
+  // 格式化时间
+  formatTime(timeString) {
+    if (!timeString) return '';
+    const date = new Date(timeString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  },
+
+  // 重试功能
+  onRetry() {
+    console.log('[OrderList] 用户点击重试按钮');
+    this.fetchOrders();
   }
 });

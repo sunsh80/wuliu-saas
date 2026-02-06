@@ -23,6 +23,28 @@
       <text class="countdown-text">{{ timeRemaining }}</text>
     </view>
 
+    <!-- 订单时间线 -->
+    <view class="timeline-section">
+      <view class="timeline-title">订单进度</view>
+      <view class="timeline-container">
+        <view class="timeline-item" wx:for="{{ order.orderTimeline }}" wx:key="index">
+          <view class="timeline-node {{ item.completed ? 'completed' : 'pending' }}">
+            <view class="timeline-dot {{ item.completed ? 'completed' : '' }}"></view>
+            <view class="timeline-line {{ index !== order.orderTimeline.length - 1 ? 'active' : '' }}"></view>
+          </view>
+          <view class="timeline-content">
+            <view class="timeline-status {{ item.completed ? 'completed' : '' }}">
+              <text>{{ item.statusText }}</text>
+              <text wx:if="{{ item.timestamp && formatTime(item.timestamp) != '' }}" class="timeline-time-inline"> [{{ formatTime(item.timestamp) }}]</text>
+              <text wx:elif="{{ item.completed }}" class="timeline-completed"> [已完成]</text>
+              <text wx:else class="timeline-processing"> [正在处理中]</text>
+            </view>
+            <view class="timeline-desc">{{ item.description }}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <view class="info-item">
       <label>发货地址:</label>
       <text>{{ order.pickup_address }}</text>
@@ -47,7 +69,7 @@
     </view>
     <view class="info-item">
       <label>创建时间:</label>
-      <text>{{ formatTime(order.created_at) }}</text>
+      <text>{{ order.formattedCreatedAt }}</text>
     </view>
     <!-- 显示客户信息 (如果已绑定) -->
     <view class="info-item" wx:if="{{ order.customer_tenant_name }}">
@@ -58,6 +80,11 @@
     <view class="info-item" wx:if="{{ order.carrier_tenant_name }}">
       <label>承运方:</label>
       <text>{{ order.carrier_tenant_name }}</text>
+    </view>
+    <!-- 显示承运方联系电话 (如果已提供) -->
+    <view class="info-item" wx:if="{{ order.carrier_contact_phone }}">
+      <label>承运方电话:</label>
+      <text>{{ order.carrier_contact_phone }}</text>
     </view>
   </view>
 

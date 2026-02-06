@@ -47,8 +47,8 @@ const orders = await db.all(
         weight_kg: order.weight_kg,
         volume_m3: order.volume_m3,
         status: order.status,
-        created_at: order.created_at,
-        updated_at: order.updated_at,
+        created_at: order.created_at ? order.created_at.replace(' ', 'T') : new Date().toISOString(),
+        updated_at: order.updated_at ? order.updated_at.replace(' ', 'T') : new Date().toISOString(),
         sender_info: senderInfo,
         receiver_info: receiverInfo,
         description: order.description || ''
@@ -58,8 +58,9 @@ const orders = await db.all(
       if (order.quote_price) {
         orderData.quote = {
           price: order.quote_price,
-          delivery_time: order.quote_delivery_time,
-          remarks: order.quote_remarks
+          delivery_time: order.quote_delivery_time ? order.quote_delivery_time.replace(' ', 'T') : null,
+          remarks: order.quote_remarks,
+          deadline: order.quote_deadline ? order.quote_deadline.replace(' ', 'T') : null
         };
       }
 

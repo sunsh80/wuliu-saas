@@ -4,7 +4,7 @@
     <block wx:if="{{userLoggedIn}}">
       <view class="user-info">
         <!-- 尝试从 userInfo 中获取更具体的名字或邮箱 -->
-        <text class="name">你好, {{userInfo.name || userInfo.email || '用户'}}</text>
+        <text class="name">您好, {{userInfo.name || userInfo.email || '顾客'}}</text>
         <!-- 如果 userInfo 中包含 contact_phone，也可以显示 -->
         <!-- <text class="phone">{{userInfo.contact_phone || userInfo.phone || '未绑定手机'}}</text> -->
         <!-- 或者根据租户信息显示 -->
@@ -20,13 +20,13 @@
 
   <view class="features-section">
     <view class="feature-item" bindtap="navigateToSettings">
-      <text>设置</text>
+      <text>常用设置</text>
     </view>
     <view class="feature-item" bindtap="navigateToRecharge">
-      <text>充值</text>
+      <text>我的优惠</text>
     </view>
     <view class="feature-item" bindtap="navigateToPoints">
-      <text>积分管理</text>
+      <text>货物地址</text>
     </view>
   </view>
 </view>
