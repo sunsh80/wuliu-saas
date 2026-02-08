@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人资料 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .profile-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1200px;
+    }
+
+    @media (max-width: 768px) {
+      .profile-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .profile-card {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .profile-info {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .info-value {
+      color: #1e293b;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.success {
+      background-color: #d1fae5;
+      color: #059669;
+      border-left: 4px solid #059669;
+    }
+
+    .message.error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: bold;
+      margin: 0 auto 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item active"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">个人资料</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">个人资料</h1>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="profile-container">
+      <!-- 个人信息卡片 -->
+      <div class="profile-card">
+        <h2 class="card-title">基本信息</h2>
+        <div class="avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <form id="profileForm">
+          <div class="form-group">
+            <label for="name">姓名:</label>
+            <input type="text" id="name" name="name" placeholder="请输入姓名">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" id="email" name="email" placeholder="请输入邮箱">
+          </div>
+          <div class="form-group">
+            <label for="phone">电话:</label>
+            <input type="tel" id="phone" name="phone" placeholder="请输入电话">
+          </div>
+          <div class="form-group">
+            <label for="company">公司名称:</label>
+            <input type="text" id="company" name="company" placeholder="请输入公司名称">
+          </div>
+          <div class="form-group">
+            <label for="address">地址:</label>
+            <textarea id="address" name="address" placeholder="请输入地址"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> 保存资料</button>
+        </form>
+      </div>
+
+      <!-- 承运商信息卡片 -->
+      <div class="profile-card">
+        <h2 class="card-title">承运商信息</h2>
+        <div class="profile-info">
+          <div class="info-label">承运商ID:</div>
+          <div class="info-value" id="carrierId">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">服务半径(km):</div>
+          <div class="info-value" id="serviceRadius">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">最大载重(kg):</div>
+          <div class="info-value" id="maxCapacityKg">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">最大容量(m³):</div>
+          <div class="info-value" id="maxCapacityM3">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">平均评分:</div>
+          <div class="info-value" id="avgRating">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">认证状态:</div>
+          <div class="info-value" id="certificationStatus">-</div>
+        </div>
+        <div class="profile-info">
+          <div class="info-label">注册时间:</div>
+          <div class="info-value" id="registrationDate">-</div>
+        </div>
+        <button class="btn btn-warning" id="updateCarrierInfoBtn"><i class="fas fa-edit"></i> 更新承运商信息</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 检查登录状态
+    function checkLoginStatus() {
+      const token = localStorage.getItem('tenantToken');
+      if (!token) {
+        window.location.href = './login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    });
+
+    // 显示消息
+    function showMessage(text, isError = false) {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = isError ? 'message error' : 'message success';
+      messageEl.style.display = 'block';
+
+      setTimeout(() => {
+        messageEl.style.display = 'none';
+      }, 3000);
+    }
+
+    // 加载个人资料
+    async function loadProfile() {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            const profile = data.data;
+            
+            // 填充基本信息
+            document.getElementById('name').value = profile.name || profile.contact_person || '';
+            document.getElementById('email').value = profile.email || '';
+            document.getElementById('phone').value = profile.phone || profile.contact_phone || '';
+            document.getElementById('company').value = profile.company_name || profile.name || '';
+            document.getElementById('address').value = profile.address || '';
+
+            // 填充承运商信息
+            document.getElementById('carrierId').textContent = profile.id || '-';
+            document.getElementById('serviceRadius').textContent = profile.service_radius_km || '-';
+            document.getElementById('maxCapacityKg').textContent = profile.capacity_kg || '-';
+            document.getElementById('maxCapacityM3').textContent = profile.capacity_m3 || '-';
+            document.getElementById('avgRating').textContent = profile.avg_rating || '-';
+            document.getElementById('certificationStatus').textContent = profile.status || '-';
+            document.getElementById('registrationDate').textContent = profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '-';
+          } else {
+            console.error('获取个人资料失败:', data);
+            showMessage('获取个人资料失败', true);
+          }
+        } else {
+          console.error('获取个人资料失败响应:', response.status);
+          showMessage('获取个人资料失败', true);
+        }
+      } catch (error) {
+        console.error('加载个人资料时出错:', error);
+        showMessage('加载个人资料时出错', true);
+      }
+    }
+
+    // 保存个人资料
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const profileData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        company_name: formData.get('company'),
+        address: formData.get('address')
+      };
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(profileData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            showMessage('资料保存成功！', false);
+          } else {
+            showMessage(result.message || result.error || '保存失败', true);
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          showMessage(errorData.message || errorData.error || '保存失败', true);
+        }
+      } catch (error) {
+        console.error('保存个人资料时出错:', error);
+        showMessage('保存个人资料时出错', true);
+      }
+    });
+
+    // 更新承运商信息
+    document.getElementById('updateCarrierInfoBtn').addEventListener('click', function() {
+      alert('点击了更新承运商信息按钮，这里可以打开编辑模态框');
+      // 这里可以实现编辑承运商信息的功能
+    });
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadProfile();
+      }
+    });
+  </script>
+</body>
+</html>

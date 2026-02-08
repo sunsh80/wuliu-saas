@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginNowLink) {
     loginNowLink.addEventListener('click', (e) => {
       e.preventDefault();
-      alert('跳转到登录页功能待实现');
+      window.location.href = './login.html';
     });
   }
 });

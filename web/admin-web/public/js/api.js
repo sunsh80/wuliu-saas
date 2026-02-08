@@ -1,5 +1,5 @@
 // public/admin/js/api.js
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';  // 使用相对路径以通过代理
 
 /**
  * 通用的 API 请求函数

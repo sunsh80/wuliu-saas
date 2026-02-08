@@ -48,14 +48,18 @@ module.exports = async (c) => {
 
     const orders = await db.all(`
       SELECT
-        id AS order_id,
-        tracking_number AS tracking_code,
+        id,
+        tracking_number,
         sender_info,
         receiver_info,
+        weight_kg,
+        volume_m3,
         status,
+        created_at,
+        updated_at,
+        customer_tenant_id,
         customer_phone,
-        carrier_id,
-        created_at
+        description
       FROM orders
       WHERE status IN ('pending_claim', 'claimed', 'quoted')
       ORDER BY created_at DESC
@@ -72,14 +76,18 @@ module.exports = async (c) => {
       try { receiver = order.receiver_info ? JSON.parse(order.receiver_info) : {}; } catch (e) {}
 
       return {
-        id: order.order_id,
-        tracking_number: order.tracking_code,
+        id: order.id,
+        tracking_number: order.tracking_number,
         sender_info: sender,
         receiver_info: receiver,
+        weight_kg: order.weight_kg,
+        volume_m3: order.volume_m3,
         status: order.status,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        customer_tenant_id: order.customer_tenant_id,
         customer_phone: order.customer_phone,
-        carrier_id: order.carrier_id,  // 添加承运商ID
-        created_at: order.created_at
+        description: order.description
       };
     });
 

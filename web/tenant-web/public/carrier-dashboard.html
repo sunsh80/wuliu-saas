@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承运商控制台 - 物流管理系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* 承运商主题配色 - 使用橙色系 */
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 10px 0;
+    }
+
+    .stat-label {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .chart-container {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    .status-claimed {
+      background-color: #dbeafe;
+      color: #2563eb;
+    }
+
+    .status-in-transit {
+      background-color: #ede9fe;
+      color: #7c3aed;
+    }
+
+    .status-completed {
+      background-color: #d1fae5;
+      color: #059669;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 4px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      border-bottom: 3px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.success {
+      background-color: #d1fae5;
+      color: #059669;
+      border-left: 4px solid #059669;
+    }
+
+    .message.error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item active"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">承运商控制台</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <h1>承运商控制台</h1>
+    <p>这里是您的专属控制台，您可以管理订单、查看报价和跟踪运输状态。</p>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="totalOrders">0</div>
+        <div class="stat-label">总订单数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="pendingOrders">0</div>
+        <div class="stat-label">待认领订单</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="inTransitOrders">0</div>
+        <div class="stat-label">运输中订单</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="completedOrders">0</div>
+        <div class="stat-label">已完成订单</div>
+      </div>
+    </div>
+
+    <!-- 功能选项卡 -->
+    <div class="tabs">
+      <div class="tab active" data-tab="orders">订单管理</div>
+      <div class="tab" data-tab="quotes">报价管理</div>
+      <div class="tab" data-tab="vehicles">车辆管理</div>
+      <div class="tab" data-tab="applications">申请资料</div>
+    </div>
+
+    <!-- 订单管理 -->
+    <div class="tab-content active" id="orders-tab">
+      <div class="chart-container">
+        <h2>近期订单</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>订单号</th>
+              <th>发货地</th>
+              <th>收货地</th>
+              <th>重量(kg)</th>
+              <th>发货人电话</th>
+              <th>收货人电话</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <!-- 订单数据将通过JS动态填充 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 报价管理 -->
+    <div class="tab-content" id="quotes-tab">
+      <div class="chart-container">
+        <h2>我的报价</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>订单号</th>
+              <th>报价金额</th>
+              <th>预计时间</th>
+              <th>状态</th>
+              <th>创建时间</th>
+            </tr>
+          </thead>
+          <tbody id="quotesTableBody">
+            <!-- 报价数据将通过JS动态填充 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 车辆管理 -->
+    <div class="tab-content" id="vehicles-tab">
+      <div class="chart-container">
+        <h2>我的车辆</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>车牌号</th>
+              <th>车型</th>
+              <th>载重(kg)</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="vehiclesTableBody">
+            <!-- 车辆数据将通过JS动态填充 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 申请资料 -->
+    <div class="tab-content" id="applications-tab">
+      <div class="chart-container">
+        <h2>资质申请</h2>
+        <form id="applicationForm">
+          <div class="form-group">
+            <label for="licenseNumber">营业执照号:</label>
+            <input type="text" id="licenseNumber" name="licenseNumber" required>
+          </div>
+          <div class="form-group">
+            <label for="licenseFile">营业执照扫描件:</label>
+            <input type="file" id="licenseFile" name="licenseFile">
+          </div>
+          <div class="form-group">
+            <label for="serviceArea">服务区域:</label>
+            <input type="text" id="serviceArea" name="serviceArea" placeholder="如：沈阳市浑南区">
+          </div>
+          <div class="form-group">
+            <label for="capacity">承载能力:</label>
+            <input type="number" id="capacity" name="capacity" placeholder="单位：吨">
+          </div>
+          <div class="form-group">
+            <label for="notes">补充说明:</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="如有其他资质或说明，请填写..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">提交申请</button>
+        </form>
+        <div id="applicationMessage" class="message"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/carrier-dashboard.js"></script>
+  <script>
+    // 退出登录 - 从carrier-dashboard.js中获取函数
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      window.location.href = './login.html';
+    });
+
+    // 选项卡切换
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // 移除所有激活状态
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // 激活当前选项卡
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+
+    // 加载承运商数据
+    async function loadCarrierData() {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        
+        // 获取用户资料
+        const profileResponse = await fetch('/api/tenant-web/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          if (profileData.success && profileData.data) {
+            document.getElementById('welcome-message').textContent = `欢迎，${profileData.data.name || '承运商'}`;
+          }
+        } else {
+          console.error('获取用户资料失败:', profileResponse.status);
+          const errorData = await profileResponse.json().catch(() => ({}));
+          console.error('错误详情:', errorData);
+        }
+
+        // 获取订单统计
+        const ordersResponse = await fetch('/api/carrier/orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (ordersResponse.ok) {
+          const ordersData = await ordersResponse.json();
+          if (ordersData.success && ordersData.data) {
+            // 统计数据
+            const orders = ordersData.data.orders || [];
+            document.getElementById('totalOrders').textContent = orders.length;
+
+            // 按状态分类
+            const pending = orders.filter(o => o.status === 'pending_claim').length;
+            const inTransit = orders.filter(o => o.status === 'in_transit').length;
+            const completed = orders.filter(o => o.status === 'delivered').length;
+
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('inTransitOrders').textContent = inTransit;
+            document.getElementById('completedOrders').textContent = completed;
+
+            // 填充订单表格
+            const ordersTableBody = document.getElementById('ordersTableBody');
+            ordersTableBody.innerHTML = '';
+            orders.slice(0, 10).forEach(order => {
+              const row = document.createElement('tr');
+              const statusClass = `status-${(order.status || '').replace(/_/g, '-')}`;
+              const statusText = getStatusText(order.status);
+
+              // 解析发货和收货信息
+              let pickupAddr = 'N/A';
+              let deliveryAddr = 'N/A';
+              let weight = order.weight_kg || 'N/A';
+              let pickupPhone = order.customer_phone || 'N/A';
+              let deliveryPhone = 'N/A';
+
+              try {
+                // 解析发货信息
+                const senderInfo = typeof order.sender_info === 'string'
+                  ? JSON.parse(order.sender_info)
+                  : order.sender_info || {};
+                pickupAddr = senderInfo.address || senderInfo.full_address || senderInfo.pickup_address || 'N/A';
+                pickupPhone = senderInfo.phone || senderInfo.contact_phone || order.customer_phone || 'N/A';
+
+                // 解析收货信息
+                const receiverInfo = typeof order.receiver_info === 'string'
+                  ? JSON.parse(order.receiver_info)
+                  : order.receiver_info || {};
+                deliveryAddr = receiverInfo.address || receiverInfo.full_address || receiverInfo.delivery_address || 'N/A';
+                deliveryPhone = receiverInfo.phone || receiverInfo.contact_phone || receiverInfo.receiver_phone || 'N/A';
+              } catch (e) {
+                console.warn('解析订单信息失败:', e.message);
+                pickupAddr = '解析失败';
+                deliveryAddr = '解析失败';
+                pickupPhone = '解析失败';
+                deliveryPhone = '解析失败';
+              }
+
+              row.innerHTML = `
+                <td>${order.tracking_number || order.id}</td>
+                <td>${pickupAddr}</td>
+                <td>${deliveryAddr}</td>
+                <td>${weight} kg</td>
+                <td>${pickupPhone}</td>
+                <td>${deliveryPhone}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>
+                  <button class="btn btn-primary" onclick="viewOrder('${order.id}')">查看</button>
+                  ${(order.status || '') === 'pending_claim' ? `<button class="btn btn-success" onclick="claimOrder('${order.id}')">认领</button>` : ''}
+                </td>
+              `;
+              ordersTableBody.appendChild(row);
+            });
+          } else {
+            console.error('订单数据响应格式错误:', ordersData);
+          }
+        } else {
+          console.error('获取订单数据失败:', ordersResponse.status);
+          const errorData = await ordersResponse.json().catch(() => ({}));
+          console.error('错误详情:', errorData);
+        }
+
+        // 获取报价数据
+        const quotesResponse = await fetch('/api/carrier/quotes', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (quotesResponse.ok) {
+          const quotesData = await quotesResponse.json();
+          if (quotesData.success && quotesData.data) {
+            const quotesTableBody = document.getElementById('quotesTableBody');
+            quotesTableBody.innerHTML = '';
+            (quotesData.data.quotes || []).forEach(quote => {
+              const row = document.createElement('tr');
+              const statusClass = `status-${(quote.status || '').replace(/_/g, '-')}`;
+              const statusText = getQuoteStatusText(quote.status);
+              
+              row.innerHTML = `
+                <td>${quote.order_id || 'N/A'}</td>
+                <td>¥${quote.price || '0.00'}</td>
+                <td>${quote.estimated_hours ? quote.estimated_hours + '小时' : 'N/A'}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>${new Date(quote.created_at).toLocaleDateString() || 'N/A'}</td>
+              `;
+              quotesTableBody.appendChild(row);
+            });
+          }
+        }
+
+        // 获取车辆数据
+        const vehiclesResponse = await fetch('/api/tenant-web/vehicles', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (vehiclesResponse.ok) {
+          const vehiclesData = await vehiclesResponse.json();
+          if (vehiclesData.success && vehiclesData.data) {
+            const vehiclesTableBody = document.getElementById('vehiclesTableBody');
+            vehiclesTableBody.innerHTML = '';
+            (vehiclesData.data.vehicles || []).forEach(vehicle => {
+              const row = document.createElement('tr');
+              const statusClass = `status-${(vehicle.status || '').replace(/_/g, '-')}`;
+              const statusText = getVehicleStatusText(vehicle.status);
+              
+              row.innerHTML = `
+                <td>${vehicle.plate_number || 'N/A'}</td>
+                <td>${vehicle.type || 'N/A'}</td>
+                <td>${vehicle.max_weight || 'N/A'}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>
+                  <button class="btn btn-primary" onclick="editVehicle('${vehicle.id}')">编辑</button>
+                  <button class="btn btn-danger" onclick="deleteVehicle('${vehicle.id}')">删除</button>
+                </td>
+              `;
+              vehiclesTableBody.appendChild(row);
+            });
+          }
+        }
+      } catch (error) {
+        console.error('加载承运商数据时出错:', error);
+      }
+    }
+
+    // 提交资质申请
+    document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const applicationData = {
+        license_number: formData.get('licenseNumber'),
+        service_area: formData.get('serviceArea'),
+        capacity: parseFloat(formData.get('capacity')) || 0,
+        notes: formData.get('notes')
+      };
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/applications', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(applicationData)
+        });
+
+        const result = await response.json();
+        const messageEl = document.getElementById('applicationMessage');
+        
+        if (response.ok && result.success) {
+          messageEl.textContent = '申请提交成功！';
+          messageEl.className = 'message success';
+          messageEl.style.display = 'block';
+          this.reset();
+        } else {
+          messageEl.textContent = result.message || result.error || '申请提交失败';
+          messageEl.className = 'message error';
+          messageEl.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('提交申请时出错:', error);
+        const messageEl = document.getElementById('applicationMessage');
+        messageEl.textContent = '提交申请时出错，请稍后重试';
+        messageEl.className = 'message error';
+        messageEl.style.display = 'block';
+      }
+    });
+
+    // 获取订单状态文本
+    function getStatusText(status) {
+      const statusMap = {
+        'created': '已创建',
+        'pending_claim': '待认领',
+        'claimed': '已认领',
+        'quoted': '已报价',
+        'awarded': '已中标',
+        'dispatched': '已发货',
+        'in_transit': '运输中',
+        'delivered': '已送达',
+        'cancelled': '已取消'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 获取报价状态文本
+    function getQuoteStatusText(status) {
+      const statusMap = {
+        'pending': '待确认',
+        'accepted': '已接受',
+        'rejected': '已拒绝',
+        'expired': '已过期'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 获取车辆状态文本
+    function getVehicleStatusText(status) {
+      const statusMap = {
+        'active': '运营中',
+        'inactive': '停运中',
+        'maintenance': '维修中',
+        'out_of_service': '报废'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 查看订单详情
+    function viewOrder(orderId) {
+      window.location.href = `./order-detail.html?id=${orderId}`;
+    }
+
+    // 认领订单
+    async function claimOrder(orderId) {
+      if (!confirm(`确定要认领订单 ${orderId} 吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/carrier/orders/${orderId}/claim`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('订单认领成功！');
+          loadCarrierData(); // 重新加载数据
+        } else {
+          const errorData = await response.json();
+          alert(`认领失败: ${errorData.message || errorData.error}`);
+        }
+      } catch (error) {
+        console.error('认领订单时出错:', error);
+        alert('认领订单时出错，请稍后重试');
+      }
+    }
+
+    // 编辑车辆
+    function editVehicle(vehicleId) {
+      alert(`编辑车辆 ${vehicleId}`);
+    }
+
+    // 删除车辆
+    async function deleteVehicle(vehicleId) {
+      if (!confirm(`确定要删除车辆 ${vehicleId} 吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/tenant-web/vehicles/${vehicleId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('车辆删除成功！');
+          loadCarrierData(); // 重新加载数据
+        } else {
+          const errorData = await response.json();
+          alert(`删除失败: ${errorData.message || errorData.error}`);
+        }
+      } catch (error) {
+        console.error('删除车辆时出错:', error);
+        alert('删除车辆时出错，请稍后重试');
+      }
+    }
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadCarrierData();
+      }
+    });
+  </script>
+</body>
+</html>

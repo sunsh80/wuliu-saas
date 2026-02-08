@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地图维护 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .map-container {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-placeholder {
+      text-align: center;
+      color: #64748b;
+    }
+
+    .map-placeholder i {
+      font-size: 4rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .service-areas {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      margin-top: 24px;
+    }
+
+    .area-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.success {
+      background-color: #d1fae5;
+      color: #059669;
+      border-left: 4px solid #059669;
+    }
+
+    .message.error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item active"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">地图维护</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">地图维护</h1>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <!-- 地图显示区域 -->
+    <div class="map-container">
+      <div class="map-placeholder">
+        <i class="fas fa-map-marked-alt"></i>
+        <h3>地图显示区域</h3>
+        <p>第三方地图集成接口预留区域</p>
+        <p>用于显示服务区域、路线规划、实时位置等功能</p>
+      </div>
+    </div>
+
+    <!-- 服务区域管理 -->
+    <div class="service-areas">
+      <h2>服务区域管理</h2>
+      <form id="serviceAreaForm" class="area-form">
+        <div class="form-group">
+          <label for="areaName">区域名称:</label>
+          <input type="text" id="areaName" name="areaName" required placeholder="例如：沈阳市浑南区">
+        </div>
+        <div class="form-group">
+          <label for="areaDescription">区域描述:</label>
+          <input type="text" id="areaDescription" name="areaDescription" placeholder="区域服务特点描述">
+        </div>
+        <div class="form-group" style="align-self: flex-end;">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> 添加区域</button>
+        </div>
+      </form>
+
+      <table class="area-table">
+        <thead>
+          <tr>
+            <th>区域名称</th>
+            <th>描述</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="serviceAreasBody">
+          <!-- 服务区域数据将通过JS动态填充 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 检查登录状态
+    function checkLoginStatus() {
+      const token = localStorage.getItem('tenantToken');
+      if (!token) {
+        window.location.href = './login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    });
+
+    // 显示消息
+    function showMessage(text, isError = false) {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = isError ? 'message error' : 'message success';
+      messageEl.style.display = 'block';
+
+      setTimeout(() => {
+        messageEl.style.display = 'none';
+      }, 3000);
+    }
+
+    // 添加服务区域
+    document.getElementById('serviceAreaForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const areaData = {
+        name: formData.get('areaName'),
+        description: formData.get('areaDescription'),
+        created_by: 'current_user_id' // 实际应用中应从token解析用户ID
+      };
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/service-areas', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(areaData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            showMessage('服务区域添加成功！', false);
+            this.reset();
+            loadServiceAreas(); // 重新加载服务区域列表
+          } else {
+            showMessage(result.message || result.error || '添加失败', true);
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          showMessage(errorData.message || errorData.error || '添加失败', true);
+        }
+      } catch (error) {
+        console.error('添加服务区域时出错:', error);
+        showMessage('添加服务区域时出错', true);
+      }
+    });
+
+    // 加载服务区域
+    async function loadServiceAreas() {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/service-areas', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            displayServiceAreas(data.data.areas || []);
+          } else {
+            console.error('获取服务区域失败:', data);
+            document.getElementById('serviceAreasBody').innerHTML = '<tr><td colspan="4">获取服务区域失败</td></tr>';
+          }
+        } else {
+          console.error('获取服务区域失败响应:', response.status);
+          document.getElementById('serviceAreasBody').innerHTML = '<tr><td colspan="4">获取服务区域失败</td></tr>';
+        }
+      } catch (error) {
+        console.error('加载服务区域时出错:', error);
+        document.getElementById('serviceAreasBody').innerHTML = '<tr><td colspan="4">加载服务区域时出错</td></tr>';
+      }
+    }
+
+    // 显示服务区域
+    function displayServiceAreas(areas) {
+      const tbody = document.getElementById('serviceAreasBody');
+      if (!areas || areas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">暂无服务区域数据</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      areas.forEach(area => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${area.name || 'N/A'}</td>
+          <td>${area.description || 'N/A'}</td>
+          <td>${new Date(area.created_at).toLocaleDateString() || 'N/A'}</td>
+          <td>
+            <button class="btn btn-warning" onclick="editServiceArea('${area.id}')">编辑</button>
+            <button class="btn btn-danger" onclick="deleteServiceArea('${area.id}')">删除</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 编辑服务区域
+    function editServiceArea(areaId) {
+      alert(`编辑服务区域 ${areaId}`);
+    }
+
+    // 删除服务区域
+    async function deleteServiceArea(areaId) {
+      if (!confirm(`确定要删除服务区域 ${areaId} 吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/tenant-web/service-areas/${areaId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('服务区域删除成功！');
+          loadServiceAreas(); // 重新加载列表
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`删除失败: ${errorData.message || errorData.error}`);
+        }
+      } catch (error) {
+        console.error('删除服务区域时出错:', error);
+        alert('删除服务区域时出错');
+      }
+    }
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadServiceAreas();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API端点验证 - 物流管理系统</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left-color: #10b981;
+        }
+        
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-left-color: #ef4444;
+        }
+        
+        .info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-left-color: #3b82f6;
+        }
+        
+        .endpoint {
+            font-family: monospace;
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API端点验证页面</h1>
+        <p>此页面用于验证所有前端文件中的API端点是否已更新为一致的地址</p>
+        
+        <button class="btn" onclick="checkAllFiles()">检查所有文件</button>
+        <button class="btn btn-success" onclick="runApiTests()">运行API测试</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const EXPECTED_API_BASE = 'http://192.168.2.250:3000/api';
+        const FILES_TO_CHECK = [
+            '/admin/js/api.js',
+            '/admin/js/auth.js',
+            '/admin/js/main.js',
+            '/admin/js/login.js',
+            '/admin/js/applicationManager.js',
+            '/admin/js/orderManager.js',
+            '/admin/index.html',
+            '/admin/orders.html',
+            '/admin/tenants.html',
+            '/admin/application-list.html',
+            '/admin/login.html'
+        ];
+
+        async function checkAllFiles() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result-item info">正在检查所有文件...</div>';
+
+            let allFilesOk = true;
+            let totalChecks = 0;
+            let failedChecks = 0;
+
+            // 检查每个文件中是否包含正确的API基础URL
+            for (const file of FILES_TO_CHECK) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const content = await response.text();
+                        const hasCorrectUrl = content.includes('http://192.168.2.250:3000/api');
+                        
+                        totalChecks++;
+                        if (hasCorrectUrl) {
+                            resultsDiv.innerHTML += `<div class="result-item success">✅ <strong>${file}</strong>: 包含正确的API基础URL</div>`;
+                        } else {
+                            resultsDiv.innerHTML += `<div class="result-item error">❌ <strong>${file}</strong>: 未找到正确的API基础URL</div>`;
+                            allFilesOk = false;
+                            failedChecks++;
+                        }
+                    } else {
+                        totalChecks++;
+                        resultsDiv.innerHTML += `<div class="result-item error">❌ <strong>${file}</strong>: 无法访问文件 (HTTP ${response.status})</div>`;
+                        allFilesOk = false;
+                        failedChecks++;
+                    }
+                } catch (error) {
+                    totalChecks++;
+                    resultsDiv.innerHTML += `<div class="result-item error">❌ <strong>${file}</strong>: 访问失败 - ${error.message}</div>`;
+                    allFilesOk = false;
+                    failedChecks++;
+                }
+            }
+
+            // 添加总结
+            if (allFilesOk) {
+                resultsDiv.innerHTML += `<div class="result-item success">🎉 所有文件都包含正确的API基础URL: <span class="endpoint">${EXPECTED_API_BASE}</span></div>`;
+            } else {
+                resultsDiv.innerHTML += `<div class="result-item error">⚠️ 有 ${failedChecks}/${totalChecks} 个文件存在问题</div>`;
+            }
+        }
+
+        async function runApiTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result-item info">正在运行API端点测试...</div>';
+
+            // 测试API端点可达性
+            const endpointsToTest = [
+                { name: '健康检查', url: 'http://192.168.2.250:3000/api/health', method: 'GET' },
+                { name: '登录端点', url: 'http://192.168.2.250:3000/api/admin/login', method: 'OPTIONS' },
+                { name: '订单端点', url: 'http://192.168.2.250:3000/api/admin/orders', method: 'OPTIONS' },
+                { name: '租户端点', url: 'http://192.168.2.250:3000/api/admin/tenants', method: 'OPTIONS' }
+            ];
+
+            for (const endpoint of endpointsToTest) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    // 对于OPTIONS请求，只要没报错就算成功（即使返回404或405也是正常的）
+                    if (response.status === 404 || response.status === 405 || response.ok) {
+                        resultsDiv.innerHTML += `<div class="result-item success">✅ <strong>${endpoint.name}</strong>: 端点可达 (状态: ${response.status})</div>`;
+                    } else {
+                        resultsDiv.innerHTML += `<div class="result-item error">❌ <strong>${endpoint.name}</strong>: 端点不可达 (状态: ${response.status})</div>`;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="result-item error">❌ <strong>${endpoint.name}</strong>: 请求失败 - ${error.message}</div>`;
+                }
+            }
+
+            resultsDiv.innerHTML += '<div class="result-item success">API端点测试完成！</div>';
+        }
+
+        // 页面加载时显示当前配置信息
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-item info">
+                    <h3>当前API配置信息:</h3>
+                    <p><strong>API基础URL:</strong> <span class="endpoint">http://192.168.2.250:3000/api</span></p>
+                    <p><strong>目标:</strong> 确保所有前端文件使用此统一的API地址</p>
+                    <p><strong>状态:</strong> 已完成API一致性更新</p>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

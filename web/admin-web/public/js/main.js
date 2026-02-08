@@ -4,7 +4,7 @@
 function checkLoginStatus() {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-        window.location.href = '/admin/login.html';
+        window.location.href = '/login.html';
         return false;
     }
     return true;
@@ -17,7 +17,7 @@ function showMessage(message, isError = false) {
         msgDiv.textContent = message;
         msgDiv.style.display = 'block';
         msgDiv.className = isError ? 'error' : 'success';
-        
+
         // 3秒后自动隐藏消息
         setTimeout(() => {
             msgDiv.style.display = 'none';
@@ -33,10 +33,17 @@ function getAuthToken() {
     return localStorage.getItem('adminToken');
 }
 
+// 从 api.js 导入 API_BASE_URL
+// 注意：需要确保在使用此函数前，api.js 已经被加载
+// 使用相对路径以通过代理
+
 // 通用的 API 请求函数
-async function apiRequest(url, options = {}) {
+async function apiRequest(path, options = {}) {
     const token = getAuthToken();
-    
+
+    // 使用相对路径确保通过代理
+    const fullPath = path.startsWith('/api') ? path : `/api${path}`;
+
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -44,19 +51,19 @@ async function apiRequest(url, options = {}) {
         },
         ...options
     };
-    
+
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     try {
-        const response = await fetch(url, config);
-        
+        const response = await fetch(fullPath, config);
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API 请求错误:', error);
@@ -67,16 +74,16 @@ async function apiRequest(url, options = {}) {
 // 退出登录函数
 function logout() {
     localStorage.removeItem('adminToken');
-    window.location.href = '/admin/login.html';
+    window.location.href = '/login.html';
 }
 
 // 页面加载完成后执行的初始化函数
 document.addEventListener('DOMContentLoaded', function() {
     // 检查当前页面是否需要登录验证
-    const protectedPages = ['/admin/index.html', '/admin/orders.html', '/admin/customers.html', '/admin/carriers.html', '/admin/tenants.html', '/admin/reports.html'];
+    const protectedPages = ['/index.html', '/orders.html', '/customers.html', '/carriers.html', '/tenants.html', '/reports.html'];
     const currentPath = window.location.pathname;
-    
-    if (protectedPages.includes(currentPath) && currentPath !== '/admin/login.html') {
+
+    if (protectedPages.includes(currentPath) && currentPath !== '/login.html') {
         if (!checkLoginStatus()) {
             return; // 如果未登录且在受保护页面，则重定向到登录页
         }

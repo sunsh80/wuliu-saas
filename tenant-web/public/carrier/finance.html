@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财务管理 - 承运商系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #f97316; /* 橙色主色调 */
+            --primary-dark: #ea580c; /* 深橙色 */
+            --primary-light: #fb923c; /* 浅橙色 */
+            --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+            --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+            --topbar-bg: #ffffff; /* 顶部栏白色 */
+            --topbar-text: #1e293b; /* 顶部栏文字深色 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .main-content {
+            padding: 80px 24px 24px 270px; /* 为顶部栏和侧边栏留出空间 */
+            min-height: calc(100vh - 104px);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 24px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+
+        .empty-description {
+            color: #64748b;
+            margin-bottom: 24px;
+            max-width: 500px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-warning { background-color: #f59e0b; color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 12px 0;
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+            margin: 8px 0;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving"></i>
+            <span>承运商系统</span>
+        </div>
+        <ul>
+            <li><a href="/carrier/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/carrier/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/carrier/quotes.html"><i class="fas fa-tags"></i> <span>报价管理</span></a></li>
+            <li><a href="/carrier/locations.html"><i class="fas fa-map-marker-alt"></i> <span>站点维护</span></a></li>
+            <li><a href="/carrier/messages.html"><i class="fas fa-envelope"></i> <span>消息</span></a></li>
+            <li><a href="/carrier/finance.html" class="active"><i class="fas fa-wallet"></i> <span>财务</span></a></li>
+            <li><a href="/carrier/profile.html"><i class="fas fa-user"></i> <span>个人资料</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span id="userName">承运商用户</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">财务管理</h1>
+            <div>
+                <button class="btn btn-warning" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> 刷新
+                </button>
+            </div>
+        </div>
+
+        <!-- 财务统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总收入</h3>
+                <div class="stat-number">¥0.00</div>
+                <div class="stat-label">本期累计</div>
+            </div>
+            <div class="stat-card">
+                <h3>待结算金额</h3>
+                <div class="stat-number">¥0.00</div>
+                <div class="stat-label">待处理款项</div>
+            </div>
+            <div class="stat-card">
+                <h3>已结算金额</h3>
+                <div class="stat-number">¥0.00</div>
+                <div class="stat-label">已到账</div>
+            </div>
+            <div class="stat-card">
+                <h3>订单数量</h3>
+                <div class="stat-number">0</div>
+                <div class="stat-label">已完成订单</div>
+            </div>
+        </div>
+
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <h2 class="empty-title">财务功能开发中</h2>
+            <p class="empty-description">
+                财务管理功能正在开发中，将为您提供收入统计、结算管理、发票管理等功能。
+                敬请期待完整版财务功能上线。
+            </p>
+            <button class="btn btn-primary" onclick="alert('财务管理功能正在开发中，敬请期待！')">
+                <i class="fas fa-chart-line"></i> 查看收入趋势
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('carrierToken');
+            if (!token) {
+                window.location.href = '/carrier-login.html';
+            }
+
+            // 获取用户信息
+            try {
+                const carrierInfo = JSON.parse(localStorage.getItem('carrierInfo'));
+                if (carrierInfo) {
+                    document.getElementById('userName').textContent = carrierInfo.name || carrierInfo.username || '承运商用户';
+                }
+            } catch (e) {
+                console.error('获取用户信息失败:', e);
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('carrierToken');
+                localStorage.removeItem('carrierInfo');
+                window.location.href = '/carrier-login.html';
+            }
+        });
+    </script>
+</body>
+</html>

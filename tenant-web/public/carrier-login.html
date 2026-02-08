@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>承运商登录 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* 承运商主题配色 - 使用橙色系替代绿色系 */
+        :root {
+            --primary-color: #f97316; /* 橙色主色调 */
+            --primary-dark: #ea580c; /* 深橙色 */
+            --primary-light: #fb923c; /* 浅橙色 */
+            --sidebar-bg: #f97316; /* 侧边栏使用橙色 */
+            --topbar-bg: #ffffff; /* 顶部栏白色 */
+            --topbar-text: #1e293b; /* 顶部栏文字深色 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff7ed, #ffedd5);
+            color: #334155;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 登录表单样式 */
+        .login-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .login-form-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: white;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #64748b;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #c2410c);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #dc2626;
+            display: none;
+        }
+
+        .brand-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .brand-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .brand-content p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            opacity: 0.9;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="brand-section">
+            <div class="brand-content">
+                <div class="logo">🚛</div>
+                <h2>智慧物流承运平台</h2>
+                <p>专业承运商管理系统，高效管理您的物流业务</p>
+            </div>
+        </div>
+        
+        <div class="login-form-section">
+            <form class="login-form" id="loginForm">
+                <div class="login-header">
+                    <h1>承运商登录</h1>
+                    <p>使用您的邮箱和密码登录系统</p>
+                </div>
+                
+                <div id="errorMessage" class="error-message"></div>
+                
+                <div class="form-group">
+                    <label for="email">邮箱地址</label>
+                    <input type="email" id="email" name="email" placeholder="请输入您的邮箱地址" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
+                </div>
+                
+                <button type="submit" class="btn-login">登录系统</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            try {
+                // 显示加载状态
+                const submitBtn = document.querySelector('.btn-login');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '登录中...';
+                submitBtn.disabled = true;
+                
+                // 调用登录API
+                const response = await fetch('http://localhost:3000/api/tenant-web/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // 登录成功，保存token并跳转
+                    localStorage.setItem('carrierToken', data.data.token);
+                    localStorage.setItem('carrierInfo', JSON.stringify(data.data.user));
+                    window.location.href = '/carrier/index.html';
+                } else {
+                    // 显示错误信息
+                    errorMessage.textContent = data.message || data.error || '登录失败，请检查邮箱和密码';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                errorMessage.textContent = '网络错误，请稍后重试';
+                errorMessage.style.display = 'block';
+            } finally {
+                // 恢复按钮状态
+                submitBtn.textContent = '登录系统';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报表统计 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 主内容区域 */
+        .main-content {
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* 统计卡片样式 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 12px 0;
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            line-height: 1;
+        }
+
+        .stat-label {
+            margin-top: 8px;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .date-range-selector {
+            padding: 8px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        /* 订单表格样式 */
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .order-table th, .order-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .order-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .order-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .order-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .recent-orders-section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html" class="active"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">报表统计</h1>
+                <p class="page-description">查看物流业务的各项统计数据和分析报告</p>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总订单数</h3>
+                <div class="stat-number" id="totalOrders">0</div>
+                <div class="stat-label">本月累计</div>
+            </div>
+            <div class="stat-card">
+                <h3>已完成订单</h3>
+                <div class="stat-number" id="completedOrders">0</div>
+                <div class="stat-label">已送达</div>
+            </div>
+            <div class="stat-card">
+                <h3>运输中订单</h3>
+                <div class="stat-number" id="inTransitOrders">0</div>
+                <div class="stat-label">当前运输</div>
+            </div>
+            <div class="stat-card">
+                <h3>待处理订单</h3>
+                <div class="stat-number" id="pendingOrders">0</div>
+                <div class="stat-label">待认领</div>
+            </div>
+            <div class="stat-card">
+                <h3>处理中订单</h3>
+                <div class="stat-number" id="processingOrders">0</div>
+                <div class="stat-label">已认领</div>
+            </div>
+            <div class="stat-card">
+                <h3>已取消订单</h3>
+                <div class="stat-number" id="cancelledOrders">0</div>
+                <div class="stat-label">已取消</div>
+            </div>
+            <div class="stat-card">
+                <h3>客户数量</h3>
+                <div class="stat-number" id="totalCustomers">0</div>
+                <div class="stat-label">注册客户</div>
+            </div>
+        </div>
+
+        <!-- 订单趋势图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">订单趋势</h2>
+                <div class="chart-actions">
+                    <select class="date-range-selector" id="dateRange">
+                        <option value="today">今天</option>
+                        <option value="week" selected>本周</option>
+                        <option value="month">本月</option>
+                        <option value="quarter">本季度</option>
+                        <option value="year">本年</option>
+                    </select>
+                </div>
+            </div>
+            <div id="orderChart" style="height: 300px; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; border-radius: 8px;">
+                <p>图表区域 - 订单趋势数据可视化</p>
+            </div>
+        </div>
+
+        <!-- 收入统计图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">收入统计</h2>
+                <div class="chart-actions">
+                    <select class="date-range-selector" id="revenueDateRange">
+                        <option value="week" selected>本周</option>
+                        <option value="month">本月</option>
+                        <option value="quarter">本季度</option>
+                        <option value="year">本年</option>
+                    </select>
+                </div>
+            </div>
+            <div id="revenueChart" style="height: 300px; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; border-radius: 8px;">
+                <p>图表区域 - 收入数据可视化</p>
+            </div>
+        </div>
+
+        <!-- 最新订单 -->
+        <div class="recent-orders-section">
+            <h2 class="section-title">最新订单</h2>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户</th>
+                        <th>发货地</th>
+                        <th>收货地</th>
+                        <th>重量(kg)</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                    <!-- 订单数据将通过JS动态填充 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login.html';
+        });
+
+        // 加载报表统计数据
+        async function loadReportStats() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/admin/reports/overview-stats', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const stats = data.data || {};
+
+                    // 更新统计数字
+                    document.getElementById('totalOrders').textContent = stats.total_orders || 0;
+                    document.getElementById('completedOrders').textContent = stats.completed_orders || 0;
+                    document.getElementById('inTransitOrders').textContent = stats.in_transit_orders || 0;
+                    document.getElementById('pendingOrders').textContent = stats.pending_orders || 0;
+                    document.getElementById('processingOrders').textContent = stats.processing_orders || 0;
+                    document.getElementById('cancelledOrders').textContent = stats.cancelled_orders || 0;
+                    document.getElementById('totalCustomers').textContent = stats.total_customers || 0;
+
+                    // 显示最新订单
+                    if (stats.recent_orders && Array.isArray(stats.recent_orders)) {
+                        displayRecentOrders(stats.recent_orders);
+                    }
+                } else {
+                    console.error('获取报表统计数据失败:', response.status);
+                    // 设置默认值
+                    document.getElementById('totalOrders').textContent = '0';
+                    document.getElementById('completedOrders').textContent = '0';
+                    document.getElementById('inTransitOrders').textContent = '0';
+                    document.getElementById('pendingOrders').textContent = '0';
+                    document.getElementById('processingOrders').textContent = '0';
+                    document.getElementById('cancelledOrders').textContent = '0';
+                    document.getElementById('totalCustomers').textContent = '0';
+                }
+            } catch (error) {
+                console.error('加载报表统计数据时出错:', error);
+                // 设置默认值
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('completedOrders').textContent = '0';
+                document.getElementById('inTransitOrders').textContent = '0';
+                document.getElementById('pendingOrders').textContent = '0';
+                document.getElementById('processingOrders').textContent = '0';
+                document.getElementById('cancelledOrders').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+            }
+        }
+
+        // 显示最新订单
+        function displayRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersBody');
+            tbody.innerHTML = '';
+
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">暂无订单数据</td></tr>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+
+                // 获取发货地和收货地信息
+                let pickupAddr = '未知';
+                let deliveryAddr = '未知';
+
+                try {
+                    const senderInfo = typeof order.sender_info === 'string'
+                        ? JSON.parse(order.sender_info)
+                        : order.sender_info || {};
+                    pickupAddr = senderInfo.address || senderInfo.full_address || '未知';
+                } catch(e) {
+                    pickupAddr = '解析错误';
+                }
+
+                try {
+                    const receiverInfo = typeof order.receiver_info === 'string'
+                        ? JSON.parse(order.receiver_info)
+                        : order.receiver_info || {};
+                    deliveryAddr = receiverInfo.address || receiverInfo.full_address || '未知';
+                } catch(e) {
+                    deliveryAddr = '解析错误';
+                }
+
+                // 获取客户名称
+                const customerName = order.customer_tenant_name || '未知客户';
+
+                // 状态标签
+                const statusClass = `status-${order.status.replace('_', '-')}`;
+                const statusText = getStatusText(order.status);
+
+                row.innerHTML = `
+                    <td>${order.tracking_number || order.id}</td>
+                    <td>${customerName}</td>
+                    <td>${pickupAddr}</td>
+                    <td>${deliveryAddr}</td>
+                    <td>${order.weight_kg || 'N/A'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${new Date(order.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewOrder('${order.id}')">查看</button>
+                        <button class="btn btn-warning" onclick="updateOrderStatus('${order.id}', '${order.status}')">调度</button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'created': '已创建',
+                'pending_claim': '待认领',
+                'available': '可认领',
+                'claimed': '已认领',
+                'quoted': '已报价',
+                'awarded': '已选定',
+                'dispatched': '已发货',
+                'in_transit': '运输中',
+                'delivered': '已送达',
+                'cancelled': '已取消'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 查看订单详情
+        function viewOrder(orderId) {
+            alert(`查看订单 ${orderId} 的详情`);
+        }
+
+        // 更新订单状态
+        function updateOrderStatus(orderId, currentStatus) {
+            const newStatus = prompt(`当前状态: ${getStatusText(currentStatus)}\n请输入新状态:`, '');
+            if (newStatus) {
+                assignOrder(orderId, newStatus);
+            }
+        }
+
+        // 分配订单
+        async function assignOrder(orderId, status) {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: status })
+                });
+
+                if (response.ok) {
+                    alert('订单状态更新成功！');
+                    loadReportStats(); // 重新加载数据
+                } else {
+                    const errorData = await response.json();
+                    alert(`更新失败: ${errorData.message || errorData.error}`);
+                }
+            } catch (error) {
+                console.error('更新订单状态时出错:', error);
+                alert('更新订单状态时出错');
+            }
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadReportStats();
+
+            // 日期范围选择器事件
+            document.getElementById('dateRange').addEventListener('change', loadReportStats);
+            document.getElementById('revenueDateRange').addEventListener('change', loadReportStats);
+        });
+    </script>
+</body>
+</html>

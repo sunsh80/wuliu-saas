@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>承运商管理 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 主内容区域 */
+        .main-content {
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* 表格样式 */
+        .carrier-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .carrier-table th, .carrier-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .carrier-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .carrier-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .carrier-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-box {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .search-box input {
+            padding: 12px 16px;
+            width: 300px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+        }
+
+        .pagination {
+            margin-top: 24px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 10px 16px;
+            margin: 0 2px;
+            border: 1px solid #cbd5e1;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .pagination button.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html" class="active"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <ul style="padding-left: 20px;">
+                <li><a href="/vehicles.html"><i class="fas fa-car"></i> <span>车辆管理</span></a></li>
+            </ul>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">承运商管理</h1>
+                <p class="page-description">管理平台上的承运商信息和运输能力</p>
+            </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索承运商名称、联系人...">
+            <button onclick="searchCarriers()">搜索</button>
+            <button onclick="loadCarriers()" style="margin-left: 10px;">重置</button>
+        </div>
+
+        <!-- 承运商表格 -->
+        <table class="carrier-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>承运商名称</th>
+                    <th>联系人</th>
+                    <th>联系电话</th>
+                    <th>车辆数量</th>
+                    <th>服务区域</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="carriersTableBody">
+                <!-- 承运商数据将通过JS动态填充 -->
+            </tbody>
+        </table>
+
+        <!-- 分页控件 -->
+        <div class="pagination" id="pagination">
+            <!-- 分页按钮将通过JS动态生成 -->
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        let currentPage = 1;
+        const carriersPerPage = 10;
+        let allCarriers = [];
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login.html';
+        });
+
+        // 加载承运商数据
+        async function loadCarriers(page = 1) {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/admin/tenants', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // 过滤出承运商类型的租户
+                    allCarriers = (data.data.tenants || []).filter(tenant => {
+                        // 检查tenant.roles是否包含'carrier'
+                        if (typeof tenant.roles === 'string') {
+                            let parsedRoles = null;
+                            
+                            // 尝试解析JSON（可能需要多次解析，因为数据可能被多重转义）
+                            try {
+                                parsedRoles = JSON.parse(tenant.roles);
+                            } catch (e) {
+                                console.warn('第一次解析tenant.roles失败:', e);
+                                // 如果第一次解析失败，尝试再次解析（处理双重转义的情况）
+                                try {
+                                    parsedRoles = JSON.parse(JSON.parse(tenant.roles));
+                                } catch (e2) {
+                                    console.warn('第二次解析tenant.roles失败:', e2);
+                                    return false;
+                                }
+                            }
+                            
+                            // 检查解析后的结果是否包含'carrier'
+                            if (Array.isArray(parsedRoles)) {
+                                return parsedRoles.includes('carrier');
+                            } else if (typeof parsedRoles === 'string') {
+                                // 如果解析后仍然是字符串，再次尝试解析
+                                try {
+                                    const finalParsed = JSON.parse(parsedRoles);
+                                    return Array.isArray(finalParsed) && finalParsed.includes('carrier');
+                                } catch (e) {
+                                    console.warn('最终解析tenant.roles失败:', e);
+                                    return false;
+                                }
+                            }
+                            return false;
+                        } else if (Array.isArray(tenant.roles)) {
+                            return tenant.roles.includes('carrier');
+                        }
+                        return false;
+                    });
+                    displayCarriers(allCarriers, page);
+                } else {
+                    console.error('获取承运商数据失败:', response.status);
+                    alert('获取承运商数据失败');
+                }
+            } catch (error) {
+                console.error('加载承运商数据时出错:', error);
+                alert('加载承运商数据时出错');
+            }
+        }
+
+        // 显示承运商
+        function displayCarriers(carriers, page) {
+            const startIndex = (page - 1) * carriersPerPage;
+            const endIndex = startIndex + carriersPerPage;
+            const pageCarriers = carriers.slice(startIndex, endIndex);
+
+            const tbody = document.getElementById('carriersTableBody');
+            tbody.innerHTML = '';
+
+            if (pageCarriers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">暂无承运商数据</td></tr>';
+                return;
+            }
+
+            pageCarriers.forEach(carrier => {
+                const row = document.createElement('tr');
+
+                // 状态标签
+                const statusClass = `status-${carrier.status.replace('_', '-')}`;
+                const statusText = getTenantStatusText(carrier.status);
+
+                // 尝试获取车辆数量（如果有的话）
+                const vehicleCount = carrier.capacity_info ? (carrier.capacity_info.vehicle_count || 0) : (carrier.vehicle_count || 0);
+
+                row.innerHTML = `
+                    <td>${carrier.id}</td>
+                    <td>${carrier.name}</td>
+                    <td>${carrier.contact_person || '未知'}</td>
+                    <td>${carrier.contact_phone || '未知'}</td>
+                    <td>${vehicleCount}</td>
+                    <td>${carrier.service_radius_km ? `${carrier.service_radius_km}km` : '全国'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${new Date(carrier.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewCarrier('${carrier.id}')">查看</button>
+                        <button class="btn btn-warning" onclick="editCarrier('${carrier.id}')">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteCarrier('${carrier.id}')">删除</button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            // 生成分页控件
+            generatePagination(carriers.length, page);
+        }
+
+        // 生成分页控件
+        function generatePagination(totalCount, currentPage) {
+            const totalPages = Math.ceil(totalCount / carriersPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // 上一页
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.textContent = '上一页';
+                prevBtn.onclick = () => displayCarriers(allCarriers, currentPage - 1);
+                pagination.appendChild(prevBtn);
+            }
+
+            // 页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = i === currentPage ? 'active' : '';
+                pageBtn.onclick = () => displayCarriers(allCarriers, i);
+                pagination.appendChild(pageBtn);
+            }
+
+            // 下一页
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.textContent = '下一页';
+                nextBtn.onclick = () => displayCarriers(allCarriers, currentPage + 1);
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        // 获取租户状态文本
+        function getTenantStatusText(status) {
+            const statusMap = {
+                'active': '活跃',
+                'inactive': '非活跃',
+                'pending': '待审核',
+                'suspended': '已暂停',
+                'approved': '已批准',
+                'rejected': '已拒绝'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 查看承运商详情
+        function viewCarrier(carrierId) {
+            alert(`查看承运商 ${carrierId} 的详情`);
+        }
+
+        // 编辑承运商
+        function editCarrier(carrierId) {
+            alert(`编辑承运商 ${carrierId}`);
+        }
+
+        // 删除承运商（实际上是删除租户）
+        async function deleteCarrier(carrierId) {
+            if (confirm(`确定要删除承运商 ${carrierId} 吗？此操作不可逆！`)) {
+                try {
+                    const token = localStorage.getItem('adminToken');
+                    const response = await fetch(`/api/admin/tenants/${carrierId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        alert('承运商删除成功！');
+                        loadCarriers(currentPage); // 重新加载当前页数据
+                    } else {
+                        const errorData = await response.json();
+                        alert(`删除失败: ${errorData.message || errorData.error}`);
+                    }
+                } catch (error) {
+                    console.error('删除承运商时出错:', error);
+                    alert('删除承运商时出错');
+                }
+            }
+        }
+
+        // 搜索承运商
+        function searchCarriers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!searchTerm) {
+                displayCarriers(allCarriers, 1);
+                return;
+            }
+
+            const filteredCarriers = allCarriers.filter(carrier => {
+                const name = (carrier.name || '').toLowerCase();
+                const contact = (carrier.contact_person || '').toLowerCase();
+                const phone = (carrier.contact_phone || '').toLowerCase();
+                return name.includes(searchTerm) || contact.includes(searchTerm) || phone.includes(searchTerm);
+            });
+
+            displayCarriers(filteredCarriers, 1);
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadCarriers();
+        });
+    </script>
+</body>
+</html>

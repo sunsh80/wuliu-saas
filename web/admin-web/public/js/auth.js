@@ -81,7 +81,8 @@ async function login(event) {
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:3000/api/admin/login', {
+        // 使用相对路径确保通过代理
+        const response = await fetch('/api/admin/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

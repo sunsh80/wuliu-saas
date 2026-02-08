@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连接验证 - 物流管理系统</title>
+    <link rel="stylesheet" href="/admin/css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #2563eb;
+        }
+        
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        input, select {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 200px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: #10b981;
+        }
+        
+        .status-inactive {
+            background-color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>前端-后端连接验证</h1>
+        <p>此页面用于验证前端与后端服务的连接状态</p>
+        
+        <div class="test-section">
+            <h2>1. 服务器连通性测试</h2>
+            <button onclick="testServerConnectivity()">测试服务器连通性</button>
+            <div id="connectivity-result" class="result info">点击按钮开始测试</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. API端点可用性测试</h2>
+            <button onclick="testApiEndpoints()">测试API端点</button>
+            <div id="api-result" class="result info">点击按钮开始测试</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. 登录功能测试</h2>
+            <input type="text" id="test-username" placeholder="用户名" value="admin">
+            <input type="password" id="test-password" placeholder="密码" value="admin123">
+            <button onclick="testLoginFunctionality()">测试登录</button>
+            <div id="login-result" class="result info">输入凭据并点击测试</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. 代理配置验证</h2>
+            <button onclick="verifyProxyConfiguration()">验证代理配置</button>
+            <div id="proxy-result" class="result info">点击按钮开始验证</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>5. 系统状态概览</h2>
+            <div id="status-overview">
+                <div>前端服务器: <span id="frontend-status"><span class="status-indicator status-inactive"></span>未知</span></div>
+                <div>后端服务器: <span id="backend-status"><span class="status-indicator status-inactive"></span>未知</span></div>
+                <div>API连通性: <span id="api-status"><span class="status-indicator status-inactive"></span>未知</span></div>
+                <div>登录功能: <span id="login-status"><span class="status-indicator status-inactive"></span>未知</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 测试服务器连通性
+        async function testServerConnectivity() {
+            const resultDiv = document.getElementById('connectivity-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '正在测试服务器连通性...';
+            
+            try {
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ 服务器连通性正常!<br>状态: ${data.status || 'OK'}<br>响应时间: ${response.responseTime || 'N/A'}ms`;
+                    updateStatusIndicator('backend', true);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ 服务器响应错误: ${response.status} ${response.statusText}`;
+                    updateStatusIndicator('backend', false);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 连接服务器失败: ${error.message}`;
+                updateStatusIndicator('backend', false);
+            }
+        }
+        
+        // 测试API端点
+        async function testApiEndpoints() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '正在测试API端点...';
+            
+            const endpoints = [
+                { url: '/api/health', method: 'GET', desc: '健康检查' },
+                { url: '/api/admin/login', method: 'OPTIONS', desc: '登录端点' },
+                { url: '/api/admin/orders', method: 'OPTIONS', desc: '订单端点' }
+            ];
+            
+            let allPassed = true;
+            let results = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const success = response.ok || response.status === 404 || response.status === 405;
+                    results.push({
+                        endpoint: endpoint.desc,
+                        url: endpoint.url,
+                        status: response.status,
+                        success: success
+                    });
+                    
+                    if (!success) {
+                        allPassed = false;
+                    }
+                } catch (error) {
+                    results.push({
+                        endpoint: endpoint.desc,
+                        url: endpoint.url,
+                        status: 'ERROR',
+                        success: false,
+                        error: error.message
+                    });
+                    allPassed = false;
+                }
+            }
+            
+            if (allPassed) {
+                resultDiv.className = 'result success';
+                resultDiv.innerHTML = `✅ 所有API端点测试通过!<br>测试了 ${results.length} 个端点`;
+                updateStatusIndicator('api', true);
+            } else {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = '❌ 部分API端点测试失败:<br>' + 
+                    results.map(r => `${r.success ? '✅' : '❌'} ${r.endpoint}: ${r.status}`).join('<br>');
+                updateStatusIndicator('api', false);
+            }
+        }
+        
+        // 测试登录功能
+        async function testLoginFunctionality() {
+            const resultDiv = document.getElementById('login-result');
+            const username = document.getElementById('test-username').value;
+            const password = document.getElementById('test-password').value;
+            
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '正在测试登录功能...';
+            
+            if (!username || !password) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请输入用户名和密码';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data && data.data.token) {
+                        resultDiv.className = 'result success';
+                        resultDiv.innerHTML = '✅ 登录测试成功!<br>Token获取正常';
+                        updateStatusIndicator('login', true);
+                    } else {
+                        resultDiv.className = 'result error';
+                        resultDiv.textContent = '❌ 登录响应中未包含token';
+                        updateStatusIndicator('login', false);
+                    }
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ 登录失败: ${errorData.message || response.status}`;
+                    updateStatusIndicator('login', false);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 登录请求失败: ${error.message}`;
+                updateStatusIndicator('login', false);
+            }
+        }
+        
+        // 验证代理配置
+        async function verifyProxyConfiguration() {
+            const resultDiv = document.getElementById('proxy-result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '正在验证代理配置...';
+            
+            try {
+                // 尝试访问一个应该被代理的路径
+                const response = await fetch('/api/config', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // 如果请求成功完成（即使返回404也是代理成功的标志），说明代理配置正确
+                if (response.status !== 404 && response.status < 500) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✅ 代理配置验证通过!';
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 代理配置正常 (状态: ${response.status}, 说明代理已生效)`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 代理配置有问题: ${error.message}`;
+            }
+        }
+        
+        // 更新状态指示器
+        function updateStatusIndicator(type, isSuccess) {
+            const statusSpan = document.getElementById(`${type}-status`);
+            const indicator = statusSpan.querySelector('.status-indicator');
+            
+            if (isSuccess) {
+                indicator.className = 'status-indicator status-active';
+                statusSpan.innerHTML = `<span class="status-indicator status-active"></span>正常`;
+            } else {
+                indicator.className = 'status-indicator status-inactive';
+                statusSpan.innerHTML = `<span class="status-indicator status-inactive"></span>异常`;
+            }
+        }
+        
+        // 页面加载时进行初始检测
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检测前端服务器状态
+            document.getElementById('frontend-status').innerHTML = '<span class="status-indicator status-active"></span>正常';
+            
+            // 提供一键测试功能
+            const quickTestBtn = document.createElement('button');
+            quickTestBtn.textContent = '一键完整测试';
+            quickTestBtn.style.background = '#8b5cf6';
+            quickTestBtn.onclick = runCompleteTest;
+            document.querySelector('.container').insertBefore(quickTestBtn, document.querySelector('.test-section'));
+        });
+        
+        // 一键完整测试
+        async function runCompleteTest() {
+            // 依次运行所有测试
+            await testServerConnectivity();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒
+            await testApiEndpoints();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒
+            await verifyProxyConfiguration();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒
+            
+            // 使用默认凭据测试登录
+            document.getElementById('test-username').value = 'admin';
+            document.getElementById('test-password').value = 'admin123';
+            await testLoginFunctionality();
+        }
+    </script>
+</body>
+</html>

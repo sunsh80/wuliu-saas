@@ -4,186 +4,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>租户管理 - 物流管理系统</title>
-    <link rel="stylesheet" href="/admin/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* 导航栏样式 */
-        .navbar {
-            background-color: #2c3e50;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .navbar a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-        }
-        
-        .navbar a:hover {
-            background-color: #34495e;
-        }
-        
-        .navbar a.active {
-            background-color: #3498db;
-        }
-        
-        .navbar .right {
-            float: right;
-        }
-        
         /* 主内容区域 */
         .main-content {
-            padding: 20px;
-            margin-top: 20px;
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
         }
-        
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 4px;
+        }
+
         /* 表格样式 */
         .tenant-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        
+
         .tenant-table th, .tenant-table td {
-            padding: 12px;
+            padding: 14px 16px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #e2e8f0;
         }
-        
+
         .tenant-table th {
-            background-color: #f2f2f2;
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
         }
-        
+
+        .tenant-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tenant-table tr:hover {
+            background-color: #f8fafc;
+        }
+
         .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
         }
-        
-        .status-pending { background-color: #f39c12; color: white; }
-        .status-approved { background-color: #2ecc71; color: white; }
-        .status-rejected { background-color: #e74c3c; color: white; }
-        .status-active { background-color: #3498db; color: white; }
-        .status-inactive { background-color: #95a5a6; color: white; }
-        
+
+        .status-pending { background-color: #fbbf24; color: #92400e; }
+        .status-approved { background-color: #34d399; color: #064e3b; }
+        .status-rejected { background-color: #f87171; color: #7f1d1d; }
+        .status-active { background-color: #60a5fa; color: #1e3a8a; }
+        .status-inactive { background-color: #9ca3af; color: #374151; }
+
         .btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             margin: 4px 2px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
-        
-        .btn-primary { background-color: #3498db; color: white; }
-        .btn-success { background-color: #2ecc71; color: white; }
-        .btn-warning { background-color: #f39c12; color: white; }
-        .btn-danger { background-color: #e74c3c; color: white; }
-        
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
         .search-box {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
-        
+
         .search-box input {
-            padding: 10px;
+            padding: 12px 16px;
             width: 300px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
         }
-        
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
         .search-box button {
-            padding: 10px 15px;
-            background-color: #3498db;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
             border-radius: 8px;
-        }
-        
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
-        
+
+        .search-box button:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
         }
-        
+
         .form-group input, .form-group select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
             box-sizing: border-box;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar">
-        <a href="/admin/index.html">首页</a>
-        <a href="/admin/orders.html">订单管理</a>
-        <a href="/admin/customers.html">客户管理</a>
-        <a href="/admin/carriers.html">承运商管理</a>
-        <a href="/admin/tenants.html" class="active">租户管理</a>
-        <a href="/admin/reports.html">报表统计</a>
-        <div class="right">
-            <a href="#" id="logoutBtn">退出登录</a>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
         </div>
-    </nav>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <li><a href="/tenants.html" class="active"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
 
     <!-- 主内容区域 -->
     <div class="main-content">
-        <h1>租户管理</h1>
-        
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">租户管理</h1>
+                <p class="page-description">管理平台上的租户账户，包括客户和承运商</p>
+            </div>
+        </div>
+
         <!-- 搜索框 -->
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="搜索租户名称、联系人...">
             <button onclick="searchTenants()">搜索</button>
             <button onclick="loadTenants()" style="margin-left: 10px;">重置</button>
         </div>
-        
+
         <!-- 租户表格 -->
         <table class="tenant-table">
             <thead>
@@ -248,7 +279,7 @@
         </div>
     </div>
 
-    <script src="/admin/js/main.js"></script>
+    <script src="/js/main.js"></script>
     <script>
         let allTenants = [];
 
@@ -256,7 +287,7 @@
         function checkLoginStatus() {
             const token = localStorage.getItem('adminToken');
             if (!token) {
-                window.location.href = '/admin/login.html';
+                window.location.href = '/login.html';
             }
         }
 
@@ -264,7 +295,7 @@
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminToken');
-            window.location.href = '/admin/login.html';
+            window.location.href = '/login.html';
         });
 
         // 加载租户数据
@@ -297,10 +328,15 @@
         function displayTenants(tenants) {
             const tbody = document.getElementById('tenantsTableBody');
             tbody.innerHTML = '';
-            
+
+            if (tenants.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">暂无租户数据</td></tr>';
+                return;
+            }
+
             tenants.forEach(tenant => {
                 const row = document.createElement('tr');
-                
+
                 // 角色显示
                 let rolesDisplay = '未知';
                 try {
@@ -309,11 +345,11 @@
                 } catch(e) {
                     rolesDisplay = tenant.roles || '未设置';
                 }
-                
+
                 // 状态标签
-                const statusClass = `status-${tenant.status.replace('_', '-')}`;
+                const statusClass = `status-${tenant.status.replace('_', '-')} `;
                 const statusText = getStatusText(tenant.status);
-                
+
                 row.innerHTML = `
                     <td>${tenant.id}</td>
                     <td>${tenant.name}</td>
@@ -329,7 +365,7 @@
                         <button class="btn btn-danger" onclick="deleteTenant(${tenant.id})">删除</button>
                     </td>
                 `;
-                
+
                 tbody.appendChild(row);
             });
         }
@@ -357,7 +393,7 @@
                 document.getElementById('contactPhone').value = tenant.contact_phone;
                 document.getElementById('email').value = tenant.email;
                 document.getElementById('status').value = tenant.status;
-                
+
                 // 处理角色
                 try {
                     const roles = Array.isArray(tenant.roles) ? tenant.roles : JSON.parse(tenant.roles || '[]');
@@ -365,14 +401,14 @@
                 } catch(e) {
                     document.getElementById('roles').value = tenant.roles || '';
                 }
-                
+
                 // 禁用表单输入
                 const inputs = document.querySelectorAll('#tenantForm input, #tenantForm select');
                 inputs.forEach(input => input.disabled = true);
-                
+
                 // 隐藏提交按钮
                 document.querySelector('#tenantForm button[type="submit"]').style.display = 'none';
-                
+
                 document.getElementById('tenantModal').style.display = 'block';
             }
         }
@@ -388,7 +424,7 @@
                 document.getElementById('contactPhone').value = tenant.contact_phone;
                 document.getElementById('email').value = tenant.email;
                 document.getElementById('status').value = tenant.status;
-                
+
                 // 处理角色
                 try {
                     const roles = Array.isArray(tenant.roles) ? tenant.roles : JSON.parse(tenant.roles || '[]');
@@ -396,14 +432,14 @@
                 } catch(e) {
                     document.getElementById('roles').value = tenant.roles || '';
                 }
-                
+
                 // 启用表单输入
                 const inputs = document.querySelectorAll('#tenantForm input, #tenantForm select');
                 inputs.forEach(input => input.disabled = false);
-                
+
                 // 显示提交按钮
                 document.querySelector('#tenantForm button[type="submit"]').style.display = 'inline-block';
-                
+
                 document.getElementById('tenantModal').style.display = 'block';
             }
         }
@@ -484,14 +520,14 @@
                 displayTenants(allTenants);
                 return;
             }
-            
+
             const filteredTenants = allTenants.filter(tenant => {
                 const name = (tenant.name || '').toLowerCase();
                 const contact = (tenant.contact_person || '').toLowerCase();
                 const email = (tenant.email || '').toLowerCase();
                 return name.includes(searchTerm) || contact.includes(searchTerm) || email.includes(searchTerm);
             });
-            
+
             displayTenants(filteredTenants);
         }
 

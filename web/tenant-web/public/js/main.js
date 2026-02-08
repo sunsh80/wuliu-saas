@@ -1,33 +1,53 @@
 // main.js - 基于原始文件的最小修复版（保留全部功能）
 document.addEventListener('DOMContentLoaded', async () => {
+    // ========== 防止在登录页执行初始化逻辑 ==========
+    if (window.location.pathname.endsWith('/login.html') || 
+        window.location.pathname.endsWith('/carrier-login.html') ||
+        window.location.pathname.endsWith('/apply.html')) {
+        console.log('检测到登录/注册页面，跳过主应用初始化。');
+        return; // 直接退出，不执行任何初始化逻辑
+    }
+    // ==========
+
     const API_BASE = 'http://localhost:3000'; // 保留原始开发配置
 
     let currentTenantId = null;
 
     // ========== 初始化租户信息 ==========
     try {
+        const token = localStorage.getItem('tenantToken');
+        if (!token) {
+            console.log('未找到本地存储的token，重定向到登录页面');
+            window.location.href = '/login.html';
+            return;
+        }
+        
         const res = await fetch(`${API_BASE}/api/tenant-web/profile`, {
-            credentials: 'include'
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
         if (res.ok) {
             const data = await res.json();
             currentTenantId = data.data.id;
             const tenantName = data.data.company_name || '我的租户';
-            
+
             // ✅ 保留原始租户名称显示逻辑
             document.querySelectorAll('#tenant-name-display, #tenant-name-welcome').forEach(el => {
                 el.textContent = tenantName;
             });
-            
+
             loadProfileInfo(data.data);
         } else {
-            alert('请先登录');
-            window.location.href = '/apply.html';
+            console.log('获取用户资料失败，响应状态:', res.status);
+            const errorData = await res.json().catch(() => ({}));
+            console.error('API错误详情:', errorData);
+            window.location.href = '/login.html';
         }
     } catch (error) {
         console.error('初始化失败:', error);
-        alert('系统异常，请重试');
-        window.location.href = '/apply.html';
+        window.location.href = '/login.html';
     }
 
     // ========== 主 Tab 切换 ==========
@@ -38,8 +58,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.main-tab-link').forEach(link => {
             link.classList.remove('active');
         });
-        document.getElementById(tabName)?.style.display = 'block';
-        event?.target?.classList.add('active');
+        const element = document.getElementById(tabName);
+        if (element) element.style.display = 'block';
+        if (event && event.target) event.target.classList.add('active');
         
         // 自动加载订单 Tab 的默认子 Tab
         if (tabName === 'orders-tab') {
@@ -55,8 +76,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.sub-tab-link').forEach(link => {
             link.classList.remove('active');
         });
-        document.getElementById(subTabName + '-orders')?.style.display = 'block';
-        document.querySelector(`.sub-tab-link[data-subtab="${subTabName}"]`)?.classList.add('active');
+        const subTabElement = document.getElementById(subTabName + '-orders');
+        if (subTabElement) subTabElement.style.display = 'block';
+        const navLink = document.querySelector(`.sub-tab-link[data-subtab="${subTabName}"]`);
+        if (navLink) navLink.classList.add('active');
         
         // 加载对应订单
         if (['pending', 'claimed', 'delivered', 'settling'].includes(subTabName)) {
@@ -220,10 +243,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const html = orders.map(order => {
             // ✅ 关键修复：兼容两种数据结构
-            const customerName = order.customer_name || order.receiver_info?.name || '未知客户';
-            const phone = order.customer_phone || order.receiver_info?.phone || '';
-            const address = order.address || order.receiver_info?.address || '';
-            const weight = order.weight || order.parcel_info?.weight_kg || 0;
+            const customerName = order.customer_name || (order.receiver_info && order.receiver_info.name) || '未知客户';
+            const phone = order.customer_phone || (order.receiver_info && order.receiver_info.phone) || '';
+            const address = order.address || (order.receiver_info && order.receiver_info.address) || '';
+            const weight = order.weight || (order.parcel_info && order.parcel_info.weight_kg) || 0;
             const trackingNumber = order.order_number || order.tracking_number || 'N/A';
 
             let actionBtn = '';
@@ -308,10 +331,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     (pendingData.orders || []).forEach(order => {
                         order.displayType = 'pending_unclaimed';
                         // 字段标准化（适配 renderOrderList）
-                        order.customer_name = order.receiver_info?.name || '未知客户';
-                        order.customer_phone = order.receiver_info?.phone || '';
-                        order.address = order.receiver_info?.address || '';
-                        order.weight = order.parcel_info?.weight_kg || 0;
+                        order.customer_name = (order.receiver_info && order.receiver_info.name) || '未知客户';
+                        order.customer_phone = (order.receiver_info && order.receiver_info.phone) || '';
+                        order.address = (order.receiver_info && order.receiver_info.address) || '';
+                        order.weight = (order.parcel_info && order.parcel_info.weight_kg) || 0;
                     });
                     allOrders = [...(pendingData.orders || []), ...allOrders];
                 }
@@ -333,16 +356,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     showMainTab('dashboard-tab');
 
     // ========== 登出 ==========
-    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            await fetch(`${API_BASE}/api/tenant-web/logout`, {
-                method: 'POST',
-                credentials: 'include'
-            });
-            window.location.href = '/apply.html';
-        } catch (error) {
-            console.error('登出失败:', error);
-        }
-    });
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch(`${API_BASE}/api/tenant-web/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                // 根据用户角色跳转到相应的登录页面
+                const urlParams = new URLSearchParams(window.location.search);
+                const role = urlParams.get('role') || localStorage.getItem('userRole') || 'tenant';
+                if (role === 'carrier' || window.location.pathname.includes('carrier')) {
+                    window.location.href = '/carrier-login.html';
+                } else {
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('登出失败:', error);
+            }
+        });
+    }
 });

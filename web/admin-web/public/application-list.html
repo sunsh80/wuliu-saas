@@ -4,36 +4,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>入驻申请管理 - PC Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f8fafc;
+        }
+        
         .hidden { display: none; }
-        .error { color: red; }
-        .success { color: green; }
-        .btn { padding: 5px 10px; margin: 2px; cursor: pointer; }
-        .btn-success { background-color: #28a745; color: white; }
-        .btn-danger { background-color: #dc3545; color: white; }
-        .btn-info { background-color: #17a2b8; color: white; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        nav a { margin-right: 15px; text-decoration: none; color: blue; }
-        nav a:hover { text-decoration: underline; }
-        section { margin-bottom: 30px; }
-        #message, #loginMessage { margin-top: 10px; font-weight: bold; }
+        .error { color: #dc2626; }
+        .success { color: #059669; }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-info { background-color: #3b82f6; color: white; }
+        .btn-refresh { background-color: #f59e0b; color: white; }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        th, td { 
+            padding: 14px 16px; 
+            text-align: left; 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        
+        th { 
+            background-color: #f1f5f9; 
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        nav a { 
+            margin-right: 15px; 
+            text-decoration: none; 
+            color: #3b82f6; 
+            font-weight: 500;
+        }
+        
+        nav a:hover { 
+            text-decoration: underline; 
+        }
+        
+        section {
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background-color: #f5f5f5;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tab-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .status-approved {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: #F44336;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        #message, #loginMessage { 
+            margin-top: 15px; 
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        #loginSection {
+            max-width: 450px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        #loginSection h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #1e293b;
+            font-size: 1.5rem;
+        }
+        
+        #loginSection form div {
+            margin-bottom: 20px;
+        }
+        
+        #loginSection label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        #loginSection input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        #loginSection input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        #loginSection button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        #loginSection button:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.06);
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .page-description {
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .admin-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+        }
+        
+        #logoutButton {
+            padding: 8px 16px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        #logoutButton:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
+        }
     </style>
 </head>
 <body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html" class="active"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
     <!-- 登录区域 -->
     <div id="loginSection" class="hidden">
         <h2>管理员登录</h2>
         <form id="loginForm">
             <div>
                 <label for="username">用户名:</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required placeholder="请输入用户名">
             </div>
             <div>
                 <label for="password">密码:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required placeholder="请输入密码">
             </div>
             <button type="submit">登录</button>
         </form>
@@ -42,44 +326,107 @@
 
     <!-- 主内容区域 -->
     <div id="mainSection" class="hidden">
-        <h1>入驻申请管理</h1>
-        <p>
-            <span>管理员</span>
-            <button id="logoutButton">登出</button>
-        </p>
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">入驻申请管理</h1>
+            </div>
+            
+            <div class="admin-info">
+                <span>管理员</span>
+                <button id="logoutButton">登出</button>
+            </div>
 
-        <nav>
-            <a href="/">返回主页</a> <!-- 假设主页是 / -->
-        </nav>
+            <nav>
+                <a href="/">返回主页</a> <!-- 假设主页是 / -->
+            </nav>
 
-        <section id="applications">
-            <h2>待审核申请</h2>
-            <button onclick="loadPendingTenants()">刷新</button>
-            <table border="1" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>租户名称</th>
-                        <th>联系人</th>
-                        <th>联系电话</th>
-                        <th>申请时间</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="pending-tenants-body">
-                    <tr id="no-pending-tenants-message">
-                        <td colspan="6">暂无待审核申请</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+            <section id="applications">
+                <div class="page-header">
+                    <h2>入驻申请管理</h2>
+                    <div class="controls">
+                        <div class="status-tabs">
+                            <button class="tab-btn active" onclick="switchTab('pending')">待审核</button>
+                            <button class="tab-btn" onclick="switchTab('approved')">已通过</button>
+                            <button class="tab-btn" onclick="switchTab('rejected')">已驳回</button>
+                        </div>
+                        <button class="btn btn-refresh" onclick="refreshCurrentTab()">刷新</button>
+                    </div>
+                </div>
+                
+                <!-- 待审核租户列表 -->
+                <div id="pending-tab" class="tab-content active">
+                    <h3>待审核入驻申请</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>租户名称</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>申请时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-tenants-body">
+                            <tr id="no-pending-tenants-message">
+                                <td colspan="6" style="text-align: center; padding: 20px;">暂无待审核申请</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 已通过租户列表 -->
+                <div id="approved-tab" class="tab-content">
+                    <h3>已通过入驻申请</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>租户名称</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>申请时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approved-tenants-body">
+                            <tr id="no-approved-tenants-message">
+                                <td colspan="6" style="text-align: center; padding: 20px;">暂无已通过申请</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 已驳回租户列表 -->
+                <div id="rejected-tab" class="tab-content">
+                    <h3>已驳回入驻申请</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>租户名称</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>申请时间</th>
+                                <th>驳回原因</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rejected-tenants-body">
+                            <tr id="no-rejected-tenants-message">
+                                <td colspan="6" style="text-align: center; padding: 20px;">暂无已驳回申请</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <div id="message"></div>
+            <div id="message"></div>
+        </div>
     </div>
 
     <script>
         // --- 通用逻辑 ---
-        const API_BASE_URL = 'http://localhost:3000/api'; // 后端 API 地址
+        const API_BASE_URL = 'http://192.168.2.250:3000/api'; // 后端 API 地址
         const loginSection = document.getElementById('loginSection');
         const mainSection = document.getElementById('mainSection');
         const loginForm = document.getElementById('loginForm');
@@ -146,6 +493,12 @@
             if (msgDiv) {
                 msgDiv.textContent = text;
                 msgDiv.className = isError ? 'error' : 'success';
+                msgDiv.style.display = 'block';
+                
+                // 3秒后自动隐藏消息
+                setTimeout(() => {
+                    msgDiv.style.display = 'none';
+                }, 3000);
             } else {
                 alert(text);
             }
@@ -159,6 +512,7 @@
             if (!username || !password) {
                 loginMessage.textContent = '用户名和密码不能为空';
                 loginMessage.className = 'error';
+                loginMessage.style.display = 'block';
                 return;
             }
 
@@ -174,16 +528,19 @@
                     localStorage.setItem('adminToken', data.token);
                     loginMessage.textContent = '登录成功！';
                     loginMessage.className = 'success';
+                    loginMessage.style.display = 'block';
                     setTimeout(() => showMainSection(), 500); // 延迟一下，让用户看到成功消息
                 } else {
                     const errorData = await response.json().catch(() => ({}));
                     loginMessage.textContent = errorData.message || errorData.error || '登录失败';
                     loginMessage.className = 'error';
+                    loginMessage.style.display = 'block';
                 }
             } catch (error) {
                 console.error('登录请求失败:', error);
                 loginMessage.textContent = '网络错误，请稍后重试';
                 loginMessage.className = 'error';
+                loginMessage.style.display = 'block';
             }
         }
 
@@ -199,13 +556,77 @@
         }
 
         // --- 待审核租户逻辑 ---
-        async function loadPendingTenants() {
-            try {
-                const response = await apiRequest('/admin/tenants/pending');
-                const tenants = response.data; // OpenAPI 返回格式 { data: [...] }
+        // 当前激活的标签页
+        let currentActiveTab = 'pending';
 
-                const tbody = document.getElementById('pending-tenants-body');
-                const noTenantsMsg = document.getElementById('no-pending-tenants-message');
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签按钮的激活状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 激活选中的标签内容
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // 激活选中的标签按钮
+            event.target.classList.add('active');
+            
+            // 更新当前激活的标签
+            currentActiveTab = tabName;
+            
+            // 根据标签加载相应数据
+            loadDataByStatus(tabName);
+        }
+
+        // 刷新当前标签页
+        function refreshCurrentTab() {
+            loadDataByStatus(currentActiveTab);
+        }
+
+        // 根据状态加载数据
+        async function loadDataByStatus(status) {
+            try {
+                let apiUrl = '';
+                let tableBodyId = '';
+                let noDataMessageId = '';
+
+                switch(status) {
+                    case 'pending':
+                        apiUrl = '/admin/tenants/pending';
+                        tableBodyId = 'pending-tenants-body';
+                        noDataMessageId = 'no-pending-tenants-message';
+                        break;
+                    case 'approved':
+                        apiUrl = '/admin/tenants?status=approved';
+                        tableBodyId = 'approved-tenants-body';
+                        noDataMessageId = 'no-approved-tenants-message';
+                        break;
+                    case 'rejected':
+                        apiUrl = '/admin/tenants?status=rejected';
+                        tableBodyId = 'rejected-tenants-body';
+                        noDataMessageId = 'no-rejected-tenants-message';
+                        break;
+                    default:
+                        throw new Error('未知的状态');
+                }
+
+                const response = await apiRequest(apiUrl);
+                // OpenAPI 返回格式 { data: { tenants: [...], pagination: {...} } }
+                const tenants = response.data.tenants || []; 
+
+                const tbody = document.getElementById(tableBodyId);
+                const noDataMsg = document.getElementById(noDataMessageId);
+
+                if (!tbody) {
+                    console.error(`未找到表格主体元素 #${tableBodyId}`);
+                    return;
+                }
 
                 if (!Array.isArray(tenants)) {
                     throw new Error('服务器返回的数据格式不正确');
@@ -213,35 +634,70 @@
 
                 if (tenants.length === 0) {
                     tbody.innerHTML = '';
-                    noTenantsMsg.style.display = 'table-row';
+                    if (noDataMsg) {
+                        noDataMsg.style.display = 'table-row';
+                        noDataMsg.innerHTML = `<td colspan="6" style="text-align: center; padding: 20px;">暂无${getStatusText(status)}申请</td>`;
+                    }
                     return;
                 }
 
-                noTenantsMsg.style.display = 'none';
+                if (noDataMsg) {
+                    noDataMsg.style.display = 'none';
+                }
                 tbody.innerHTML = '';
 
                 tenants.forEach(tenant => {
                     const row = document.createElement('tr');
                     const createdAt = new Date(tenant.created_at).toLocaleString();
+                    
+                    let actionCell = '';
+                    if (status === 'pending') {
+                        actionCell = `
+                            <td>
+                                <button class="btn btn-success" onclick="approveTenant(${tenant.id})">通过</button>
+                                <button class="btn btn-danger" onclick="rejectTenantPrompt(${tenant.id})">拒绝</button>
+                                <button class="btn btn-info" onclick="viewTenantDetails(${tenant.id})">查看附件</button>
+                            </td>
+                        `;
+                    } else if (status === 'approved') {
+                        actionCell = `<td><span class="status-badge status-approved">已通过</span></td>`;
+                    } else if (status === 'rejected') {
+                        actionCell = `<td>${tenant.rejection_notes || '无原因'}</td>`;
+                    }
+
                     row.innerHTML = `
                         <td>${tenant.id}</td>
                         <td>${tenant.name}</td>
                         <td>${tenant.contact_person}</td>
                         <td>${tenant.contact_phone}</td>
                         <td>${createdAt}</td>
-                        <td>
-                            <button class="btn btn-success" onclick="approveTenant(${tenant.id})">通过</button>
-                            <button class="btn btn-danger" onclick="rejectTenantPrompt(${tenant.id})">拒绝</button>
-                            <button class="btn btn-info" onclick="viewTenantDetails(${tenant.id})">查看附件</button>
-                        </td>
+                        ${actionCell}
                     `;
                     tbody.appendChild(row);
                 });
             } catch (error) {
-                console.error('加载待审核租户失败:', error);
+                console.error(`加载${getStatusText(status)}租户失败:`, error);
                 showMessage(`加载失败: ${error.message}`, true);
-                document.getElementById('pending-tenants-body').innerHTML = `<tr><td colspan="6">加载失败，请刷新重试。</td></tr>`;
+                const tbody = document.getElementById(`${status}-tenants-body`);
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">加载失败，请刷新重试。</td></tr>`;
+                }
             }
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待审核',
+                'approved': '已通过',
+                'rejected': '已驳回'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 加载待审核租户
+        async function loadPendingTenants() {
+            await loadDataByStatus('pending');
         }
 
         async function approveTenant(id) {
@@ -288,10 +744,13 @@
                 loginForm.addEventListener('submit', login);
             }
 
-            const logoutButton = document.getElementById('logoutButton');
+            const logoutButton = document.getElementById('logoutBtn');
             if (logoutButton) {
                 logoutButton.addEventListener('click', logout);
             }
+            
+            // 初始化加载待审核租户
+            loadPendingTenants();
         });
 
     </script>

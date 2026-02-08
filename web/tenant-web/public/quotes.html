@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>报价管理 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .search-filter {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 300px;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .quote-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .quote-table th, .quote-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .quote-table th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.5px;
+    }
+
+    .quote-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .quote-table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-align: center;
+      display: inline-block;
+      min-width: 80px;
+    }
+
+    .status-pending { background-color: #fef3c7; color: #d97706; }
+    .status-accepted { background-color: #d1fae5; color: #059669; }
+    .status-rejected { background-color: #fee2e2; color: #dc2626; }
+    .status-expired { background-color: #e2e8f0; color: #64748b; }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: #f97316;
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 24px;
+      gap: 8px;
+    }
+
+    .pagination button {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .pagination button.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item active"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">报价管理</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">报价管理</h1>
+    </div>
+
+    <div class="search-filter">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索订单号、客户...">
+      <select class="filter-select" id="statusFilter">
+        <option value="">全部状态</option>
+        <option value="pending">待确认</option>
+        <option value="accepted">已接受</option>
+        <option value="rejected">已拒绝</option>
+        <option value="expired">已过期</option>
+      </select>
+      <button class="btn btn-primary" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
+    </div>
+
+    <div class="table-container">
+      <table class="quote-table">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>报价金额</th>
+            <th>预计工时</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="quotesTableBody">
+          <!-- 报价数据将通过JS动态填充 -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="paginationContainer">
+      <!-- 分页控件将通过JS动态填充 -->
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 检查登录状态
+    function checkLoginStatus() {
+      const token = localStorage.getItem('tenantToken');
+      if (!token) {
+        window.location.href = './login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    });
+
+    // 加载报价数据
+    async function loadQuotes(page = 1, search = '', status = '') {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        let url = `/api/carrier/quotes?page=${page}&limit=10`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (status) url += `&status=${status}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            displayQuotes(data.data.quotes || []);
+            setupPagination(data.data.pagination || {});
+          } else {
+            console.error('获取报价数据失败:', data);
+            document.getElementById('quotesTableBody').innerHTML = '<tr><td colspan="6" class="no-data">获取报价数据失败</td></tr>';
+          }
+        } else {
+          console.error('获取报价失败响应:', response.status);
+          document.getElementById('quotesTableBody').innerHTML = '<tr><td colspan="6" class="no-data">获取报价数据失败</td></tr>';
+        }
+      } catch (error) {
+        console.error('加载报价时出错:', error);
+        document.getElementById('quotesTableBody').innerHTML = '<tr><td colspan="6" class="no-data">加载报价数据时出错</td></tr>';
+      }
+    }
+
+    // 显示报价数据
+    function displayQuotes(quotes) {
+      const tbody = document.getElementById('quotesTableBody');
+      if (!quotes || quotes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="no-data">暂无报价数据</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      quotes.forEach(quote => {
+        const row = document.createElement('tr');
+        const statusClass = `status-${quote.status.replace(/_/g, '-')}`;
+        const statusText = getQuoteStatusText(quote.status);
+        
+        row.innerHTML = `
+          <td>${quote.order_id || 'N/A'}</td>
+          <td>¥${quote.price || '0.00'}</td>
+          <td>${quote.estimated_hours ? quote.estimated_hours + '小时' : 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${new Date(quote.created_at).toLocaleDateString() || 'N/A'}</td>
+          <td class="action-buttons">
+            <button class="btn btn-view" onclick="viewQuote('${quote.id}')">查看</button>
+            ${quote.status === 'pending' ? `<button class="btn btn-success" onclick="acceptQuote('${quote.id}')">接受</button>
+            <button class="btn btn-danger" onclick="rejectQuote('${quote.id}')">拒绝</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 设置分页
+    function setupPagination(pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (!pagination.total_pages || pagination.total_pages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const currentPage = pagination.current_page || 1;
+      const totalPages = pagination.total_pages || 1;
+
+      // 上一页按钮
+      html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadQuotes(${Math.max(1, currentPage - 1)})">
+        <i class="fas fa-chevron-left"></i>
+      </button>`;
+
+      // 页码按钮
+      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadQuotes(${i})">${i}</button>`;
+      }
+
+      // 下一页按钮
+      html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadQuotes(${Math.min(totalPages, currentPage + 1)})">
+        <i class="fas fa-chevron-right"></i>
+      </button>`;
+
+      container.innerHTML = html;
+    }
+
+    // 获取报价状态文本
+    function getQuoteStatusText(status) {
+      const statusMap = {
+        'pending': '待确认',
+        'accepted': '已接受',
+        'rejected': '已拒绝',
+        'expired': '已过期'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 接受报价
+    async function acceptQuote(quoteId) {
+      if (!confirm(`确定要接受此报价吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/carrier/quotes/${quoteId}/accept`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('报价接受成功！');
+          loadQuotes(); // 重新加载报价列表
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`接受失败: ${errorData.message || errorData.error || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('接受报价时出错:', error);
+        alert('接受报价时出错，请稍后重试');
+      }
+    }
+
+    // 拒绝报价
+    async function rejectQuote(quoteId) {
+      if (!confirm(`确定要拒绝此报价吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/carrier/quotes/${quoteId}/reject`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('报价拒绝成功！');
+          loadQuotes(); // 重新加载报价列表
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`拒绝失败: ${errorData.message || errorData.error || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('拒绝报价时出错:', error);
+        alert('拒绝报价时出错，请稍后重试');
+      }
+    }
+
+    // 查看报价详情
+    function viewQuote(quoteId) {
+      alert(`查看报价 ${quoteId} 详情`);
+      // 这里可以跳转到报价详情页面
+      // window.location.href = `./quote-detail.html?id=${quoteId}`;
+    }
+
+    // 搜索和筛选事件
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const searchValue = this.value.trim();
+      const statusValue = document.getElementById('statusFilter').value;
+      loadQuotes(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+      const statusValue = this.value;
+      const searchValue = document.getElementById('searchInput').value.trim();
+      loadQuotes(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      loadQuotes(1, '', ''); // 重置为第一页，无筛选
+    });
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadQuotes();
+      }
+    });
+  </script>
+</body>
+</html>

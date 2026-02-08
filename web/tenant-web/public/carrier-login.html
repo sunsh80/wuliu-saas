@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>承运商登录 - 物流管理系统</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      margin: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #f97316, #ea580c);
+    }
+
+    .login-title {
+      text-align: center;
+      margin-bottom: 32px;
+      color: #1e293b;
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3), 0 4px 6px -2px rgba(249, 115, 22, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+      font-weight: 500;
+    }
+
+    .error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+
+    .success {
+      background-color: #d1fae5;
+      color: #059669;
+      border-left: 4px solid #059669;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      color: #64748b;
+    }
+
+    .links a {
+      color: #f97316;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-container">
+      <div class="logo">LMS</div>
+      <h2 class="login-title">承运商登录</h2>
+    </div>
+    <form id="carrierLoginForm">
+      <div class="form-group">
+        <label for="email">邮箱:</label>
+        <input type="email" id="email" name="email" required placeholder="请输入注册邮箱">
+      </div>
+      <div class="form-group">
+        <label for="password">密码:</label>
+        <input type="password" id="password" name="password" required placeholder="请输入密码">
+      </div>
+      <button type="submit" id="loginButton">登录</button>
+    </form>
+    <div id="message" class="message"></div>
+    <div class="links">
+      <a href="./login.html">返回普通登录</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('carrierLoginForm');
+      const messageDiv = document.getElementById('message');
+      const loginButton = document.getElementById('loginButton');
+
+      function showMessage(text, isError = false) {
+        messageDiv.textContent = text;
+        messageDiv.className = isError ? 'message error' : 'message success';
+        messageDiv.style.display = 'block';
+
+        // 3秒后自动隐藏
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 3000);
+      }
+
+      loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        // 前端验证
+        if (!email || !password) {
+          showMessage('邮箱和密码不能为空', true);
+          return;
+        }
+
+        // 简单邮箱格式验证
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          showMessage('请输入有效的邮箱地址', true);
+          return;
+        }
+
+        try {
+          // 显示加载状态
+          loginButton.textContent = '登录中...';
+          loginButton.disabled = true;
+
+          // 发送登录请求到承运商登录API
+          console.log('正在发送登录请求到 /api/tenant-web/login');
+          const response = await fetch('/api/tenant-web/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              email: email, 
+              password: password 
+            })
+          });
+
+          console.log('收到响应:', response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log('登录响应数据:', data);
+
+            // 检查响应格式并存储 token
+            let token = null;
+            if (data && data.data && data.data.token) {
+              // 新格式：token 在 data.token 下
+              token = data.data.token;
+            } else if (data && data.token) {
+              // 旧格式：token 直接在顶层
+              token = data.token;
+            }
+
+            if (token) {
+              localStorage.setItem('tenantToken', token);
+              localStorage.setItem('userRole', 'carrier'); // 设置用户角色为承运商
+              console.log('Token已保存:', token.substring(0, 20) + '...');
+
+              showMessage('登录成功！正在跳转...', false);
+
+              // 跳转到承运商控制台
+              setTimeout(() => {
+                console.log('执行跳转到 /carrier-dashboard.html');
+                window.location.href = '/carrier-dashboard.html';
+              }, 1000);
+            } else {
+              console.error('登录响应中未包含有效 token:', data);
+              throw new Error('登录响应中未包含有效 token');
+            }
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('登录失败响应:', errorData);
+            let errorMessage = errorData.message || errorData.error || `登录失败 (${response.status})`;
+            throw new Error(errorMessage);
+          }
+        } catch (error) {
+          console.error('登录错误:', error);
+          showMessage(error.message || '登录失败，请稍后重试', true);
+        } finally {
+          // 恢复按钮状态
+          loginButton.textContent = '登录';
+          loginButton.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

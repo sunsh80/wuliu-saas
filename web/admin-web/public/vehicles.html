@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车辆管理 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 主内容区域 */
+        .main-content {
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* 表格样式 */
+        .vehicle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .vehicle-table th, .vehicle-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .vehicle-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .vehicle-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vehicle-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-box {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .search-box input {
+            padding: 12px 16px;
+            flex: 1;
+            min-width: 200px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+        }
+
+        .image-preview {
+            max-width: 100px;
+            max-height: 60px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            color: #94a3b8;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #334155;
+        }
+
+        .image-large {
+            max-width: 100%;
+            max-height: 70vh;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html" class="active"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <ul style="padding-left: 20px;">
+                <li><a href="/vehicles.html" class="active"><i class="fas fa-car"></i> <span>车辆管理</span></a></li>
+            </ul>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">车辆管理</h1>
+                <p class="page-description">管理平台所有承运商的车辆信息</p>
+            </div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <input type="text" id="plateNumberInput" placeholder="输入车牌号...">
+            <input type="text" id="tenantNameInput" placeholder="输入承运商名称...">
+            <button onclick="searchVehicles()">搜索</button>
+            <button onclick="loadAllVehicles()" style="margin-left: 10px;">重置</button>
+        </div>
+
+        <!-- 车辆表格 -->
+        <table class="vehicle-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>承运商</th>
+                    <th>车牌号</th>
+                    <th>车辆类型</th>
+                    <th>尺寸(m)</th>
+                    <th>最大载重(kg)</th>
+                    <th>司机姓名</th>
+                    <th>司机电话</th>
+                    <th>状态</th>
+                    <th>车辆照片</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="vehiclesTableBody">
+                <!-- 车辆数据将通过JS动态填充 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeImageModal()">&times;</span>
+            <img id="largeImage" class="image-large" src="" alt="车辆图片">
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        let allVehicles = [];
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login.html';
+        });
+
+        // 加载所有车辆数据
+        async function loadAllVehicles() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/admin/vehicles', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    allVehicles = data.data.vehicles || [];
+                    displayVehicles(allVehicles);
+                } else {
+                    console.error('获取车辆数据失败:', response.status);
+                    alert('获取车辆数据失败');
+                }
+            } catch (error) {
+                console.error('加载车辆数据时出错:', error);
+                alert('加载车辆数据时出错');
+            }
+        }
+
+        // 显示车辆
+        function displayVehicles(vehicles) {
+            const tbody = document.getElementById('vehiclesTableBody');
+            tbody.innerHTML = '';
+
+            if (vehicles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">暂无车辆数据</td></tr>';
+                return;
+            }
+
+            vehicles.forEach(vehicle => {
+                const row = document.createElement('tr');
+
+                // 尺寸信息
+                const dimensions = vehicle.length && vehicle.width && vehicle.height 
+                    ? `${vehicle.length}×${vehicle.width}×${vehicle.height}`
+                    : '未填写';
+
+                // 状态标签
+                const statusClass = `status-${vehicle.status.replace('_', '-')}`;
+                const statusText = getVehicleStatusText(vehicle.status);
+
+                // 车辆照片
+                const imageCell = vehicle.image_url 
+                    ? `<img src="${vehicle.image_url}" class="image-preview" onclick="showImage('${vehicle.image_url}')" alt="车辆图片">`
+                    : '无图片';
+
+                row.innerHTML = `
+                    <td>${vehicle.id}</td>
+                    <td>${vehicle.tenant_name || '未知'}</td>
+                    <td>${vehicle.plate_number || '未填写'}</td>
+                    <td>${vehicle.type || '未填写'}</td>
+                    <td>${dimensions}</td>
+                    <td>${vehicle.max_weight || '未填写'}</td>
+                    <td>${vehicle.driver_name || '未填写'}</td>
+                    <td>${vehicle.driver_phone || '未填写'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${imageCell}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewVehicle('${vehicle.id}')">查看</button>
+                        <button class="btn btn-warning" onclick="editVehicle('${vehicle.id}')">编辑</button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // 获取车辆状态文本
+        function getVehicleStatusText(status) {
+            const statusMap = {
+                'active': '运营中',
+                'inactive': '停运',
+                'maintenance': '维修中',
+                'decommissioned': '已报废'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 查看车辆详情
+        function viewVehicle(vehicleId) {
+            alert(`查看车辆 ${vehicleId} 的详情`);
+        }
+
+        // 编辑车辆
+        function editVehicle(vehicleId) {
+            alert(`编辑车辆 ${vehicleId}`);
+        }
+
+        // 搜索车辆
+        async function searchVehicles() {
+            const plateNumber = document.getElementById('plateNumberInput').value.trim();
+            const tenantName = document.getElementById('tenantNameInput').value.trim();
+            
+            if (!plateNumber && !tenantName) {
+                loadAllVehicles();
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                
+                // 构建查询参数
+                const params = new URLSearchParams();
+                if (plateNumber) params.append('plate_number', plateNumber);
+                if (tenantName) params.append('tenant_name', tenantName);
+                
+                const queryString = params.toString();
+                const url = queryString 
+                    ? `/api/admin/vehicles/search?${queryString}`
+                    : '/api/admin/vehicles';
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    allVehicles = data.data.vehicles || [];
+                    displayVehicles(allVehicles);
+                } else {
+                    console.error('搜索车辆失败:', response.status);
+                    alert('搜索车辆失败');
+                }
+            } catch (error) {
+                console.error('搜索车辆时出错:', error);
+                alert('搜索车辆时出错');
+            }
+        }
+
+        // 显示大图
+        function showImage(imageUrl) {
+            const modal = document.getElementById('imageModal');
+            const largeImg = document.getElementById('largeImage');
+            largeImg.src = imageUrl;
+            modal.style.display = 'block';
+        }
+
+        // 关闭图片模态框
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadAllVehicles();
+        });
+    </script>
+</body>
+</html>

@@ -43,7 +43,7 @@ module.exports = async (c) => {
 
     // 获取分页后的租户列表
     const tenants = await db.all(
-      `SELECT id, name, contact_person, contact_phone, email, status, created_at, address, service_radius_km, capacity_kg, capacity_m3, base_price_per_km, avg_rating FROM tenants ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT id, name, contact_person, contact_phone, email, roles, status, created_at, address, service_radius_km, capacity_kg, capacity_m3, base_price_per_km, avg_rating FROM tenants ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
 

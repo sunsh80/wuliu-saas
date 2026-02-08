@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>申请资料 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .application-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1200px;
+    }
+
+    @media (max-width: 768px) {
+      .application-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .application-card {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.success {
+      background-color: #d1fae5;
+      color: #059669;
+      border-left: 4px solid #059669;
+    }
+
+    .message.error {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-left: 4px solid #dc2626;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-align: center;
+      display: inline-block;
+      min-width: 80px;
+    }
+
+    .status-pending { background-color: #fef3c7; color: #d97706; }
+    .status-approved { background-color: #d1fae5; color: #059669; }
+    .status-rejected { background-color: #fee2e2; color: #dc2626; }
+    .status-active { background-color: #dbeafe; color: #2563eb; }
+    .status-inactive { background-color: #e2e8f0; color: #64748b; }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item active"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">申请资料</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">申请资料管理</h1>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="application-container">
+      <!-- 申请表单 -->
+      <div class="application-card">
+        <h2 class="card-title">提交申请</h2>
+        <form id="applicationForm">
+          <div class="form-group">
+            <label for="companyName">公司名称:</label>
+            <input type="text" id="companyName" name="companyName" required placeholder="请输入公司全称">
+          </div>
+          <div class="form-group">
+            <label for="contactPerson">联系人:</label>
+            <input type="text" id="contactPerson" name="contactPerson" required placeholder="请输入联系人姓名">
+          </div>
+          <div class="form-group">
+            <label for="contactPhone">联系电话:</label>
+            <input type="tel" id="contactPhone" name="contactPhone" required placeholder="请输入联系人电话">
+          </div>
+          <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" id="email" name="email" required placeholder="请输入联系邮箱">
+          </div>
+          <div class="form-group">
+            <label for="businessLicense">营业执照号:</label>
+            <input type="text" id="businessLicense" name="businessLicense" required placeholder="请输入营业执照号码">
+          </div>
+          <div class="form-group">
+            <label for="serviceArea">服务区域:</label>
+            <input type="text" id="serviceArea" name="serviceArea" placeholder="请输入主要服务区域">
+          </div>
+          <div class="form-group">
+            <label for="serviceRadius">服务半径(km):</label>
+            <input type="number" id="serviceRadius" name="serviceRadius" min="1" placeholder="例如：200">
+          </div>
+          <div class="form-group">
+            <label for="capacityKg">最大载重(kg):</label>
+            <input type="number" id="capacityKg" name="capacityKg" min="0.1" step="0.1" placeholder="例如：5000">
+          </div>
+          <div class="form-group">
+            <label for="capacityM3">最大容量(m³):</label>
+            <input type="number" id="capacityM3" name="capacityM3" min="0.1" step="0.1" placeholder="例如：30">
+          </div>
+          <div class="form-group">
+            <label for="basePricePerKm">基础价格(元/km):</label>
+            <input type="number" id="basePricePerKm" name="basePricePerKm" min="0.01" step="0.01" placeholder="例如：2.5">
+          </div>
+          <div class="form-group">
+            <label for="licenseFile">营业执照扫描件:</label>
+            <input type="text" id="licenseFile" name="licenseFile" placeholder="上传文件的URL或文件名">
+          </div>
+          <div class="form-group">
+            <label for="otherFiles">其他附件:</label>
+            <input type="text" id="otherFiles" name="otherFiles" placeholder="其他相关证件URL或文件名">
+          </div>
+          <div class="form-group">
+            <label for="notes">补充说明:</label>
+            <textarea id="notes" name="notes" placeholder="如有其他资质或说明，请填写..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> 提交申请</button>
+        </form>
+      </div>
+
+      <!-- 申请历史 -->
+      <div class="application-card">
+        <h2 class="card-title">申请历史</h2>
+        <div class="search-filter">
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索公司名称...">
+          <select class="filter-select" id="statusFilter">
+            <option value="">全部状态</option>
+            <option value="pending">待审核</option>
+            <option value="approved">已批准</option>
+            <option value="rejected">已拒绝</option>
+          </select>
+        </div>
+        <table class="application-table">
+          <thead>
+            <tr>
+              <th>申请ID</th>
+              <th>公司名称</th>
+              <th>联系人</th>
+              <th>状态</th>
+              <th>申请时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="applicationsTableBody">
+            <!-- 申请数据将通过JS动态填充 -->
+          </tbody>
+        </table>
+        <div class="pagination" id="paginationContainer">
+          <!-- 分页控件将通过JS动态填充 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 检查登录状态
+    function checkLoginStatus() {
+      const token = localStorage.getItem('tenantToken');
+      if (!token) {
+        window.location.href = './login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    });
+
+    // 显示消息
+    function showMessage(text, isError = false) {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = isError ? 'message error' : 'message success';
+      messageEl.style.display = 'block';
+
+      setTimeout(() => {
+        messageEl.style.display = 'none';
+      }, 3000);
+    }
+
+    // 提交申请
+    document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const applicationData = {
+        company_name: formData.get('companyName'),
+        contact_person: formData.get('contactPerson'),
+        contact_phone: formData.get('contactPhone'),
+        email: formData.get('email'),
+        business_license: formData.get('businessLicense'),
+        service_area: formData.get('serviceArea'),
+        service_radius_km: parseInt(formData.get('serviceRadius')) || null,
+        capacity_kg: parseFloat(formData.get('capacityKg')) || null,
+        capacity_m3: parseFloat(formData.get('capacityM3')) || null,
+        base_price_per_km: parseFloat(formData.get('basePricePerKm')) || null,
+        license_file: formData.get('licenseFile'),
+        other_files: formData.get('otherFiles'),
+        notes: formData.get('notes')
+      };
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/applications', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(applicationData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            showMessage('申请提交成功！请等待审核。', false);
+            this.reset(); // 清空表单
+            loadApplications(); // 重新加载申请列表
+          } else {
+            showMessage(result.message || result.error || '申请提交失败', true);
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          showMessage(errorData.message || errorData.error || '申请提交失败', true);
+        }
+      } catch (error) {
+        console.error('提交申请时出错:', error);
+        showMessage('提交申请时出错，请稍后重试', true);
+      }
+    });
+
+    // 加载申请历史
+    async function loadApplications(page = 1, search = '', status = '') {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        let url = `/api/tenant-web/applications?page=${page}&limit=10`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (status) url += `&status=${status}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            displayApplications(data.data.applications || []);
+            setupPagination(data.data.pagination || {});
+          } else {
+            console.error('获取申请历史失败:', data);
+            document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="6" class="no-data">获取申请历史失败</td></tr>';
+          }
+        } else {
+          console.error('获取申请历史失败响应:', response.status);
+          document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="6" class="no-data">获取申请历史失败</td></tr>';
+        }
+      } catch (error) {
+        console.error('加载申请历史时出错:', error);
+        document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="6" class="no-data">加载申请历史时出错</td></tr>';
+      }
+    }
+
+    // 显示申请数据
+    function displayApplications(applications) {
+      const tbody = document.getElementById('applicationsTableBody');
+      if (!applications || applications.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="no-data">暂无申请记录</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      applications.forEach(app => {
+        const row = document.createElement('tr');
+        const statusClass = `status-${app.status.replace(/_/g, '-')}`;
+        const statusText = getApplicationStatusText(app.status);
+        
+        row.innerHTML = `
+          <td>${app.id || 'N/A'}</td>
+          <td>${app.company_name || 'N/A'}</td>
+          <td>${app.contact_person || 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${new Date(app.created_at).toLocaleDateString() || 'N/A'}</td>
+          <td>
+            <button class="btn btn-primary" onclick="viewApplication('${app.id}')">查看</button>
+            ${app.status === 'pending' ? `<button class="btn btn-warning" onclick="editApplication('${app.id}')">编辑</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 设置分页
+    function setupPagination(pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (!pagination.total_pages || pagination.total_pages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const currentPage = pagination.current_page || 1;
+      const totalPages = pagination.total_pages || 1;
+
+      // 上一页按钮
+      html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadApplications(${Math.max(1, currentPage - 1)})">
+        <i class="fas fa-chevron-left"></i>
+      </button>`;
+
+      // 页码按钮
+      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadApplications(${i})">${i}</button>`;
+      }
+
+      // 下一页按钮
+      html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadApplications(${Math.min(totalPages, currentPage + 1)})">
+        <i class="fas fa-chevron-right"></i>
+      </button>`;
+
+      container.innerHTML = html;
+    }
+
+    // 获取申请状态文本
+    function getApplicationStatusText(status) {
+      const statusMap = {
+        'pending': '待审核',
+        'approved': '已批准',
+        'rejected': '已拒绝',
+        'active': '已激活',
+        'inactive': '未激活'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 查看申请详情
+    function viewApplication(appId) {
+      alert(`查看申请 ${appId} 详情`);
+      // 这里可以跳转到申请详情页面
+      // window.location.href = `./application-detail.html?id=${appId}`;
+    }
+
+    // 编辑申请
+    function editApplication(appId) {
+      alert(`编辑申请 ${appId}`);
+      // 这里可以实现编辑功能
+    }
+
+    // 搜索和筛选事件
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const searchValue = this.value.trim();
+      const statusValue = document.getElementById('statusFilter').value;
+      loadApplications(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+      const statusValue = this.value;
+      const searchValue = document.getElementById('searchInput').value.trim();
+      loadApplications(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadApplications();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络连接诊断 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .diagnostic-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .diagnostic-card.success {
+            border-left-color: #10b981;
+        }
+        
+        .diagnostic-card.error {
+            border-left-color: #ef4444;
+        }
+        
+        .diagnostic-card.warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .diagnostic-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 10px 0;
+        }
+        
+        .diagnostic-details {
+            color: #64748b;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px 5px 5px 0;
+        }
+        
+        .btn:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-error {
+            background-color: #ef4444;
+        }
+        
+        .btn-error:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8fafc;
+            border-radius: 6px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 5px;
+        }
+        
+        .step-content {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>网络连接诊断工具</h1>
+        <p>此工具用于诊断前端与后端服务器的连接问题</p>
+        
+        <button class="btn" onclick="runFullDiagnostic()">运行完整诊断</button>
+        <button class="btn btn-warning" onclick="checkBackendHealth()">检查后端健康</button>
+        <button class="btn" onclick="checkProxyConfiguration()">检查代理配置</button>
+        <button class="btn" onclick="testApiEndpoints()">测试API端点</button>
+        
+        <div id="connection-status" class="diagnostic-card">
+            <h3 class="diagnostic-title">连接状态</h3>
+            <p id="connection-details" class="diagnostic-details">等待诊断...</p>
+        </div>
+        
+        <div id="diagnostic-steps" class="diagnostic-card hidden">
+            <h3 class="diagnostic-title">诊断步骤</h3>
+            <div id="steps-content"></div>
+        </div>
+        
+        <div id="solutions" class="diagnostic-card hidden">
+            <h3 class="diagnostic-title">可能的解决方案</h3>
+            <div id="solutions-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // 服务器配置
+        const BACKEND_URL = 'http://localhost:3000';
+        const API_BASE = '/api';
+        
+        // 运行完整诊断
+        async function runFullDiagnostic() {
+            const statusDiv = document.getElementById('connection-details');
+            statusDiv.textContent = '正在运行完整诊断...';
+            
+            document.getElementById('diagnostic-steps').classList.remove('hidden');
+            document.getElementById('solutions').classList.add('hidden');
+            
+            const stepsContent = document.getElementById('steps-content');
+            stepsContent.innerHTML = '';
+            
+            // 步骤1: 检查基本连通性
+            addStep('步骤 1: 检查后端服务器连通性', '尝试连接到后端服务器...');
+            const healthCheck = await checkBackendHealth(true);
+            
+            // 步骤2: 检查API代理
+            addStep('步骤 2: 检查API代理配置', '验证前端代理是否正确转发请求...');
+            const proxyCheck = await checkProxyConfiguration(true);
+            
+            // 步骤3: 测试API端点
+            addStep('步骤 3: 测试API端点', '测试关键API端点是否可访问...');
+            const apiCheck = await testApiEndpoints(true);
+            
+            // 汇总结果
+            if (healthCheck && proxyCheck && apiCheck) {
+                statusDiv.innerHTML = '<strong style="color: #10b981;">✅ 所有检查通过！连接正常</strong>';
+                document.getElementById('connection-status').className = 'diagnostic-card success';
+            } else {
+                statusDiv.innerHTML = '<strong style="color: #ef4444;">❌ 发现连接问题，请查看下方诊断详情</strong>';
+                document.getElementById('connection-status').className = 'diagnostic-card error';
+                
+                // 提供解决方案
+                provideSolutions(!healthCheck, !proxyCheck, !apiCheck);
+            }
+        }
+        
+        // 检查后端健康
+        async function checkBackendHealth(silent = false) {
+            if (!silent) {
+                const statusDiv = document.getElementById('connection-details');
+                statusDiv.textContent = '正在检查后端服务器健康状态...';
+            }
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+                
+                const response = await fetch(`${BACKEND_URL}/health`, {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!silent) {
+                        document.getElementById('connection-details').innerHTML = `
+                            <strong style="color: #10b981;">✅ 后端服务器连接正常</strong><br>
+                            状态: ${data.status || 'OK'}<br>
+                            响应时间: ${response.responseTime || 'N/A'}ms
+                        `;
+                        document.getElementById('connection-status').className = 'diagnostic-card success';
+                    }
+                    if (!silent) addStep('后端服务器健康检查', `✅ 连接成功 - 状态: ${data.status || 'OK'}`, 'success');
+                    return true;
+                } else {
+                    if (!silent) addStep('后端服务器健康检查', `❌ HTTP错误 - 状态码: ${response.status}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('后端健康检查失败:', error);
+                if (!silent) {
+                    document.getElementById('connection-details').innerHTML = `
+                        <strong style="color: #ef4444;">❌ 无法连接到后端服务器</strong><br>
+                        错误: ${error.message}<br>
+                        请确认后端服务是否在 ${BACKEND_URL} 运行
+                    `;
+                    document.getElementById('connection-status').className = 'diagnostic-card error';
+                }
+                if (!silent) addStep('后端服务器健康检查', `❌ 连接失败 - ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // 检查代理配置
+        async function checkProxyConfiguration(silent = false) {
+            if (!silent) addStep('代理配置检查', '验证前端开发服务器代理设置...');
+            
+            try {
+                // 尝试通过前端代理访问后端
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!silent) addStep('代理配置检查', `✅ 代理配置正确 - 状态: ${data.status || 'OK'}`, 'success');
+                    return true;
+                } else {
+                    if (!silent) addStep('代理配置检查', `❌ 代理配置问题 - 状态码: ${response.status}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('代理配置检查失败:', error);
+                if (!silent) addStep('代理配置检查', `❌ 代理配置问题 - ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // 测试API端点
+        async function testApiEndpoints(silent = false) {
+            if (!silent) addStep('API端点测试', '测试关键API端点是否可访问...');
+            
+            const endpoints = [
+                { url: '/api/admin/login', method: 'OPTIONS', desc: '登录端点' },
+                { url: '/api/admin/orders', method: 'OPTIONS', desc: '订单端点' },
+                { url: '/api/admin/tenants', method: 'OPTIONS', desc: '租户端点' }
+            ];
+            
+            let allPassed = true;
+            const results = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const success = response.ok || response.status === 404 || response.status === 405;
+                    results.push({
+                        endpoint: endpoint.desc,
+                        url: endpoint.url,
+                        status: response.status,
+                        success: success
+                    });
+                    
+                    if (!success) {
+                        allPassed = false;
+                    }
+                } catch (error) {
+                    results.push({
+                        endpoint: endpoint.desc,
+                        url: endpoint.url,
+                        status: 'ERROR',
+                        success: false,
+                        error: error.message
+                    });
+                    allPassed = false;
+                }
+            }
+            
+            if (!silent) {
+                let resultHtml = '<div style="margin-top: 10px;">';
+                results.forEach(result => {
+                    const statusColor = result.success ? '#10b981' : '#ef4444';
+                    const statusIcon = result.success ? '✅' : '❌';
+                    resultHtml += `<div style="margin: 5px 0; color: ${statusColor};">${statusIcon} ${result.endpoint}: ${result.status}</div>`;
+                });
+                resultHtml += '</div>';
+                
+                addStep('API端点测试', `完成 - ${results.filter(r => r.success).length}/${results.length} 个端点正常`, allPassed ? 'success' : 'error');
+                if (!allPassed) {
+                    addStep('', resultHtml, 'error');
+                }
+            }
+            
+            return allPassed;
+        }
+        
+        // 添加诊断步骤
+        function addStep(title, content, status = '') {
+            const stepsContent = document.getElementById('steps-content');
+            const stepDiv = document.createElement('div');
+            stepDiv.className = `step ${status}`;
+            stepDiv.innerHTML = `
+                <div class="step-title">${title}</div>
+                <div class="step-content">${content}</div>
+            `;
+            stepsContent.appendChild(stepDiv);
+        }
+        
+        // 提供解决方案
+        function provideSolutions(backendIssue, proxyIssue, apiIssue) {
+            const solutionsContent = document.getElementById('solutions-content');
+            solutionsContent.innerHTML = '';
+            
+            document.getElementById('solutions').classList.remove('hidden');
+            
+            if (backendIssue) {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'step error';
+                solutionDiv.innerHTML = `
+                    <div class="step-title">🔧 后端服务器问题解决方案</div>
+                    <div class="step-content">
+                        <strong>问题:</strong> 无法连接到后端服务器<br><br>
+                        <strong>解决方案:</strong><br>
+                        1. 确认后端服务是否在端口 3000 上运行<br>
+                        2. 检查后端服务是否正常启动，查看控制台输出<br>
+                        3. 验证防火墙设置是否阻止了端口 3000<br>
+                        4. 尝试直接访问 http://localhost:3000/health 确认服务状态<br>
+                        5. 检查后端服务配置，确保监听正确的主机和端口
+                    </div>
+                `;
+                solutionsContent.appendChild(solutionDiv);
+            }
+            
+            if (proxyIssue) {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'step error';
+                solutionDiv.innerHTML = `
+                    <div class="step-title">🔧 代理配置问题解决方案</div>
+                    <div class="step-content">
+                        <strong>问题:</strong> 前端代理配置不正确<br><br>
+                        <strong>解决方案:</strong><br>
+                        1. 检查 vite.config.js 中的代理配置<br>
+                        2. 确认代理目标设置为 http://localhost:3000<br>
+                        3. 验证代理重写规则是否正确<br>
+                        4. 重启前端开发服务器以应用配置更改
+                    </div>
+                `;
+                solutionsContent.appendChild(solutionDiv);
+            }
+            
+            if (apiIssue) {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'step error';
+                solutionDiv.innerHTML = `
+                    <div class="step-title">🔧 API端点问题解决方案</div>
+                    <div class="step-content">
+                        <strong>问题:</strong> API端点无法访问<br><br>
+                        <strong>解决方案:</strong><br>
+                        1. 确认后端API路由是否正确定义<br>
+                        2. 检查CORS配置是否允许前端域名访问<br>
+                        3. 验证API端点路径是否正确<br>
+                        4. 查看后端日志以获取更多错误信息
+                    </div>
+                `;
+                solutionsContent.appendChild(solutionDiv);
+            }
+            
+            if (!backendIssue && !proxyIssue && !apiIssue) {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'step success';
+                solutionDiv.innerHTML = `
+                    <div class="step-title">✅ 所有检查通过</div>
+                    <div class="step-content">
+                        连接配置正常，如果仍有问题，请检查:<br>
+                        1. 浏览器控制台是否有错误信息<br>
+                        2. 网络请求是否返回预期响应<br>
+                        3. 认证令牌是否正确设置
+                    </div>
+                `;
+                solutionsContent.appendChild(solutionDiv);
+            }
+        }
+        
+        // 页面加载时提示
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('connection-details').innerHTML = `
+                <strong>💡 提示:</strong> 点击"运行完整诊断"按钮开始检查连接问题<br>
+                确保后端服务在 <code>http://localhost:3000</code> 运行
+            `;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>车辆管理 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316; /* 橙色主色调 */
+      --primary-dark: #ea580c; /* 深橙色 */
+      --primary-light: #fb923c; /* 浅橙色 */
+      --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+      --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+      --topbar-bg: #ffffff; /* 顶部栏白色 */
+      --topbar-text: #1e293b; /* 顶部栏文字深色 */
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #334960;
+    }
+
+    .header {
+      background-color: var(--topbar-bg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .search-filter {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      max-width: 300px;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .vehicle-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .vehicle-table th, .vehicle-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .vehicle-table th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.5px;
+    }
+
+    .vehicle-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .vehicle-table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-align: center;
+      display: inline-block;
+      min-width: 80px;
+    }
+
+    .status-active { background-color: #d1fae5; color: #059669; }
+    .status-inactive { background-color: #e2e8f0; color: #64748b; }
+    .status-maintenance { background-color: #fef3c7; color: #d97706; }
+    .status-out-of-service { background-color: #fee2e2; color: #dc2626; }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: #f97316;
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .btn-warning {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 24px;
+      gap: 8px;
+    }
+
+    .pagination button {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .pagination button.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    .add-vehicle-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 24px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .close-modal {
+      font-size: 1.5rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item active"><i class="fas fa-truck"></i> 车辆管理</a>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">车辆管理</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">车辆管理</h1>
+      <button class="btn btn-primary" id="addVehicleBtn"><i class="fas fa-plus"></i> 添加车辆</button>
+    </div>
+
+    <div class="search-filter">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索车牌号、车型...">
+      <select class="filter-select" id="statusFilter">
+        <option value="">全部状态</option>
+        <option value="active">运营中</option>
+        <option value="inactive">停运中</option>
+        <option value="maintenance">维修中</option>
+        <option value="out_of_service">报废</option>
+      </select>
+      <button class="btn btn-primary" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
+    </div>
+
+    <div class="table-container">
+      <table class="vehicle-table">
+        <thead>
+          <tr>
+            <th>车牌号</th>
+            <th>车型</th>
+            <th>载重(kg)</th>
+            <th>容量(m³)</th>
+            <th>状态</th>
+            <th>添加时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="vehiclesTableBody">
+          <!-- 车辆数据将通过JS动态填充 -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" id="paginationContainer">
+      <!-- 分页控件将通过JS动态填充 -->
+    </div>
+  </div>
+
+  <!-- 添加车辆模态框 -->
+  <div class="add-vehicle-modal" id="addVehicleModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">添加车辆</h2>
+        <button class="close-modal" id="closeModal">&times;</button>
+      </div>
+      <form id="addVehicleForm">
+        <div class="form-group">
+          <label for="plateNumber">车牌号:</label>
+          <input type="text" id="plateNumber" name="plateNumber" required placeholder="例如：辽A12345">
+        </div>
+        <div class="form-group">
+          <label for="vehicleType">车型:</label>
+          <input type="text" id="vehicleType" name="vehicleType" required placeholder="例如：厢式货车">
+        </div>
+        <div class="form-group">
+          <label for="maxWeight">最大载重(kg):</label>
+          <input type="number" id="maxWeight" name="maxWeight" required min="0" step="0.1" placeholder="例如：5000">
+        </div>
+        <div class="form-group">
+          <label for="maxVolume">最大容量(m³):</label>
+          <input type="number" id="maxVolume" name="maxVolume" required min="0" step="0.1" placeholder="例如：30">
+        </div>
+        <div class="form-group">
+          <label for="status">状态:</label>
+          <select id="status" name="status" required>
+            <option value="active">运营中</option>
+            <option value="inactive">停运中</option>
+            <option value="maintenance">维修中</option>
+            <option value="out_of_service">报废</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="driverName">司机姓名:</label>
+          <input type="text" id="driverName" name="driverName" placeholder="例如：张三">
+        </div>
+        <div class="form-group">
+          <label for="driverPhone">司机电话:</label>
+          <input type="text" id="driverPhone" name="driverPhone" placeholder="例如：13800138000">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success">添加车辆</button>
+          <button type="button" class="btn btn-warning" id="cancelAdd">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // 检查登录状态
+    function checkLoginStatus() {
+      const token = localStorage.getItem('tenantToken');
+      if (!token) {
+        window.location.href = './login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // 退出登录
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('tenantToken');
+      localStorage.removeItem('userRole');
+      window.location.href = './login.html';
+    });
+
+    // 显示添加车辆模态框
+    document.getElementById('addVehicleBtn').addEventListener('click', function() {
+      document.getElementById('addVehicleModal').style.display = 'flex';
+    });
+
+    // 关闭模态框
+    document.getElementById('closeModal').addEventListener('click', function() {
+      document.getElementById('addVehicleModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelAdd').addEventListener('click', function() {
+      document.getElementById('addVehicleModal').style.display = 'none';
+    });
+
+    // 添加车辆表单提交
+    document.getElementById('addVehicleForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const vehicleData = {
+        plate_number: formData.get('plateNumber'),
+        type: formData.get('vehicleType'),
+        max_weight_kg: parseFloat(formData.get('maxWeight')),
+        max_volume_m3: parseFloat(formData.get('maxVolume')),
+        status: formData.get('status'),
+        driver_name: formData.get('driverName'),
+        driver_phone: formData.get('driverPhone')
+      };
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch('/api/tenant-web/vehicles', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(vehicleData)
+        });
+
+        if (response.ok) {
+          alert('车辆添加成功！');
+          document.getElementById('addVehicleModal').style.display = 'none';
+          this.reset();
+          loadVehicles(); // 重新加载车辆列表
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`添加失败: ${errorData.message || errorData.error || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('添加车辆时出错:', error);
+        alert('添加车辆时出错，请稍后重试');
+      }
+    });
+
+    // 加载车辆数据
+    async function loadVehicles(page = 1, search = '', status = '') {
+      if (!checkLoginStatus()) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        let url = `/api/tenant-web/vehicles?page=${page}&limit=10`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (status) url += `&status=${status}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            displayVehicles(data.data.vehicles || []);
+            setupPagination(data.data.pagination || {});
+          } else {
+            console.error('获取车辆数据失败:', data);
+            document.getElementById('vehiclesTableBody').innerHTML = '<tr><td colspan="7" class="no-data">获取车辆数据失败</td></tr>';
+          }
+        } else {
+          console.error('获取车辆失败响应:', response.status);
+          document.getElementById('vehiclesTableBody').innerHTML = '<tr><td colspan="7" class="no-data">获取车辆数据失败</td></tr>';
+        }
+      } catch (error) {
+        console.error('加载车辆时出错:', error);
+        document.getElementById('vehiclesTableBody').innerHTML = '<tr><td colspan="7" class="no-data">加载车辆数据时出错</td></tr>';
+      }
+    }
+
+    // 显示车辆数据
+    function displayVehicles(vehicles) {
+      const tbody = document.getElementById('vehiclesTableBody');
+      if (!vehicles || vehicles.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-data">暂无车辆数据</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      vehicles.forEach(vehicle => {
+        const row = document.createElement('tr');
+        const statusClass = `status-${vehicle.status.replace(/_/g, '-')}`;
+        const statusText = getVehicleStatusText(vehicle.status);
+        
+        row.innerHTML = `
+          <td>${vehicle.plate_number || 'N/A'}</td>
+          <td>${vehicle.type || 'N/A'}</td>
+          <td>${vehicle.max_weight_kg || 'N/A'}</td>
+          <td>${vehicle.max_volume_m3 || 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          <td>${new Date(vehicle.created_at).toLocaleDateString() || 'N/A'}</td>
+          <td class="action-buttons">
+            <button class="btn btn-primary" onclick="viewVehicle('${vehicle.id}')">查看</button>
+            <button class="btn btn-warning" onclick="editVehicle('${vehicle.id}')">编辑</button>
+            <button class="btn btn-danger" onclick="deleteVehicle('${vehicle.id}')">删除</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // 设置分页
+    function setupPagination(pagination) {
+      const container = document.getElementById('paginationContainer');
+      if (!pagination.total_pages || pagination.total_pages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+      const currentPage = pagination.current_page || 1;
+      const totalPages = pagination.total_pages || 1;
+
+      // 上一页按钮
+      html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadVehicles(${Math.max(1, currentPage - 1)})">
+        <i class="fas fa-chevron-left"></i>
+      </button>`;
+
+      // 页码按钮
+      for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadVehicles(${i})">${i}</button>`;
+      }
+
+      // 下一页按钮
+      html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadVehicles(${Math.min(totalPages, currentPage + 1)})">
+        <i class="fas fa-chevron-right"></i>
+      </button>`;
+
+      container.innerHTML = html;
+    }
+
+    // 获取车辆状态文本
+    function getVehicleStatusText(status) {
+      const statusMap = {
+        'active': '运营中',
+        'inactive': '停运中',
+        'maintenance': '维修中',
+        'out_of_service': '报废'
+      };
+      return statusMap[status] || status;
+    }
+
+    // 查看车辆详情
+    function viewVehicle(vehicleId) {
+      alert(`查看车辆 ${vehicleId} 详情`);
+      // 这里可以跳转到车辆详情页面
+      // window.location.href = `./vehicle-detail.html?id=${vehicleId}`;
+    }
+
+    // 编辑车辆
+    function editVehicle(vehicleId) {
+      alert(`编辑车辆 ${vehicleId}`);
+      // 这里可以跳转到编辑页面或显示编辑模态框
+    }
+
+    // 删除车辆
+    async function deleteVehicle(vehicleId) {
+      if (!confirm(`确定要删除车辆 ${vehicleId} 吗？`)) return;
+
+      try {
+        const token = localStorage.getItem('tenantToken');
+        const response = await fetch(`/api/tenant-web/vehicles/${vehicleId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          alert('车辆删除成功！');
+          loadVehicles(); // 重新加载车辆列表
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`删除失败: ${errorData.message || errorData.error || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('删除车辆时出错:', error);
+        alert('删除车辆时出错，请稍后重试');
+      }
+    }
+
+    // 搜索和筛选事件
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const searchValue = this.value.trim();
+      const statusValue = document.getElementById('statusFilter').value;
+      loadVehicles(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+      const statusValue = this.value;
+      const searchValue = document.getElementById('searchInput').value.trim();
+      loadVehicles(1, searchValue, statusValue); // 重置为第一页
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      loadVehicles(1, '', ''); // 重置为第一页，无筛选
+    });
+
+    // 页面加载时检查登录状态并加载数据
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkLoginStatus()) {
+        loadVehicles();
+      }
+    });
+  </script>
+</body>
+</html>

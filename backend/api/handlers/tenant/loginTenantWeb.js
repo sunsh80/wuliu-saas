@@ -1,6 +1,7 @@
 // backend/api/handlers/tenant-web/loginTenantWeb.js
 const bcrypt = require('bcrypt');
 const { getDb } = require('../../../db/index.js');
+const { bcrypt: _, jwt } = require('../../../utils.js'); // 使用项目提供的JWT工具
 
 module.exports = async (c) => {
   const { email, phone, password, code } = c.request.body;
@@ -33,6 +34,20 @@ module.exports = async (c) => {
           body: { success: false, error: 'INVALID_CREDENTIALS' }
         };
       }
+
+      // 生成 JWT Token
+      const token = jwt.sign(
+        {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          tenantId: user.tenant_id,
+          userType: 'tenant_user'
+        },
+        process.env.JWT_SECRET || 'fallback_secret_key_for_testing',
+        { expiresIn: '24h' }
+      );
 
       // 设置会话信息 - 这是关键修复
       if (!c.request.session) {
@@ -89,10 +104,17 @@ module.exports = async (c) => {
 
       const userId = user.id;
       const data = {
-        tenant_id: user.tenant_id,
-        name: user.tenant_name,
-        roles: roles,
-        type: 'tenant'
+        token, // 添加token到响应中
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          type: user.type,
+          tenant_id: user.tenant_id,
+          roles: roles
+        }
       };
       console.log('📤 Login response:', { userId, data });
       return {
@@ -139,12 +161,32 @@ module.exports = async (c) => {
           // const userWithTenantInfo = await db.get("SELECT u.id, u.phone, u.tenant_id, t.name AS tenant_name FROM users u JOIN tenants t ON u.tenant_id = t.id WHERE u.id = ?", [user.id]);
           // c.request.session.tenantId = userWithTenantInfo?.tenant_id || user.tenant_id; // Fallback
 
+          // 生成 JWT Token
+          const token = jwt.sign(
+            {
+              id: user.id,
+              phone: user.phone,
+              tenantId: user.tenant_id,
+              userType: 'tenant_user'
+            },
+            process.env.JWT_SECRET || 'fallback_secret_key_for_testing',
+            { expiresIn: '24h' }
+          );
+
           c.request.session.userId = user.id;
           console.log('🔐 会话已设置:', { userId: user.id });
           c.request.session.tenantId = user.tenant_id; // Ensure this field exists in DB query result
           c.request.session.userType = 'tenant_user';
           const userId = user.id; // Now 'user' should definitely be accessible here
-          const data = { phone: user.phone, type: 'customer' };
+          const data = {
+            token, // 添加token到响应中
+            user: {
+              id: user.id,
+              phone: user.phone,
+              tenant_id: user.tenant_id,
+              type: 'customer'
+            }
+          };
           console.log('📤 Login response:', { userId, data });
           return { statusCode: 200, body: { success: true, userId: user.id, data: data } };
         } else {
@@ -189,12 +231,30 @@ module.exports = async (c) => {
           body: { success: false, error: 'SESSION_ERROR' }
         };
       }
+      // 生成 JWT Token
+      const token = jwt.sign(
+        {
+          id: customer.id,
+          phone: phone,
+          userType: 'tenant_user'
+        },
+        process.env.JWT_SECRET || 'fallback_secret_key_for_testing',
+        { expiresIn: '24h' }
+      );
+
       c.request.session.userId = customer.id;
       c.request.session.userType = 'tenant_user'; // 添加用户类型
       console.log('🔐 会话已设置:', { userId: customer.id });
 
       const userId = customer.id;
-      const data = { phone: phone, type: 'customer' };
+      const data = {
+        token, // 添加token到响应中
+        user: {
+          id: customer.id,
+          phone: phone,
+          type: 'customer'
+        }
+      };
       console.log('📤 Login response:', { userId, data });
       return {
         statusCode: 200,

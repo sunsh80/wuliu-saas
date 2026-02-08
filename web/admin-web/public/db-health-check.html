@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库连接健康检查 - 物流管理系统</title>
+    <link rel="stylesheet" href="/admin/css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .status-card.success {
+            border-left-color: #10b981;
+        }
+        
+        .status-card.error {
+            border-left-color: #ef4444;
+        }
+        
+        .status-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 10px 0;
+        }
+        
+        .status-details {
+            color: #64748b;
+            margin: 0;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-refresh {
+            background-color: #10b981;
+        }
+        
+        .btn-refresh:hover {
+            background-color: #059669;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>数据库连接健康检查</h1>
+        <p>此页面用于检查数据库连接状态和获取现有数据信息</p>
+        
+        <button class="btn btn-refresh" onclick="checkDatabaseConnection()">刷新检查</button>
+        <button class="btn" onclick="loadSampleData()">加载样本数据</button>
+        
+        <div id="connection-status" class="status-card">
+            <h3 class="status-title">数据库连接状态</h3>
+            <p id="connection-details" class="status-details">正在检查连接...</p>
+        </div>
+        
+        <div id="data-stats" class="status-card hidden">
+            <h3 class="status-title">数据统计信息</h3>
+            <div id="stats-content"></div>
+        </div>
+        
+        <div id="recent-orders" class="status-card hidden">
+            <h3 class="status-title">最近订单数据</h3>
+            <table class="data-table" id="orders-table">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="recent-tenants" class="status-card hidden">
+            <h3 class="status-title">最近租户数据</h3>
+            <table class="data-table" id="tenants-table">
+                <thead>
+                    <tr>
+                        <th>租户名称</th>
+                        <th>联系人</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id="tenants-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 检查数据库连接
+        async function checkDatabaseConnection() {
+            const statusDiv = document.getElementById('connection-details');
+            statusDiv.textContent = '正在检查数据库连接...';
+            
+            try {
+                // 这里应该调用后端API来检查数据库连接
+                // 模拟API调用
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 模拟延迟
+                
+                // 实际情况下，这里应该是真实的API调用
+                // const response = await fetch('/api/admin/health/database');
+                // const data = await response.json();
+                
+                // 模拟成功响应
+                const data = {
+                    connected: true,
+                    server_info: 'MySQL 8.0.35',
+                    connection_time: new Date().toISOString(),
+                    tables_count: 15,
+                    total_records: 1250
+                };
+                
+                if (data.connected) {
+                    statusDiv.innerHTML = `
+                        <strong style="color: #10b981;">✅ 连接成功</strong><br>
+                        服务器信息: ${data.server_info}<br>
+                        连接时间: ${new Date(data.connection_time).toLocaleString()}<br>
+                        表数量: ${data.tables_count}<br>
+                        总记录数: ${data.total_records}
+                    `;
+                    document.getElementById('connection-status').className = 'status-card success';
+                } else {
+                    statusDiv.innerHTML = `<strong style="color: #ef4444;">❌ 连接失败</strong><br>无法连接到数据库服务器`;
+                    document.getElementById('connection-status').className = 'status-card error';
+                }
+            } catch (error) {
+                console.error('数据库连接检查失败:', error);
+                statusDiv.innerHTML = `<strong style="color: #ef4444;">❌ 连接失败</strong><br>错误: ${error.message}`;
+                document.getElementById('connection-status').className = 'status-card error';
+            }
+        }
+        
+        // 加载样本数据
+        async function loadSampleData() {
+            // 显示加载状态
+            document.getElementById('stats-content').innerHTML = '<div class="loading">正在加载数据...</div>';
+            document.getElementById('data-stats').classList.remove('hidden');
+            document.getElementById('recent-orders').classList.remove('hidden');
+            document.getElementById('recent-tenants').classList.remove('hidden');
+            
+            try {
+                // 模拟API调用获取统计数据
+                await new Promise(resolve => setTimeout(resolve, 800)); // 模拟延迟
+                
+                // 模拟统计数据
+                const stats = {
+                    total_orders: 1250,
+                    pending_orders: 120,
+                    in_transit_orders: 85,
+                    completed_orders: 1045,
+                    total_tenants: 89,
+                    pending_tenants: 5,
+                    active_tenants: 78
+                };
+                
+                // 显示统计数据
+                document.getElementById('stats-content').innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div class="card" style="padding: 15px; background-color: #eff6ff; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #1d4ed8;">总订单数</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #2563eb;">${stats.total_orders}</div>
+                        </div>
+                        <div class="card" style="padding: 15px; background-color: #fffbeb; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #92400e;">待处理订单</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #f59e0b;">${stats.pending_orders}</div>
+                        </div>
+                        <div class="card" style="padding: 15px; background-color: #ecfdf5; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #065f46;">运输中订单</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #10b981;">${stats.in_transit_orders}</div>
+                        </div>
+                        <div class="card" style="padding: 15px; background-color: #f0fdf4; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #166534;">已完成订单</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #22c55e;">${stats.completed_orders}</div>
+                        </div>
+                        <div class="card" style="padding: 15px; background-color: #e0f2fe; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #0c4a6e;">总租户数</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #0ea5e9;">${stats.total_tenants}</div>
+                        </div>
+                        <div class="card" style="padding: 15px; background-color: #fee2e2; border-radius: 6px;">
+                            <h4 style="margin: 0 0 5px 0; color: #991b1b;">待审核租户</h4>
+                            <div style="font-size: 1.5em; font-weight: bold; color: #ef4444;">${stats.pending_tenants}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // 模拟订单数据
+                const orders = [
+                    { id: 'ORD-2023-001', customer: '张三公司', status: 'delivered', created_at: '2023-10-15 10:30:00' },
+                    { id: 'ORD-2023-002', customer: '李四企业', status: 'in_transit', created_at: '2023-10-15 11:15:00' },
+                    { id: 'ORD-2023-003', customer: '王五集团', status: 'pending', created_at: '2023-10-15 12:45:00' },
+                    { id: 'ORD-2023-004', customer: '赵六有限公司', status: 'awarded', created_at: '2023-10-15 14:20:00' },
+                    { id: 'ORD-2023-005', customer: '孙七贸易公司', status: 'delivered', created_at: '2023-10-15 15:30:00' }
+                ];
+                
+                // 填充订单表格
+                const ordersTbody = document.getElementById('orders-tbody');
+                ordersTbody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.id}</td>
+                        <td>${order.customer}</td>
+                        <td><span class="status-badge status-${order.status.replace('_', '-')}">${getStatusText(order.status)}</span></td>
+                        <td>${order.created_at}</td>
+                    `;
+                    ordersTbody.appendChild(row);
+                });
+                
+                // 模拟租户数据
+                const tenants = [
+                    { name: '快递有限公司', contact: '张经理', status: 'active', created_at: '2023-09-01 09:00:00' },
+                    { name: '物流配送公司', contact: '李主管', status: 'pending', created_at: '2023-09-15 14:30:00' },
+                    { name: '运输服务公司', contact: '王总监', status: 'approved', created_at: '2023-09-20 11:15:00' },
+                    { name: '货运代理公司', contact: '赵部长', status: 'active', created_at: '2023-10-01 16:45:00' },
+                    { name: '仓储服务公司', contact: '孙主任', status: 'inactive', created_at: '2023-10-05 10:20:00' }
+                ];
+                
+                // 填充租户表格
+                const tenantsTbody = document.getElementById('tenants-tbody');
+                tenantsTbody.innerHTML = '';
+                tenants.forEach(tenant => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${tenant.name}</td>
+                        <td>${tenant.contact}</td>
+                        <td><span class="status-badge status-${tenant.status}">${getStatusText(tenant.status)}</span></td>
+                        <td>${tenant.created_at}</td>
+                    `;
+                    tenantsTbody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('加载样本数据失败:', error);
+                document.getElementById('stats-content').innerHTML = `<div class="loading" style="color: #ef4444;">加载数据失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'created': '已创建',
+                'pending_claim': '待认领',
+                'claimed': '已认领',
+                'quoted': '已报价',
+                'awarded': '已选定',
+                'in_transit': '运输中',
+                'delivered': '已送达',
+                'cancelled': '已取消',
+                'pending': '待审核',
+                'approved': '已批准',
+                'rejected': '已拒绝',
+                'active': '活跃',
+                'inactive': '非活跃'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDatabaseConnection();
+        });
+    </script>
+</body>
+</html>

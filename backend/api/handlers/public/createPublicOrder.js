@@ -59,7 +59,7 @@ module.exports = async (c) => {
     // 3. 插入数据库（匿名订单，customer_id为NULL或使用phone作为标识）
     const result = await db.run(
       `INSERT INTO orders (
-         customer_id, tracking_number, sender_info, receiver_info, 
+         customer_id, tracking_number, sender_info, receiver_info,
          status, created_at, updated_at, quote_price, quote_delivery_time,
          customer_phone, weight_kg, volume_m3, required_delivery_time, quote_deadline,
          description
@@ -72,7 +72,7 @@ module.exports = async (c) => {
         receiver_info,
         status,
         null, // quote_price (可选)
-        required_delivery_time || null,
+        null, // quote_delivery_time (可选)
         customer_phone,
         weight_kg || null,
         volume_m3 || null,
