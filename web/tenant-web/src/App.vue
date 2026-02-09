@@ -1,47 +1,37 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <nav class="navbar">
+      <RouterLink to="/quotes">报价管理</RouterLink>
+      <RouterLink to="/orders">订单管理</RouterLink>
+    </nav>
   </header>
 
   <main>
-    <TheWelcome />
+    <RouterView />
   </main>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style>
+.navbar {
+  background-color: #333;
+  padding: 1rem;
+  margin-bottom: 2rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: #007bff;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.navbar a.router-link-exact-active {
+  background-color: #0056b3;
 }
 </style>
