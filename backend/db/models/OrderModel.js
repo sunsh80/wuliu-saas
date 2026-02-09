@@ -1,10 +1,7 @@
-// backend/db/models/Order.js - 修正版，适配实际的数据库结构
-const { getDb } = require('../index.js');
+// backend/db/models/OrderModel.js - 适配现有数据库结构的订单模型
+const { getDb } = require('../connection');
 
 class OrderModel {
-  // 注意：这个模型是为兼容现有数据库结构而创建的
-  // 实际的orders表结构使用customer_tenant_id而不是customer_id等字段
-
   // 创建订单（适配现有数据库结构）
   async create(orderData) {
     const db = getDb();
@@ -77,8 +74,9 @@ class OrderModel {
     const db = getDb();
     return new Promise((resolve, reject) => {
       db.all(
-        `SELECT * FROM orders WHERE customer_tenant_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-        [tenantId, limit, offset],
+        `SELECT * FROM orders WHERE customer_tenant_id = ? OR tenant_id = ? 
+         ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+        [tenantId, tenantId, limit, offset],
         (err, rows) => {
           if (err) return reject(err);
           resolve(rows);

@@ -56,29 +56,31 @@ module.exports = async (c) => {
       source: 'mobile_app_anonymous'
     });
 
-    // 3. 插入数据库（匿名订单，customer_id为NULL或使用phone作为标识）
+    // 3. 插入数据库（匿名订单，customer_tenant_id为NULL或使用phone作为标识）
     const result = await db.run(
       `INSERT INTO orders (
-         customer_id, tracking_number, sender_info, receiver_info,
+         customer_tenant_id, tracking_number, sender_info, receiver_info,
          status, created_at, updated_at, quote_price, quote_delivery_time,
-         customer_phone, weight_kg, volume_m3, required_delivery_time, quote_deadline,
-         description
+         quote_remarks, quote_deadline, customer_phone, weight_kg, volume_m3, 
+         required_delivery_time, description, cargo_type
        )
-       VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        null, // 匿名订单，customer_id为NULL
+        null, // 匿名订单，customer_tenant_id为NULL
         tracking_number,
         sender_info,
         receiver_info,
         status,
         null, // quote_price (可选)
         null, // quote_delivery_time (可选)
+        null, // quote_remarks (可选)
+        quote_deadline || null,
         customer_phone,
         weight_kg || null,
         volume_m3 || null,
         required_delivery_time || null,
-        quote_deadline || null,
-        description || null
+        description || null,
+        cargo_type || null
       ]
     );
 
