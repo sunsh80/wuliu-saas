@@ -39,6 +39,7 @@ module.exports = async (c) => {
      SELECT o.id,
             o.status,
             o.description,
+            o.cargo_type,
             o.weight_kg,
             o.volume_m3,
             o.sender_info,
@@ -130,7 +131,7 @@ module.exports = async (c) => {
     const result = {
       id: order.id,
       status: order.status,
-      // cargoType: order.cargo_type, // 不存在
+      cargoType: order.cargo_type, // 添加货物类型
       cargoRemark: order.description, // 映射 description
       weightKg: order.weight_kg,
       volumeM3: order.volume_m3,

@@ -94,6 +94,7 @@ const CORE_TABLES = {
       volume_m3 REAL,
       required_delivery_time TEXT,
       description TEXT,
+      cargo_type TEXT,
       type_user INTEGER DEFAULT NULL,
       FOREIGN KEY (customer_tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
     );
@@ -199,6 +200,12 @@ async ensureColumnsExist(db) {
     const orderTypeUserCheck = await db.all("PRAGMA table_info(orders);");
     if (!orderTypeUserCheck.some(col => col.name === 'type_user')) {
         await db.exec("ALTER TABLE orders ADD COLUMN type_user INTEGER DEFAULT NULL;");
+    }
+    
+    // Check for orders.cargo_type column
+    const orderCargoTypeCheck = await db.all("PRAGMA table_info(orders);");
+    if (!orderCargoTypeCheck.some(col => col.name === 'cargo_type')) {
+        await db.exec("ALTER TABLE orders ADD COLUMN cargo_type TEXT;");
     }
     // Add checks for other missing columns here as needed
 }

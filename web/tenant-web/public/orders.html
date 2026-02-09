@@ -61,7 +61,7 @@
       top: 0;
       left: 0;
       bottom: 0;
-      width: 250px;
+      width: 200px; /* 减小侧边栏宽度 */
       background-color: var(--sidebar-bg);
       color: white;
       padding: 20px 0;
@@ -87,7 +87,7 @@
     }
 
     .main-content {
-      margin-left: 250px;
+      margin-left: 200px; /* 调整主内容左边距 */
       margin-top: 60px;
       padding: 24px;
     }
@@ -137,12 +137,36 @@
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      table-layout: auto; /* 改回自动表格布局以允许内容自适应 */
     }
 
     .order-table th, .order-table td {
-      padding: 14px 16px;
+      padding: 8px 4px; /* 进一步减少内边距以适应更多列 */
       text-align: left;
       border-bottom: 1px solid #e2e8f0;
+      word-break: break-word; /* 防止长内容撑破表格 */
+      vertical-align: top; /* 确保内容顶部对齐 */
+    }
+    
+    .order-table {
+      width: 100%;
+      table-layout: auto; /* 使用自动表格布局 */
+    }
+    
+    /* 简化的表格样式 */
+    .order-table {
+      width: 100%;
+    }
+    
+    .order-table th, .order-table td {
+      white-space: nowrap; /* 防止内容换行 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* 为新添加的货物信息列设置样式 */
+    .cargo-info-cell {
+      min-width: 100px;
     }
 
     .order-table th {
@@ -150,8 +174,9 @@
       font-weight: 600;
       color: #334155;
       text-transform: uppercase;
-      font-size: 0.875rem;
+      font-size: 0.75rem; /* 减小字体大小 */
       letter-spacing: 0.5px;
+      text-align: left;
     }
 
     .order-table tr:last-child td {
@@ -163,13 +188,13 @@
     }
 
     .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85em;
+      padding: 4px 8px; /* 减小内边距 */
+      border-radius: 12px; /* 减小圆角 */
+      font-size: 0.75em; /* 减小字体 */
       font-weight: 600;
       text-align: center;
       display: inline-block;
-      min-width: 80px;
+      min-width: 60px; /* 减小最小宽度 */
     }
 
     .status-created { background-color: #e0f2fe; color: #0369a1; }
@@ -184,18 +209,31 @@
 
     .action-buttons {
       display: flex;
-      gap: 8px;
+      flex-direction: column; /* 垂直排列按钮 */
+      gap: 2px; /* 进一步减小按钮间距 */
+      align-items: center; /* 居中对齐按钮 */
+      justify-content: center; /* 垂直居中 */
+      height: 100%; /* 占满单元格高度 */
+      padding: 2px 0; /* 减少内边距 */
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 2px 4px; /* 进一步减小按钮内边距 */
       border: none;
-      border-radius: 6px;
+      border-radius: 2px; /* 减小圆角 */
       cursor: pointer;
       text-decoration: none;
-      display: inline-block;
+      display: block; /* 改为block显示 */
       font-weight: 500;
+      font-size: 0.6rem; /* 进一步减小字体大小 */
       transition: all 0.2s ease;
+      min-width: 40px; /* 设置更小的最小宽度 */
+      text-align: center;
+      white-space: nowrap; /* 防止文本换行 */
+      overflow: hidden; /* 隐藏溢出文本 */
+      text-overflow: ellipsis; /* 文本溢出时显示省略号 */
+      width: 100%; /* 宽度占满容器 */
+      box-sizing: border-box; /* 包含padding和border在宽度内 */
     }
 
     .btn-claim {
@@ -214,8 +252,8 @@
     }
 
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
     }
 
     .pagination {
@@ -306,7 +344,10 @@
             <th>订单号</th>
             <th>发货地</th>
             <th>收货地</th>
+            <th>货物信息</th>
             <th>重量(kg)</th>
+            <th>发货人电话</th>
+            <th>收货人电话</th>
             <th>状态</th>
             <th>创建时间</th>
             <th>操作</th>
@@ -323,8 +364,11 @@
     </div>
   </div>
 
-  <script src="/js/main.js"></script>
   <script>
+    // 注意：我们不加载carrier-dashboard.js以避免重复的API调用
+    // 如果需要某些功能，请复制所需函数到这里
+    const API_BASE = 'http://localhost:3000';
+    
     // 检查登录状态
     function checkLoginStatus() {
       const token = localStorage.getItem('tenantToken');
@@ -349,11 +393,20 @@
 
       try {
         const token = localStorage.getItem('tenantToken');
-        let url = `/api/carrier/orders?page=${page}&limit=10`;
-        if (search) url += `&search=${encodeURIComponent(search)}`;
-        if (status) url += `&status=${status}`;
+        
+        // 构建查询参数
+        const params = new URLSearchParams();
+        if(page && page != 1) params.append('page', page);
+        if(search) params.append('search', search);
+        if(status) params.append('status', status);
+        if(page && page != 1) params.append('limit', 10); // 只在需要分页时添加limit
+        
+        const queryString = params.toString();
+        const url = `/api/carrier/orders${queryString ? '?' + queryString : ''}`;
 
-        const response = await fetch(url, {
+        const fullUrl = `${API_BASE}${url}`;
+        
+        const response = await fetch(fullUrl, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -362,35 +415,117 @@
 
         if (response.ok) {
           const data = await response.json();
+          
+          // 添加调试日志
+          console.log('API响应数据:', data);
+          
+          // 尝试不同的数据结构
+          let orders = [];
+          let pagination = {};
+          
+          // 首先尝试标准格式 {success: true, data: {orders: [], pagination: {}}}
           if (data.success && data.data) {
-            displayOrders(data.data.orders || []);
-            setupPagination(data.data.pagination || {});
-          } else {
-            console.error('获取订单数据失败:', data);
-            document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" class="no-data">获取订单数据失败</td></tr>';
+            orders = data.data.orders || [];
+            pagination = data.data.pagination || {};
+            console.log('使用标准格式解析数据，订单数量:', orders.length);
+          } 
+          // 如果不是标准格式，尝试 {orders: []} 或直接数组格式
+          else if (Array.isArray(data)) {
+            orders = data;
+            console.log('使用数组格式解析数据，订单数量:', orders.length);
+            // 如果是简单数组，我们无法知道总数，所以不显示分页
+          } 
+          else if (data.orders) {
+            orders = data.orders;
+            console.log('使用data.orders格式解析数据，订单数量:', orders.length);
           }
+          // 最后尝试直接使用data作为订单数组
+          else {
+            orders = data || [];
+            console.log('使用默认格式解析数据，订单数量:', orders.length);
+          }
+          
+          displayOrders(orders);
+          setupPagination(pagination);
         } else {
           console.error('获取订单失败响应:', response.status);
-          document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" class="no-data">获取订单数据失败</td></tr>';
+          // 尝试读取错误响应体
+          try {
+            // 首先尝试解析为JSON
+            const contentType = response.headers.get('content-type');
+            let errorData;
+            
+            if (contentType && contentType.includes('application/json')) {
+              errorData = await response.json();
+              console.error('JSON错误响应内容:', errorData);
+              
+              // 检查是否是验证错误，如果是则尝试基本请求
+              if (errorData.errors && errorData.message === 'Bad Request') {
+                console.log('检测到验证错误，尝试基本请求（无参数）');
+                
+                // 发送不带参数的基本请求
+                const basicResponse = await fetch(`${API_BASE}/api/carrier/orders`, {
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+                
+                if (basicResponse.ok) {
+                  const basicData = await basicResponse.json();
+                  console.log('基本请求响应:', basicData);
+                  
+                  let basicOrders = [];
+                  if (basicData.success && basicData.data) {
+                    basicOrders = basicData.data.orders || [];
+                  } else if (Array.isArray(basicData)) {
+                    basicOrders = basicData;
+                  } else if (basicData.orders) {
+                    basicOrders = basicData.orders;
+                  } else {
+                    basicOrders = basicData || [];
+                  }
+                  
+                  displayOrders(basicOrders);
+                  setupPagination({}); // 不显示分页
+                  return; // 成功则返回
+                }
+              }
+            } else {
+              // 如果不是JSON，读取为文本
+              const errorText = await response.text();
+              console.error('文本错误响应内容:', errorText);
+              
+              // 如果是速率限制错误，显示相应提示
+              if (response.status === 429) {
+                console.log('检测到速率限制，稍后重试...');
+                document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="9" class="no-data">请求过于频繁，请稍后再试</td></tr>';
+                return;
+              }
+            }
+          } catch (e) {
+            console.error('无法解析错误响应:', e);
+          }
+          document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="10" class="no-data">获取订单数据失败</td></tr>';
         }
       } catch (error) {
         console.error('加载订单时出错:', error);
-        document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" class="no-data">加载订单数据时出错</td></tr>';
+        document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="10" class="no-data">加载订单数据时出错</td></tr>';
       }
     }
 
     // 显示订单数据
     function displayOrders(orders) {
       const tbody = document.getElementById('ordersTableBody');
-      if (!orders || orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="no-data">暂无订单数据</td></tr>';
+      if (!orders || !Array.isArray(orders) || orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="no-data">暂无订单数据</td></tr>';
         return;
       }
 
       tbody.innerHTML = '';
       orders.forEach(order => {
         const row = document.createElement('tr');
-        
+
         // 解析发货和收货信息
         let pickupAddr = '未知';
         let deliveryAddr = '未知';
@@ -400,7 +535,7 @@
         } catch(e) {
           console.warn('解析发货信息失败:', e);
         }
-        
+
         try {
           const receiverInfo = typeof order.receiver_info === 'string' ? JSON.parse(order.receiver_info) : order.receiver_info || {};
           deliveryAddr = receiverInfo.address || receiverInfo.full_address || '未知';
@@ -410,20 +545,80 @@
 
         const statusClass = `status-${order.status.replace(/_/g, '-')}`;
         const statusText = getStatusText(order.status);
+
+        // 提取发货人和收货人电话
+        let pickupPhone = 'N/A';
+        let deliveryPhone = 'N/A';
         
+        try {
+          // 从sender_info中提取发货人电话
+          const senderInfo = typeof order.sender_info === 'string' 
+            ? JSON.parse(order.sender_info) 
+            : order.sender_info || {};
+          pickupPhone = senderInfo.phone || senderInfo.contact_phone || order.customer_phone || 'N/A';
+        } catch(e) {
+          console.warn('解析发货人电话失败:', e);
+          pickupPhone = order.customer_phone || 'N/A';
+        }
+        
+        try {
+          // 从receiver_info中提取收货人电话
+          const receiverInfo = typeof order.receiver_info === 'string' 
+            ? JSON.parse(order.receiver_info) 
+            : order.receiver_info || {};
+          deliveryPhone = receiverInfo.phone || receiverInfo.contact_phone || receiverInfo.receiver_phone || 'N/A';
+        } catch(e) {
+          console.warn('解析收货人电话失败:', e);
+        }
+
+        // 使用最简单直接的innerHTML方法创建表格行
+        const timeValue = order.created_at ? new Date(order.created_at).toLocaleString() : 'N/A';
+        
+        // 提取货物信息 - 从后端API返回的字段中获取
+        let cargoInfo = '包裹'; // 默认值
+        if (order.cargo_type) {
+            cargoInfo = order.cargo_type;  // 优先显示货物类型
+        } else if (order.description) {
+            cargoInfo = order.description;  // 其次显示描述
+        } else if (order.parcel_info) {
+            // 如果parcel_info是字符串，尝试解析；如果是对象，直接使用
+            if (typeof order.parcel_info === 'string') {
+                try {
+                    const parcelObj = JSON.parse(order.parcel_info);
+                    cargoInfo = parcelObj.description || parcelObj.type || parcelObj.category || '包裹';
+                } catch (e) {
+                    cargoInfo = order.parcel_info;
+                }
+            } else if (typeof order.parcel_info === 'object') {
+                cargoInfo = order.parcel_info.description || order.parcel_info.type || order.parcel_info.category || '包裹';
+            }
+        }
+        
+        // 构建按钮HTML
+        let buttonsHtml = `<button class="btn btn-view" onclick="viewOrder('${order.id}')">查看</button>`;
+        if (order.status === 'pending_claim') {
+            buttonsHtml += `<button class="btn btn-claim" onclick="claimOrder('${order.id}')">认领</button>`;
+        }
+        if (order.status === 'claimed') {
+            buttonsHtml += `<button class="btn btn-complete" onclick="completeOrder('${order.id}')">完成</button>`;
+        }
+        
+        // 使用innerHTML一次性创建整个行，确保顺序正确
         row.innerHTML = `
-          <td>${order.order_id || order.id || 'N/A'}</td>
-          <td>${pickupAddr}</td>
-          <td>${deliveryAddr}</td>
-          <td>${order.weight_kg || order.parcel_info?.weight_kg || 'N/A'}</td>
-          <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-          <td>${new Date(order.created_at).toLocaleDateString() || 'N/A'}</td>
-          <td class="action-buttons">
-            <button class="btn btn-view" onclick="viewOrder('${order.id}')">查看</button>
-            ${order.status === 'pending_claim' ? `<button class="btn btn-claim" onclick="claimOrder('${order.id}')">认领</button>` : ''}
-            ${order.status === 'claimed' ? `<button class="btn btn-complete" onclick="completeOrder('${order.id}')">完成</button>` : ''}
+          <td class="order-id-cell" title="${order.tracking_number || order.order_id || order.id || 'N/A'}">${order.tracking_number || order.order_id || order.id || 'N/A'}</td>
+          <td class="pickup-addr-cell" title="${pickupAddr}">${pickupAddr}</td>
+          <td class="delivery-addr-cell" title="${deliveryAddr}">${deliveryAddr}</td>
+          <td class="cargo-info-cell" title="${cargoInfo}">${cargoInfo}</td>
+          <td class="weight-cell" title="${order.weight_kg || order.parcel_info?.weight_kg || 'N/A'}">${order.weight_kg || order.parcel_info?.weight_kg || 'N/A'}</td>
+          <td class="pickup-phone-cell" title="${pickupPhone}">${pickupPhone}</td>
+          <td class="delivery-phone-cell" title="${deliveryPhone}">${deliveryPhone}</td>
+          <td class="status-cell" title="${statusText}">
+            <span class="status-badge ${statusClass}">${statusText}</span>
           </td>
+          <td class="time-cell" title="${timeValue}">${timeValue}</td>
+          <td class="action-buttons action-cell" title="操作">${buttonsHtml}</td>
         `;
+
         tbody.appendChild(row);
       });
     }
@@ -431,7 +626,11 @@
     // 设置分页
     function setupPagination(pagination) {
       const container = document.getElementById('paginationContainer');
-      if (!pagination.total_pages || pagination.total_pages <= 1) {
+      
+      // 如果没有分页信息或只有一页，隐藏分页控件
+      if (!pagination || 
+          (typeof pagination.total_pages !== 'number') || 
+          pagination.total_pages <= 1) {
         container.innerHTML = '';
         return;
       }
@@ -441,17 +640,17 @@
       const totalPages = pagination.total_pages || 1;
 
       // 上一页按钮
-      html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadOrders(${Math.max(1, currentPage - 1)})">
+      html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadOrders(${Math.max(1, currentPage - 1)}, document.getElementById('searchInput')?.value || '', document.getElementById('statusFilter')?.value || '')">
         <i class="fas fa-chevron-left"></i>
       </button>`;
 
       // 页码按钮
       for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-        html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadOrders(${i})">${i}</button>`;
+        html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadOrders(${i}, document.getElementById('searchInput')?.value || '', document.getElementById('statusFilter')?.value || '')">${i}</button>`;
       }
 
       // 下一页按钮
-      html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadOrders(${Math.min(totalPages, currentPage + 1)})">
+      html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadOrders(${Math.min(totalPages, currentPage + 1)}, document.getElementById('searchInput')?.value || '', document.getElementById('statusFilter')?.value || '')">
         <i class="fas fa-chevron-right"></i>
       </button>`;
 

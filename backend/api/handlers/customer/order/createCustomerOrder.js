@@ -34,7 +34,8 @@ module.exports = async (c) => {
   const {
     pickup_address, delivery_address, weight_kg, volume_m3,
     required_delivery_time, quote_deadline, customer_name, customer_phone,
-    description, shipper_name, shipper_phone, recipient_name, recipient_phone
+    description, shipper_name, shipper_phone, recipient_name, recipient_phone,
+    cargo_type  // 添加货物类型字段
   } = c.request.body; // 使用 c.request.body
 
   // 1. 验证请求体
@@ -117,8 +118,9 @@ const result = await db.run(
       required_delivery_time,
       quote_deadline,
       description,
+      cargo_type,
       tenant_id
-    ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       user.tenant_id,             // 1st -> customer_tenant_id
       tracking_number,            // 2nd -> tracking_number
@@ -135,7 +137,8 @@ const result = await db.run(
       required_delivery_time || null, // 13th -> required_delivery_time
       quote_deadline || null,     // 14th -> quote_deadline
       description || null,        // 15th -> description
-      user.tenant_id              // 16th -> tenant_id (这才是正确的！)
+      cargo_type || null,         // 16th -> cargo_type
+      user.tenant_id              // 17th -> tenant_id (这才是正确的！)
     ]
 );
 
