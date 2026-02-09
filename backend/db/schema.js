@@ -99,6 +99,28 @@ const CORE_TABLES = {
       FOREIGN KEY (customer_tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
     );
   `,
+  platform_pricing_rules: `
+    CREATE TABLE IF NOT EXISTS platform_pricing_rules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      rule_name TEXT NOT NULL,
+      base_price REAL NOT NULL DEFAULT 0.0,
+      price_per_km REAL NOT NULL DEFAULT 0.0,
+      price_per_hour REAL NOT NULL DEFAULT 0.0,
+      price_per_kg REAL NOT NULL DEFAULT 0.0,
+      cold_storage_surcharge REAL NOT NULL DEFAULT 0.0,
+      peak_hour_multiplier REAL NOT NULL DEFAULT 1.0,
+      off_peak_hour_multiplier REAL NOT NULL DEFAULT 1.0,
+      weather_multiplier REAL NOT NULL DEFAULT 1.0,
+      min_price REAL NOT NULL DEFAULT 0.0,
+      max_price REAL NOT NULL DEFAULT 999999.0,
+      time_slot_rules TEXT, -- JSON格式的时间段规则
+      region_rules TEXT, -- JSON格式的区域规则
+      vehicle_type_rules TEXT, -- JSON格式的车型规则
+      active BOOLEAN DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
 tenant_vehicles: ` CREATE TABLE IF NOT EXISTS tenant_vehicles (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   tenant_id INTEGER NOT NULL, -- 引用 tenants 表
@@ -116,8 +138,34 @@ tenant_vehicles: ` CREATE TABLE IF NOT EXISTS tenant_vehicles (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE -- 正确的外键约束
-); 
+);
 `,
+  carrier_pricing_configs: `
+    CREATE TABLE IF NOT EXISTS carrier_pricing_configs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      carrier_tenant_id INTEGER NOT NULL, -- 承运商租户ID
+      config_name TEXT NOT NULL,
+      base_price REAL NOT NULL DEFAULT 0.0,
+      price_per_km REAL NOT NULL DEFAULT 0.0,
+      price_per_hour REAL NOT NULL DEFAULT 0.0,
+      price_per_kg REAL NOT NULL DEFAULT 0.0,
+      cold_storage_surcharge REAL NOT NULL DEFAULT 0.0,
+      peak_hour_multiplier REAL NOT NULL DEFAULT 1.0,
+      off_peak_hour_multiplier REAL NOT NULL DEFAULT 1.0,
+      weather_multiplier REAL NOT NULL DEFAULT 1.0,
+      min_price REAL NOT NULL DEFAULT 0.0,
+      max_price REAL NOT NULL DEFAULT 999999.0,
+      time_slot_rules TEXT, -- JSON格式的时间段规则
+      region_rules TEXT, -- JSON格式的区域规则
+      vehicle_type_rules TEXT, -- JSON格式的车型规则
+      pricing_strategy TEXT DEFAULT 'distance_based', -- 定价策略：distance_based, weight_based, time_based, mixed
+      service_addons TEXT, -- JSON格式的增值服务选项
+      active BOOLEAN DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (carrier_tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
+    );
+  `,
 };
 
 // 扩展表定义
@@ -207,6 +255,7 @@ async ensureColumnsExist(db) {
     if (!orderCargoTypeCheck.some(col => col.name === 'cargo_type')) {
         await db.exec("ALTER TABLE orders ADD COLUMN cargo_type TEXT;");
     }
+    
     // Add checks for other missing columns here as needed
 }
 

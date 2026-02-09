@@ -1,11 +1,7 @@
 openapi: 3.0.3
 info:
   title: 多租户物流平台 API
-  version: 1.0.2-safe
-    技术栈:Node.js + Express + SQLite + OpenAPI Backend
-    认证机制:express-session(基于 Cookie 的会话）
-    安全模型：通过 TenantSessionAuth 安全处理器校验 req.session.userId
-    多租户支持:tenants 表存储租户,users 表存储租户员工 & 小程序顾客
+  version: 1.0.2-safe 技术栈:Node.js + Express + SQLite + OpenAPI Backend 认证机制:express-session(基于 Cookie 的会话） 安全模型：通过 TenantSessionAuth 安全处理器校验 req.session.userId 多租户支持:tenants 表存储租户,users 表存储租户员工 & 小程序顾客
   description: |
     支持客户（下单方）与承运方（接单方）双角色的物流订单系统。
     - `/api/admin/...`：平台管理员
@@ -55,7 +51,6 @@ components:
       name: connect.sid
       description: 租户登录后自动携带（由 Express Session 管理）
   schemas:
-    # 为 Web 端客户注册专用 ---
     CustomerWebRegistration:
       type: object
       required:
@@ -65,35 +60,32 @@ components:
       properties:
         contact_phone:
           type: string
-          pattern: '^1[3-9][0-9]{9}$' # 中国手机号格式
-          example: "13800138000"
+          pattern: ^1[3-9][0-9]{9}$
+          example: '13800138000'
         password:
           type: string
           minLength: 6
-          example: "password123"
+          example: password123
         roles:
           type: array
           items:
             type: string
-            enum: [customer]
-          example: ["customer"]
-    # --- 通用验证模式 ---
+            enum:
+              - customer
+          example:
+            - customer
     Username:
       type: string
-      pattern: '^[a-zA-Z0-9_-]{3,20}$' # 用户名格式：字母、数字、下划线、连字符，长度3-20
-      example: "user_name_123"
-
+      pattern: ^[a-zA-Z0-9_-]{3,20}$
+      example: user_name_123
     Name:
       type: string
-      pattern: '^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,50}$' # 名称格式：支持中文、英文、数字、下划线、连字符，长度1-50
-      example: "张三"
-
+      pattern: ^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,50}$
+      example: 张三
     Address:
       type: string
-      pattern: '^[\u4e00-\u9fa5a-zA-Z0-9\s\S]{1,200}$' # 地址格式：支持中文、英文、数字、空格及任意字符，长度1-200
-      example: "北京市朝阳区某某街道123号"
-
-    # --- 租户相关 ---
+      pattern: ^[\u4e00-\u9fa5a-zA-Z0-9\s\S]{1,200}$
+      example: 北京市朝阳区某某街道123号
     TenantApplication:
       type: object
       required:
@@ -110,7 +102,7 @@ components:
           $ref: '#/components/schemas/Name'
         contact_phone:
           type: string
-          pattern: '^1[3-9][0-9]{9}$'
+          pattern: ^1[3-9][0-9]{9}$
         email:
           type: string
           format: email
@@ -121,10 +113,13 @@ components:
           type: array
           items:
             type: string
-            enum: [customer, carrier]
+            enum:
+              - customer
+              - carrier
           minItems: 1
-          example: ["customer", "carrier"]
-        # === 新增：可选能力字段（不影响旧逻辑）===
+          example:
+            - customer
+            - carrier
         address:
           $ref: '#/components/schemas/Address'
         service_radius_km:
@@ -156,8 +151,9 @@ components:
           type: array
           items:
             type: string
-            enum: [customer, carrier]
-        # === 新增：可选能力字段 ===
+            enum:
+              - customer
+              - carrier
         address:
           $ref: '#/components/schemas/Address'
         service_radius_km:
@@ -172,7 +168,6 @@ components:
           type: number
           minimum: 0
           maximum: 5
-    # --- 报价模型 ---
     QuoteRequest:
       type: object
       required:
@@ -181,19 +176,18 @@ components:
         price:
           type: number
           minimum: 0.01
-          example: 150.0
+          example: 150
         estimated_hours:
           type: integer
           minimum: 1
           example: 24
-        # === 新增：更精确的到达时间（可选）===
         estimated_arrival:
           type: string
           format: date-time
-          example: "2026-01-14T18:00:00Z"
+          example: '2026-01-14T18:00:00Z'
         note:
           type: string
-          example: "自有车辆,24小时内装车"
+          example: 自有车辆,24小时内装车
     QuoteItem:
       type: object
       properties:
@@ -209,7 +203,6 @@ components:
           type: number
         estimated_hours:
           type: integer
-        # === 新增 ===
         estimated_arrival:
           type: string
           format: date-time
@@ -222,7 +215,6 @@ components:
         created_at:
           type: string
           format: date-time
-    # --- 订单相关 ---
     CreateOrderRequest:
       type: object
       required:
@@ -232,51 +224,56 @@ components:
       properties:
         pickup_address:
           type: string
-          example: "北京市朝阳区XX大厦"
+          example: 北京市朝阳区XX大厦
         delivery_address:
           type: string
-          example: "上海市浦东新区YY园区"
+          example: 上海市浦东新区YY园区
         weight_kg:
           type: number
           format: float
           minimum: 0.1
           example: 25.5
-        # === 小程序端特有字段 ===
         cargo_type:
           type: string
-          enum: [家具家电, 装修建材, 办公用品, 快递包裹, 其他]
-          description: "货物类型"
-          example: "家具家电"
+          enum:
+            - 家具家电
+            - 装修建材
+            - 办公用品
+            - 快递包裹
+            - 其他
+          description: 货物类型
+          example: 家具家电
         cargo_remark:
           type: string
-          description: "货物备注"
-          example: "易碎品，请小心搬运"
+          description: 货物备注
+          example: 易碎品，请小心搬运
         length:
           type: number
           minimum: 0.01
-          description: "货物长度(米)"
+          description: 货物长度(米)
           example: 1.2
         width:
           type: number
           minimum: 0.01
-          description: "货物宽度(米)"
+          description: 货物宽度(米)
           example: 0.8
         height:
           type: number
           minimum: 0.01
-          description: "货物高度(米)"
+          description: 货物高度(米)
           example: 0.6
         vehicle_type:
           type: string
-          enum: [无人车, 有人车]
-          description: "车型要求"
-          example: "有人车"
+          enum:
+            - 无人车
+            - 有人车
+          description: 车型要求
+          example: 有人车
         pickup_time:
           type: string
           format: date-time
-          description: "预约取货时间"
-          example: "2026-01-15T10:00:00Z"
-        # === 现有可选字段 ===
+          description: 预约取货时间
+          example: '2026-01-15T10:00:00Z'
         volume_m3:
           type: number
           minimum: 0.01
@@ -284,28 +281,26 @@ components:
         required_delivery_time:
           type: string
           format: date-time
-          example: "2026-01-15T12:00:00Z"
+          example: '2026-01-15T12:00:00Z'
         quote_deadline:
           type: string
           format: date-time
-          example: "2026-01-14T10:00:00Z"
-        # 原有字段
+          example: '2026-01-14T10:00:00Z'
         customer_name:
           $ref: '#/components/schemas/Name'
         customer_phone:
           type: string
-          pattern: '^1[3-9]\d{9}$'
-          example: "13800138000"
+          pattern: ^1[3-9]\d{9}$
+          example: '13800138000'
         description:
           type: string
-          example: "易碎品，请轻拿轻放"
-
+          example: 易碎品，请轻拿轻放
     OrderItem:
       type: object
       properties:
         id:
           type: string
-          example: "order_123e4567-e89b-12d3-a456-426614174000"
+          example: order_123e4567-e89b-12d3-a456-426614174000
         customer_tenant_id:
           type: string
         customer_tenant_name:
@@ -332,7 +327,17 @@ components:
           format: date-time
         status:
           type: string
-          enum: [created, pending, pending_claim, claimed, quoted, awarded, dispatched, in_transit, delivered, cancelled] # ⚠️ 严格保留原状态枚举！
+          enum:
+            - created
+            - pending
+            - pending_claim
+            - claimed
+            - quoted
+            - awarded
+            - dispatched
+            - in_transit
+            - delivered
+            - cancelled
         created_at:
           type: string
           format: date-time
@@ -343,24 +348,24 @@ components:
           nullable: true
         order_id:
           type: string
-          example: "ORD-20260205-001"
+          example: ORD-20260205-001
           description: 订单的唯一标识符，用于前端展示和跳转详情页
         updated_at:
           type: string
           format: date-time
-          example: "2026-02-05T10:35:00Z"
+          example: '2026-02-05T10:35:00Z'
           description: 订单最后更新时间
         sender_info:
-          type: string # 注意：这是 JSON 字符串，在前端被解析为对象
+          type: string
           example: '{"name": "张三", "phone": "13800138000"}'
           description: 发货人信息（JSON 字符串格式）
         receiver_info:
-          type: string # 注意：这是 JSON 字符串，在前端被解析为对象
+          type: string
           example: '{"name": "李四", "phone": "13900139000"}'
           description: 收货人信息（JSON 字符串格式）
         cargo_type:
           type: string
-          example: "furniture"
+          example: furniture
           description: 货物类型
         length:
           type: number
@@ -376,7 +381,7 @@ components:
           description: 货物高度（米）
         description:
           type: string
-          example: "请务必小心轻放"
+          example: 请务必小心轻放
           description: 订单备注
         total_price:
           type: number
@@ -398,7 +403,6 @@ components:
         - height
         - volume_m3
         - total_price
-        # 注意：这里假设它们是必填的。
         - customer_tenant_id
         - customer_tenant_name
     OrderListResponse:
@@ -409,7 +413,7 @@ components:
           example: true
         message:
           type: string
-          example: "获取成功"
+          example: 获取成功
         data:
           type: object
           properties:
@@ -437,12 +441,10 @@ components:
       properties:
         error:
           type: string
-          example: "TENANT_ROLE_NOT_ENABLED"
+          example: TENANT_ROLE_NOT_ENABLED
         message:
           type: string
-          example: "当前租户未启用客户角色"
-
-    # --- 租户管理相关补充模型 ---
+          example: 当前租户未启用客户角色
     TenantListItem:
       type: object
       properties:
@@ -454,13 +456,18 @@ components:
           $ref: '#/components/schemas/Name'
         contact_phone:
           type: string
-          pattern: '^1[3-9][0-9]{9}$'
+          pattern: ^1[3-9][0-9]{9}$
         email:
           type: string
           format: email
         status:
           type: string
-          enum: [pending, approved, rejected, active, inactive]
+          enum:
+            - pending
+            - approved
+            - rejected
+            - active
+            - inactive
         created_at:
           type: string
           format: date-time
@@ -478,7 +485,6 @@ components:
           type: number
           minimum: 0
           maximum: 5
-
     TenantDetail:
       allOf:
         - $ref: '#/components/schemas/TenantListItem'
@@ -495,7 +501,6 @@ components:
               $ref: '#/components/schemas/TenantFinancialInfo'
             contact_info:
               $ref: '#/components/schemas/TenantContactInfo'
-
     VehicleInfo:
       type: object
       properties:
@@ -529,7 +534,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     TenantFinancialInfo:
       type: object
       properties:
@@ -551,7 +555,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     TenantContactInfo:
       type: object
       properties:
@@ -573,19 +576,416 @@ components:
         updated_at:
           type: string
           format: date-time
-
     PaginationInfo:
       type: object
       properties:
         current_page:
           type: integer
-        total_pages:
-          type: integer
-        total_items:
-          type: integer
+          example: 1
         per_page:
           type: integer
-
+          example: 10
+        total:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        has_next:
+          type: boolean
+          example: true
+        has_prev:
+          type: boolean
+          example: false
+    PricingRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        rule_name:
+          type: string
+          example: 标准定价规则
+        base_price:
+          type: number
+          example: 10
+        price_per_km:
+          type: number
+          example: 2.5
+        price_per_hour:
+          type: number
+          example: 5
+        price_per_kg:
+          type: number
+          example: 1
+        cold_storage_surcharge:
+          type: number
+          example: 0.5
+        peak_hour_multiplier:
+          type: number
+          example: 1.5
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.8
+        weather_multiplier:
+          type: number
+          example: 1.2
+        min_price:
+          type: number
+          example: 5
+        max_price:
+          type: number
+          example: 1000
+        time_slot_rules:
+          type: object
+          example: {}
+        region_rules:
+          type: object
+          example: {}
+        vehicle_type_rules:
+          type: object
+          example: {}
+        active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-01-25T15:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-01-25T15:30:00Z'
+    CreatePricingRuleRequest:
+      type: object
+      required:
+        - rule_name
+      properties:
+        rule_name:
+          type: string
+          example: 标准定价规则
+          description: 定价规则名称
+        base_price:
+          type: number
+          example: 10
+          description: 基础价格
+        price_per_km:
+          type: number
+          example: 2.5
+          description: 每公里价格
+        price_per_hour:
+          type: number
+          example: 5
+          description: 每小时价格
+        price_per_kg:
+          type: number
+          example: 1
+          description: 每公斤价格
+        cold_storage_surcharge:
+          type: number
+          example: 0.5
+          description: 冷藏附加费
+        peak_hour_multiplier:
+          type: number
+          example: 1.5
+          description: 高峰时段倍率
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.8
+          description: 非高峰时段倍率
+        weather_multiplier:
+          type: number
+          example: 1.2
+          description: 天气倍率
+        min_price:
+          type: number
+          example: 5
+          description: 最低价格
+        max_price:
+          type: number
+          example: 1000
+          description: 最高价格
+        time_slot_rules:
+          type: object
+          description: 时段规则
+        region_rules:
+          type: object
+          description: 地区规则
+        vehicle_type_rules:
+          type: object
+          description: 车型规则
+        active:
+          type: boolean
+          example: true
+          description: 是否激活
+    UpdatePricingRuleRequest:
+      type: object
+      properties:
+        rule_name:
+          type: string
+          example: 标准定价规则
+          description: 定价规则名称
+        base_price:
+          type: number
+          example: 10
+          description: 基础价格
+        price_per_km:
+          type: number
+          example: 2.5
+          description: 每公里价格
+        price_per_hour:
+          type: number
+          example: 5
+          description: 每小时价格
+        price_per_kg:
+          type: number
+          example: 1
+          description: 每公斤价格
+        cold_storage_surcharge:
+          type: number
+          example: 0.5
+          description: 冷藏附加费
+        peak_hour_multiplier:
+          type: number
+          example: 1.5
+          description: 高峰时段倍率
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.8
+          description: 非高峰时段倍率
+        weather_multiplier:
+          type: number
+          example: 1.2
+          description: 天气倍率
+        min_price:
+          type: number
+          example: 5
+          description: 最低价格
+        max_price:
+          type: number
+          example: 1000
+          description: 最高价格
+        time_slot_rules:
+          type: object
+          description: 时段规则
+        region_rules:
+          type: object
+          description: 地区规则
+        vehicle_type_rules:
+          type: object
+          description: 车型规则
+        active:
+          type: boolean
+          description: 是否激活
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 100
+        total_pages:
+          type: integer
+          example: 10
+        has_next:
+          type: boolean
+          example: true
+        has_prev:
+          type: boolean
+          example: false
+    CarrierPricingConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        carrier_id:
+          type: integer
+          example: 1
+        config_name:
+          type: string
+          example: 标准配送定价
+        base_price:
+          type: number
+          example: 15
+        price_per_km:
+          type: number
+          example: 3
+        price_per_hour:
+          type: number
+          example: 6
+        price_per_kg:
+          type: number
+          example: 1.5
+        cold_storage_surcharge:
+          type: number
+          example: 0.8
+        peak_hour_multiplier:
+          type: number
+          example: 1.8
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.7
+        weather_multiplier:
+          type: number
+          example: 1.3
+        min_price:
+          type: number
+          example: 8
+        max_price:
+          type: number
+          example: 200
+        time_slot_rules:
+          type: object
+          example: {}
+        region_rules:
+          type: object
+          example: {}
+        vehicle_type_rules:
+          type: object
+          example: {}
+        active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-01-25T15:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-01-25T15:30:00Z'
+    CreateCarrierPricingConfigRequest:
+      type: object
+      required:
+        - carrier_id
+        - config_name
+      properties:
+        carrier_id:
+          type: integer
+          example: 1
+          description: 承运商ID
+        config_name:
+          type: string
+          example: 标准配送定价
+          description: 配置名称
+        base_price:
+          type: number
+          example: 15
+          description: 基础价格
+        price_per_km:
+          type: number
+          example: 3
+          description: 每公里价格
+        price_per_hour:
+          type: number
+          example: 6
+          description: 每小时价格
+        price_per_kg:
+          type: number
+          example: 1.5
+          description: 每公斤价格
+        cold_storage_surcharge:
+          type: number
+          example: 0.8
+          description: 冷藏附加费
+        peak_hour_multiplier:
+          type: number
+          example: 1.8
+          description: 高峰时段倍率
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.7
+          description: 非高峰时段倍率
+        weather_multiplier:
+          type: number
+          example: 1.3
+          description: 天气倍率
+        min_price:
+          type: number
+          example: 8
+          description: 最低价格
+        max_price:
+          type: number
+          example: 200
+          description: 最高价格
+        time_slot_rules:
+          type: object
+          description: 时段规则
+        region_rules:
+          type: object
+          description: 地区规则
+        vehicle_type_rules:
+          type: object
+          description: 车型规则
+        active:
+          type: boolean
+          example: true
+          description: 是否激活
+    UpdateCarrierPricingConfigRequest:
+      type: object
+      properties:
+        config_name:
+          type: string
+          example: 标准配送定价
+          description: 配置名称
+        base_price:
+          type: number
+          example: 15
+          description: 基础价格
+        price_per_km:
+          type: number
+          example: 3
+          description: 每公里价格
+        price_per_hour:
+          type: number
+          example: 6
+          description: 每小时价格
+        price_per_kg:
+          type: number
+          example: 1.5
+          description: 每公斤价格
+        cold_storage_surcharge:
+          type: number
+          example: 0.8
+          description: 冷藏附加费
+        peak_hour_multiplier:
+          type: number
+          example: 1.8
+          description: 高峰时段倍率
+        off_peak_hour_multiplier:
+          type: number
+          example: 0.7
+          description: 非高峰时段倍率
+        weather_multiplier:
+          type: number
+          example: 1.3
+          description: 天气倍率
+        min_price:
+          type: number
+          example: 8
+          description: 最低价格
+        max_price:
+          type: number
+          example: 200
+          description: 最高价格
+        time_slot_rules:
+          type: object
+          description: 时段规则
+        region_rules:
+          type: object
+          description: 地区规则
+        vehicle_type_rules:
+          type: object
+          description: 车型规则
+        active:
+          type: boolean
+          description: 是否激活
   responses:
     UnauthorizedError:
       description: 未认证
@@ -600,18 +1000,53 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     NotFoundError:
-      description: 资源不存在
+      description: 资源未找到
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: NOT_FOUND
+              message:
+                type: string
+                example: 资源未找到
     InternalServerError:
-      description: 内部服务器错误
+      description: 服务器内部错误
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: INTERNAL_SERVER_ERROR
+              message:
+                type: string
+                example: 服务器内部错误
+    BadRequestError:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: BAD_REQUEST
+              message:
+                type: string
+                example: 请求参数错误
 paths:
   /api/admin/tenants:
     get:
@@ -643,7 +1078,12 @@ paths:
           required: false
           schema:
             type: string
-            enum: [pending, approved, rejected, active, inactive]
+            enum:
+              - pending
+              - approved
+              - rejected
+              - active
+              - inactive
         - name: search
           in: query
           description: 搜索租户名称或联系人
@@ -671,7 +1111,6 @@ paths:
                         $ref: '#/components/schemas/PaginationInfo'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/tenants/{id}:
     get:
       tags:
@@ -735,7 +1174,12 @@ paths:
                   format: email
                 status:
                   type: string
-                  enum: [pending, approved, rejected, active, inactive]
+                  enum:
+                    - pending
+                    - approved
+                    - rejected
+                    - active
+                    - inactive
                 address:
                   type: string
       responses:
@@ -758,7 +1202,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/reports/overview-stats:
     get:
       tags:
@@ -808,7 +1251,6 @@ paths:
                           $ref: '#/components/schemas/OrderItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/tenants/approved:
     get:
       tags:
@@ -854,7 +1296,6 @@ paths:
                         $ref: '#/components/schemas/PaginationInfo'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/tenants/rejected:
     get:
       tags:
@@ -906,8 +1347,6 @@ paths:
                         $ref: '#/components/schemas/PaginationInfo'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
-
   /api/admin/tenants/{id}/financial:
     put:
       tags:
@@ -947,7 +1386,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/tenants/{id}/contact:
     put:
       tags:
@@ -987,7 +1425,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/vehicles:
     get:
       tags:
@@ -1071,7 +1508,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/vehicles/search:
     get:
       tags:
@@ -1116,7 +1552,6 @@ paths:
                       $ref: '#/components/schemas/VehicleInfo'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/vehicles/{id}:
     get:
       tags:
@@ -1148,7 +1583,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/tenants/{id}/vehicles:
     post:
       tags:
@@ -1190,7 +1624,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/health:
     get:
       summary: 健康检查
@@ -1207,20 +1640,19 @@ paths:
                 properties:
                   status:
                     type: string
-                    example: "ok"
+                    example: ok
         '500':
           description: 服务内部错误
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/customer/order/bind:
     post:
       summary: 将订单绑定到客户（通过手机号）
       operationId: bindOrderToCustomer
       security:
-       - TenantSessionAuth: []
+        - TenantSessionAuth: []
       requestBody:
         required: true
         content:
@@ -1253,7 +1685,6 @@ paths:
           description: 未登录
         '404':
           description: 订单未找到或已绑定
-
   /api/customer/orders:
     post:
       tags:
@@ -1278,10 +1709,10 @@ paths:
                 properties:
                   order_id:
                     type: string
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
     get:
       tags:
         - customer-order
@@ -1298,7 +1729,6 @@ paths:
                 $ref: '#/components/schemas/OrderListResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/customer/orders/{order_id}:
     get:
       tags:
@@ -1320,10 +1750,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderItem'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
     put:
       tags:
         - customer-order
@@ -1353,10 +1783,10 @@ paths:
       responses:
         '200':
           description: 更新成功
-        '404':
-          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
     delete:
       tags:
         - customer-order
@@ -1373,11 +1803,10 @@ paths:
       responses:
         '200':
           description: 删除成功
-        '404':
-          $ref: '#/components/responses/NotFoundError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /api/customer/orders/{order_id}/quotes:
     get:
       tags:
@@ -1409,7 +1838,7 @@ paths:
                     properties:
                       order_id:
                         type: string
-                        example: "order_123"
+                        example: order_123
                       quotes:
                         type: array
                         items:
@@ -1426,26 +1855,25 @@ paths:
                                   type: string
                             price:
                               type: number
-                              example: 150.0
+                              example: 150
                             delivery_time:
                               type: string
                               format: date-time
-                              example: "2026-01-14T18:00:00Z"
+                              example: '2026-01-14T18:00:00Z'
                             remarks:
                               type: string
-                              example: "可加急，但需额外费用"
+                              example: 可加急，但需额外费用
                             status:
                               type: string
-                              example: "pending"
+                              example: pending
                             created_at:
                               type: string
                               format: date-time
-                              example: "2026-01-13T10:00:00Z"
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                              example: '2026-01-13T10:00:00Z'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
+        '404':
+          $ref: '#/components/responses/NotFoundError'
   /api/setup/status:
     get:
       tags:
@@ -1469,7 +1897,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/setup/admin:
     post:
       tags:
@@ -1493,19 +1920,19 @@ paths:
                 password:
                   type: string
                   minLength: 8
-                  example: "SecurePass123!"
+                  example: SecurePass123!
                 email:
                   type: string
                   format: email
-                  example: "admin@yourlogistics.com"
+                  example: admin@yourlogistics.com
                 platform_name:
                   type: string
                   description: 该平台实例的名称（如“华东物流云”）
-                  example: "我的物流平台"
+                  example: 我的物流平台
                 license_key:
                   type: string
                   description: 授权密钥（可选，用于产品授权验证）
-                  example: "LIC-2026-XXXX-YYYY-ZZZZ"
+                  example: LIC-2026-XXXX-YYYY-ZZZZ
       responses:
         '201':
           description: 初始化成功
@@ -1519,7 +1946,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "平台初始化成功"
+                    example: 平台初始化成功
         '400':
           description: 请求参数错误
           content:
@@ -1532,15 +1959,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/auth/ping:
     get:
       summary: 检查当前会话是否有效
       description: 用于验证用户登录状态（Session 是否有效）。
       security:
-      - TenantSessionAuth: []
+        - TenantSessionAuth: []
       tags:
-        - auth 
+        - auth
       responses:
         '200':
           description: Session 有效
@@ -1554,16 +1980,16 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Session is valid"
+                    example: Session is valid
                   user:
                     type: object
                     properties:
                       id:
                         type: string
-                        example: "user_123"
+                        example: user_123
                       name:
                         type: string
-                        example: "张三"
+                        example: 张三
         '401':
           description: Session 无效或未登录
           content:
@@ -1576,7 +2002,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Session is invalid or not logged in"
+                    example: Session is invalid or not logged in
   /api/admin/login:
     post:
       tags:
@@ -1598,7 +2024,7 @@ paths:
                   $ref: '#/components/schemas/Username'
                 password:
                   type: string
-                  example: "SecurePass123!"
+                  example: SecurePass123!
       responses:
         '200':
           description: 登录成功,Set-Cookie 自动设置 session
@@ -1608,7 +2034,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/admin/logout:
     post:
       tags:
@@ -1627,8 +2052,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "已安全退出"
-
+                    example: 已安全退出
   /api/admin/profile:
     get:
       tags:
@@ -1658,7 +2082,6 @@ paths:
                     format: date-time
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/admin/users:
     post:
       tags:
@@ -1688,7 +2111,9 @@ paths:
                   format: email
                 role:
                   type: string
-                  enum: [admin, operator]
+                  enum:
+                    - admin
+                    - operator
                   default: admin
       responses:
         '201':
@@ -1708,7 +2133,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/admin/tenants/pending:
     get:
       tags:
@@ -1728,7 +2152,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/TenantApplication'
-
   /api/admin/tenants/{id}/approve:
     put:
       tags:
@@ -1754,13 +2177,14 @@ paths:
                   type: array
                   items:
                     type: string
-                    enum: [customer, carrier]
+                    enum:
+                      - customer
+                      - carrier
       responses:
         '200':
           description: 审核通过
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/tenants/{id}/reject:
     put:
       tags:
@@ -1797,10 +2221,9 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "租户申请已拒绝"
+                    example: 租户申请已拒绝
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/admin/orders:
     get:
       tags:
@@ -1815,7 +2238,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderListResponse'
-
   /api/admin/orders/{id}/status:
     put:
       tags:
@@ -1841,8 +2263,18 @@ paths:
               properties:
                 status:
                   type: string
-                  enum: [pending,pending_claim, available,created, claimed, awarded, dispatched, in_transit, delivered, cancelled]
-                  example: "cancelled"
+                  enum:
+                    - pending
+                    - pending_claim
+                    - available
+                    - created
+                    - claimed
+                    - awarded
+                    - dispatched
+                    - in_transit
+                    - delivered
+                    - cancelled
+                  example: cancelled
       responses:
         '200':
           description: 状态更新成功
@@ -1856,7 +2288,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "订单状态已更新"
+                    example: 订单状态已更新
         '400':
           description: 状态值无效
           content:
@@ -1865,7 +2297,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           $ref: '#/components/responses/NotFoundError'
-  
   /api/public/orders/{id}:
     get:
       operationId: fetchPublicOrder
@@ -1894,7 +2325,6 @@ paths:
           description: 订单未找到
         '500':
           description: 服务器内部错误.
-  
   /api/public/orders:
     post:
       tags:
@@ -1919,7 +2349,6 @@ paths:
                     type: string
         '400':
           $ref: '#/components/responses/ForbiddenError'
-
   /api/carrier/orders:
     get:
       tags:
@@ -1967,7 +2396,6 @@ paths:
                 $ref: '#/components/schemas/OrderListResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/carrier/orders/{order_id}/claim:
     put:
       tags:
@@ -1996,7 +2424,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/carrier/orders/{order_id}/complete:
     put:
       tags:
@@ -2018,7 +2445,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/carrier/orders/{order_id}/start-delivery:
     put:
       tags:
@@ -2047,16 +2473,16 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Delivery started successfully"
+                    example: Delivery started successfully
                   data:
                     type: object
                     properties:
                       order_id:
                         type: string
-                        example: "order_123"
+                        example: order_123
                       status:
                         type: string
-                        example: "in_transit"
+                        example: in_transit
         '400':
           description: 订单状态不允许开始配送
           content:
@@ -2067,7 +2493,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/carrier/orders/{order_id}/quote:
     post:
       operationId: submitCarrierQuote
@@ -2104,12 +2529,12 @@ paths:
                 deliveryTime:
                   type: string
                   description: 预计送达时间 (ISO 8601 格式或自定义格式)
-                  example: "2024-05-25T18:00:00Z"
+                  example: '2024-05-25T18:00:00Z'
                 remarks:
                   type: string
                   maxLength: 500
                   description: 报价备注
-                  example: "可加急，但需额外费用"
+                  example: 可加急，但需额外费用
               required:
                 - price
                 - deliveryTime
@@ -2126,7 +2551,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Quote submitted successfully"
+                    example: Quote submitted successfully
                   data:
                     type: object
                     properties:
@@ -2142,10 +2567,10 @@ paths:
                             example: 150.75
                           deliveryTime:
                             type: string
-                            example: "2024-05-25T18:00:00Z"
+                            example: '2024-05-25T18:00:00Z'
                           remarks:
                             type: string
-                            example: "可加急，但需额外费用"
+                            example: 可加急，但需额外费用
                       carrierId:
                         type: integer
                         example: 456
@@ -2170,26 +2595,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
-         $ref: '#/components/responses/InternalServerError'
-
-# ... (schemas, securitySchemes, responses remain unchanged)
-# If you don't have an Error schema defined, add it under components/schemas:
-#   Error:
-#     type: object
-#     properties:
-#       success:
-#         type: boolean
-#         example: false
-#       error:
-#         type: string
-#         example: "ERROR_CODE"
-#       message:
-#         type: string
-#         example: "Human-readable error message" # Optional
-#     required:
-#       - success
-#       - error
-
+          $ref: '#/components/responses/InternalServerError'
   /api/customer/orders/{order_id}/award:
     post:
       tags:
@@ -2229,18 +2635,17 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "订单已成交，承运方已通知"
+                    example: 订单已成交，承运方已通知
         '400':
           description: 请求参数错误（如 carrier_tenant_id 无效）
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/tenant-web/register:
     post:
       tags:
-        - auth # 可以归类到 auth，或者新建一个 'registration' tag
+        - auth
       summary: 租户/客户注册
       operationId: registerTenantWeb
       description: 新租户或客户提交注册信息，创建账户。
@@ -2263,19 +2668,14 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Tenant registered successfully"
+                    example: Tenant registered successfully
                   data:
                     type: object
-                    description: "可选：返回新创建的租户信息或登录凭据"
+                    description: 可选：返回新创建的租户信息或登录凭据
                     properties:
                       tenant_id:
                         type: string
-                        example: "tenant_abc123"
-                      # 如果注册后自动登录，也可以返回 sessionData 或 token
-                      # sessionData:
-                      #   type: object
-                      #   description: "Session 数据，由 server.js 处理"
-                      #   properties: ...
+                        example: tenant_abc123
         '400':
           description: 请求参数不完整或格式错误
           content:
@@ -2294,7 +2694,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /api/tenant-web/login:
     post:
       tags:
@@ -2312,26 +2711,21 @@ paths:
           application/json:
             schema:
               type: object
-              # 移除原有的强制要求 email 和 password 的 required 数组
-              # required:
-              #   - email
-              #   - password
               properties:
                 email:
                   type: string
                   format: email
-                  description: "租户/客户注册邮箱"
-                  example: "user@example.com"
+                  description: 租户/客户注册邮箱
+                  example: user@example.com
                 phone:
                   type: string
-                  pattern: '^1[3-9][0-9]{9}$' # 中国手机号格式
-                  description: "租户/客户注册手机号"
-                  example: "13800138000"
+                  pattern: ^1[3-9][0-9]{9}$
+                  description: 租户/客户注册手机号
+                  example: '13800138000'
                 password:
                   type: string
-                  description: "登录密码"
-                  example: "SecurePassword123!"
-              # 仅在此处标记 password 为必需，email 和 phone 由后端逻辑校验
+                  description: 登录密码
+                  example: SecurePassword123!
               required:
                 - password
       responses:
@@ -2347,23 +2741,25 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Login successful"
+                    example: Login successful
                   data:
                     type: object
                     properties:
                       tenant_id:
                         type: string
-                        example: "tenant_12345"
+                        example: tenant_12345
                       name:
                         type: string
-                        example: "Example Tenant"
+                        example: Example Tenant
                       roles:
                         type: array
                         items:
                           type: string
-                          enum: [customer, carrier]
-                        example: ["customer"]
-                      # ... 可能还有其他字段，如 token (如果使用 JWT) 等
+                          enum:
+                            - customer
+                            - carrier
+                        example:
+                          - customer
                     required:
                       - tenant_id
                       - name
@@ -2380,7 +2776,7 @@ paths:
                     example: false
                   error:
                     type: string
-                    example: "Either email or phone must be provided along with password."
+                    example: Either email or phone must be provided along with password.
         '401':
           description: 邮箱或密码错误 / 手机号或密码错误 / 账户未激活
           content:
@@ -2393,8 +2789,7 @@ paths:
                     example: false
                   error:
                     type: string
-                    example: "Invalid credentials" # 或 "Account is not active..."
-
+                    example: Invalid credentials
   /api/tenant-web/profile:
     get:
       tags:
@@ -2458,7 +2853,7 @@ paths:
                   type: string
                 customer_phone:
                   type: string
-                  pattern: '^1[3-9][0-9]{9}$'
+                  pattern: ^1[3-9][0-9]{9}$
                 address:
                   type: string
                 weight:
@@ -2476,7 +2871,6 @@ paths:
                     type: string
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/tenant-web/profile/roles:
     get:
       tags:
@@ -2497,8 +2891,9 @@ paths:
                     type: array
                     items:
                       type: string
-                      enum: [customer, carrier]
-
+                      enum:
+                        - customer
+                        - carrier
   /api/pc-tenant/apply:
     post:
       operationId: applyPcTenant
@@ -2538,7 +2933,9 @@ paths:
                   type: array
                   items:
                     type: string
-                    enum: [customer, carrier]
+                    enum:
+                      - customer
+                      - carrier
                   description: 角色列表
                 address:
                   type: string
@@ -2599,7 +2996,6 @@ paths:
                     example: EMAIL_ALREADY_REGISTERED
         '500':
           description: 服务器内部错误
-
   /api/tenant-web/orders/pending:
     get:
       tags:
@@ -2617,7 +3013,6 @@ paths:
                 $ref: '#/components/schemas/OrderListResponse'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/tenant-web/orders/{order_id}/claim:
     put:
       tags:
@@ -2635,13 +3030,12 @@ paths:
       responses:
         '200':
           description: 认领成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
   /api/tenant-web/orders/{order_id}/complete:
     put:
       tags:
@@ -2659,13 +3053,12 @@ paths:
       responses:
         '200':
           description: 完成成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
   /api/tenant-web/logout:
     post:
       tags:
@@ -2684,10 +3077,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "已安全退出"
-
-  # ======================
-  # 🔸 新增：智能匹配接口（全新路径，不干扰旧流程）
+                    example: 已安全退出
   /api/matching/search-carriers:
     post:
       tags:
@@ -2707,16 +3097,15 @@ paths:
               properties:
                 pickup_address:
                   type: string
-                  example: "北京市朝阳区XX大厦"
+                  example: 北京市朝阳区XX大厦
                 delivery_address:
                   type: string
-                  example: "上海市浦东新区YY园区"
+                  example: 上海市浦东新区YY园区
                 weight_kg:
                   type: number
                   format: float
                   minimum: 0.1
                   example: 25.5
-                # === 新增可选字段 ===
                 volume_m3:
                   type: number
                   minimum: 0.01
@@ -2724,12 +3113,12 @@ paths:
                 required_delivery_time:
                   type: string
                   format: date-time
-                  example: "2026-01-15T12:00:00Z"
+                  example: '2026-01-15T12:00:00Z'
                 preferred_carrier_ids:
                   type: array
                   items:
                     type: string
-                  description: "优先匹配的承运方ID列表"
+                  description: 优先匹配的承运方ID列表
       responses:
         '200':
           description: 匹配的承运方列表
@@ -2749,7 +3138,6 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-
   /api/matching/get-quote-suggestions:
     get:
       tags:
@@ -2782,7 +3170,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
-
   /api/carrier/quotes:
     get:
       tags:
@@ -2818,7 +3205,11 @@ paths:
           required: false
           schema:
             type: string
-            enum: [pending, awarded, rejected, expired]
+            enum:
+              - pending
+              - awarded
+              - rejected
+              - expired
       responses:
         '200':
           description: 承运商报价列表
@@ -2832,7 +3223,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "获取成功"
+                    example: 获取成功
                   data:
                     type: object
                     properties:
@@ -2844,3 +3235,383 @@ paths:
                         $ref: '#/components/schemas/PaginationInfo'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/pricing-rules:
+    get:
+      tags:
+        - admin-pricing
+      summary: 获取平台定价规则列表
+      operationId: listPlatformPricingRules
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 页码
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 每页数量
+        - name: active
+          in: query
+          schema:
+            type: boolean
+          description: 是否只返回激活的规则
+      responses:
+        '200':
+          description: 定价规则列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PricingRule'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - admin-pricing
+      summary: 创建平台定价规则
+      operationId: createPlatformPricingRule
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePricingRuleRequest'
+      responses:
+        '201':
+          description: 定价规则创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 平台定价规则创建成功
+                  data:
+                    $ref: '#/components/schemas/PricingRule'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/admin/pricing-rules/{id}:
+    get:
+      tags:
+        - admin-pricing
+      summary: 获取单个平台定价规则
+      operationId: getPlatformPricingRule
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价规则ID
+      responses:
+        '200':
+          description: 定价规则详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/PricingRule'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - admin-pricing
+      summary: 更新平台定价规则
+      operationId: updatePlatformPricingRule
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价规则ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePricingRuleRequest'
+      responses:
+        '200':
+          description: 定价规则更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 平台定价规则更新成功
+                  data:
+                    $ref: '#/components/schemas/PricingRule'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - admin-pricing
+      summary: 删除平台定价规则
+      operationId: deletePlatformPricingRule
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价规则ID
+      responses:
+        '200':
+          description: 定价规则删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 平台定价规则删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/carrier/pricing-configs:
+    get:
+      tags:
+        - carrier-pricing
+      summary: 获取承运商定价配置列表
+      operationId: listCarrierPricingConfigs
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 页码
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 每页数量
+        - name: carrier_id
+          in: query
+          schema:
+            type: integer
+          description: 承运商ID过滤
+      responses:
+        '200':
+          description: 承运商定价配置列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CarrierPricingConfig'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - carrier-pricing
+      summary: 创建承运商定价配置
+      operationId: createCarrierPricingConfig
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCarrierPricingConfigRequest'
+      responses:
+        '201':
+          description: 承运商定价配置创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 承运商定价配置创建成功
+                  data:
+                    $ref: '#/components/schemas/CarrierPricingConfig'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/carrier/pricing-configs/{id}:
+    get:
+      tags:
+        - carrier-pricing
+      summary: 获取单个承运商定价配置
+      operationId: getCarrierPricingConfig
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价配置ID
+      responses:
+        '200':
+          description: 承运商定价配置详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CarrierPricingConfig'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - carrier-pricing
+      summary: 更新承运商定价配置
+      operationId: updateCarrierPricingConfig
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价配置ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCarrierPricingConfigRequest'
+      responses:
+        '200':
+          description: 承运商定价配置更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 承运商定价配置更新成功
+                  data:
+                    $ref: '#/components/schemas/CarrierPricingConfig'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - carrier-pricing
+      summary: 删除承运商定价配置
+      operationId: deleteCarrierPricingConfig
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 定价配置ID
+      responses:
+        '200':
+          description: 承运商定价配置删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 承运商定价配置删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
