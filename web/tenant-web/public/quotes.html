@@ -508,6 +508,36 @@
       text-align: center;
     }
     
+    .standard-price-row {
+      background-color: #e9ecef !important;
+    }
+    
+    .standard-price-cell {
+      padding: 10px !important;
+      vertical-align: top;
+    }
+    
+    .standard-price-header {
+      font-weight: bold;
+      color: #495057;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+    
+    .standard-price-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .standard-price-values span {
+      background-color: #dee2e6;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+    
     .total-price {
       font-weight: bold;
       color: #007bff;
@@ -1029,81 +1059,98 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="slot in selectedTimeSlots" :key="slot.timeSlot">
-                  <td>{{ slot.timeSlot }}</td>
-                  <td>
-                    <input 
-                      type="number" 
-                      v-model.number="slot.params.basePrice" 
-                      @input="updateSlotQuote(slot)"
-                      min="0" 
-                      step="0.01"
-                      :disabled="loading"
-                    />
-                  </td>
-                  <td>
-                    <input 
-                      type="number" 
-                      v-model.number="slot.params.distance" 
-                      @input="updateSlotQuote(slot)"
-                      min="0" 
-                      step="0.1"
-                      :disabled="loading"
-                    />
-                  </td>
-                  <td>
-                    <select 
-                      v-model="slot.params.overtimeCharge" 
-                      @change="updateSlotQuote(slot)"
-                      :disabled="loading">
-                      <option value="false">无附加费</option>
-                      <option value="true">启用附加费</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select 
-                      v-model="slot.params.weather" 
-                      @change="updateSlotQuote(slot)"
-                      :disabled="loading">
-                      <option value="normal">正常</option>
-                      <option value="rain">雨天</option>
-                      <option value="snow">雪天</option>
-                      <option value="storm">风暴</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select 
-                      v-model="slot.params.vehicleType" 
-                      @change="updateSlotQuote(slot)"
-                      :disabled="loading">
-                      <option value="normal">常温车</option>
-                      <option value="refrigerated">冷藏车</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select 
-                      v-model="slot.params.isExpress" 
-                      @change="updateSlotQuote(slot)"
-                      :disabled="loading">
-                      <option :value="false">否</option>
-                      <option :value="true">是</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input 
-                      type="number" 
-                      v-model.number="slot.params.additionalFee" 
-                      @input="updateSlotQuote(slot)"
-                      min="0" 
-                      step="0.01"
-                      :disabled="loading"
-                    />
-                  </td>
-                  <td class="total-price">¥{{ slot.quote.toFixed(2) }}</td>
-                  <td>
-                    <button @click="removeTimeSlot(slot.timeSlot)" class="btn btn-danger btn-sm">删除</button>
-                  </td>
-                </tr>
+                <template v-for="slot in selectedTimeSlots" :key="slot.timeSlot">
+                  <!-- 标准价格行 -->
+                  <tr class="standard-price-row">
+                    <td colspan="10" class="standard-price-cell">
+                      <div class="standard-price-header">平台标准价格 ({{ slot.timeSlot }})</div>
+                      <div class="standard-price-values">
+                        <span>起步价: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</span>
+                        <span>里程费: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).distanceRate.toFixed(2) }}/km</span>
+                        <span>天气附加: {{ getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge.toFixed(2) : '无' }}</span>
+                        <span>车型附加: {{ getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge.toFixed(2) : '无' }}</span>
+                        <span>总计: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).total.toFixed(2) }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- 承运商自定义价格行 -->
+                  <tr>
+                    <td>{{ slot.timeSlot }}</td>
+                    <td>
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.basePrice" 
+                        @input="updateSlotQuote(slot)"
+                        min="0" 
+                        step="0.01"
+                        :disabled="loading"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.distance" 
+                        @input="updateSlotQuote(slot)"
+                        min="0" 
+                        step="0.1"
+                        :disabled="loading"
+                      />
+                    </td>
+                    <td>
+                      <select 
+                        v-model="slot.params.overtimeCharge" 
+                        @change="updateSlotQuote(slot)"
+                        :disabled="loading">
+                        <option value="false">无附加费</option>
+                        <option value="true">启用附加费</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select 
+                        v-model="slot.params.weather" 
+                        @change="updateSlotQuote(slot)"
+                        :disabled="loading">
+                        <option value="normal">正常</option>
+                        <option value="rain">雨天</option>
+                        <option value="snow">雪天</option>
+                        <option value="storm">风暴</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select 
+                        v-model="slot.params.vehicleType" 
+                        @change="updateSlotQuote(slot)"
+                        :disabled="loading">
+                        <option value="normal">常温车</option>
+                        <option value="refrigerated">冷藏车</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select 
+                        v-model="slot.params.isExpress" 
+                        @change="updateSlotQuote(slot)"
+                        :disabled="loading">
+                        <option :value="false">否</option>
+                        <option :value="true">是</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.additionalFee" 
+                        @input="updateSlotQuote(slot)"
+                        min="0" 
+                        step="0.01"
+                        :disabled="loading"
+                      />
+                    </td>
+                    <td class="total-price">¥{{ slot.quote.toFixed(2) }}</td>
+                    <td>
+                      <button @click="removeTimeSlot(slot.timeSlot)" class="btn btn-danger btn-sm">删除</button>
+                    </td>
+                  </tr>
+                </template>
               </tbody>
             </table>
           </div>
@@ -1643,6 +1690,48 @@
           slot.breakdown = breakdown
         }
         
+        // 获取特定时间段的标准价格
+        const getStandardPriceForTimeSlot = (timeSlot) => {
+          // 根据时间段设置不同的标准价格
+          const startHour = parseInt(timeSlot.split(':')[0])
+          let timeMultiplier = 1
+          
+          // 根据时间段设置不同的倍数
+          if ((startHour >= 7 && startHour < 9) || (startHour >= 17 && startHour < 19)) {
+            // 高峰时段
+            timeMultiplier = 1 + (timePricing.peakMultiplier / 100)
+          } else if (startHour >= 9 && startHour < 17) {
+            // 平峰时段
+            timeMultiplier = 1 + (timePricing.normalMultiplier / 100)
+          } else {
+            // 低谷时段
+            timeMultiplier = 1 + (timePricing.offPeakMultiplier / 100)
+          }
+          
+          // 计算标准价格
+          const basePrice = pricingConfig.basePrice
+          const distanceRate = pricingConfig.mileageRate
+          const distance = 10 // 默认10公里
+          const distanceFee = distance * distanceRate
+          const duration = distance * 5 // 估算时长（分钟）
+          const durationFee = duration * pricingConfig.timeRate
+          const vehicleSurcharge = pricingConfig.refrigeratedSurcharge // 冷藏附加费
+          const weatherSurcharge = 0 // 默认天气附加费
+          
+          // 总计
+          const total = (basePrice + distanceFee + durationFee + vehicleSurcharge + weatherSurcharge) * timeMultiplier
+          
+          return {
+            basePrice,
+            distanceRate,
+            distanceFee,
+            durationFee,
+            vehicleSurcharge,
+            weatherSurcharge,
+            total
+          }
+        }
+        
         // 切叠/展开表格
         const toggleTable = () => {
           showTable.value = !showTable.value
@@ -1841,6 +1930,7 @@
           toggleTable,
           updateSlotQuote,
           calculateStandardPricing,
+          getStandardPriceForTimeSlot,
           getQuoteClass,
           pendingOrders,
           loading,
