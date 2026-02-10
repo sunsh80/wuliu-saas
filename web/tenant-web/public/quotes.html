@@ -491,6 +491,14 @@
       color: #555;
     }
     
+    .quote-dynamic-table th small {
+      display: block;
+      font-weight: normal;
+      color: #6c757d;
+      font-size: 0.8em;
+      margin-top: 4px;
+    }
+    
     .quote-dynamic-table td input,
     .quote-dynamic-table td select {
       width: 100%;
@@ -1009,14 +1017,14 @@
               <thead>
                 <tr>
                   <th>时间段</th>
-                  <th>起步价 (元)</th>
-                  <th>里程 (公里)</th>
-                  <th>超时附加费</th>
-                  <th>天气附加费</th>
-                  <th>车型</th>
-                  <th>加急服务</th>
-                  <th>附加费 (元)</th>
-                  <th>总计</th>
+                  <th>起步价 (元)<br><small>标准: {{ standardPricing.basePrice }}</small></th>
+                  <th>里程 (公里)<br><small>标准: {{ standardPricing.distance }}</small></th>
+                  <th>超时附加费<br><small>标准: {{ standardPricing.overtimeCharge }}</small></th>
+                  <th>天气附加费<br><small>标准: {{ standardPricing.weather }}</small></th>
+                  <th>车型<br><small>标准: {{ standardPricing.vehicleType }}</small></th>
+                  <th>加急服务<br><small>标准: {{ standardPricing.isExpress }}</small></th>
+                  <th>附加费 (元)<br><small>标准: {{ standardPricing.additionalFee }}</small></th>
+                  <th>总计<br><small>标准: {{ standardPricing.total }}</small></th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -1284,6 +1292,18 @@
         const selectedTimeSlots = ref([])
         const showTable = ref(true)
         
+        // 平台标准定价
+        const standardPricing = reactive({
+          basePrice: 10.00,
+          distance: 2.00,
+          overtimeCharge: false,
+          weather: 'normal',
+          vehicleType: 'normal',
+          isExpress: false,
+          additionalFee: 0,
+          total: 0
+        })
+        
         // 初始化每个小时的报价
         timeSlots.value.forEach(timeSlot => {
           // 这里不再初始化所有时间段，而是按需添加
@@ -1386,6 +1406,9 @@
             selectedTimeSlots.value[index].breakdown = breakdown
           })
           
+          // 计算标准价格
+          calculateStandardPricing()
+          
           // 更新当前选择时间段的报价到主显示（如果有已选时间段）
           if (selectedTimeSlots.value.length > 0) {
             calculatedQuote.value = selectedTimeSlots.value[0].quote
@@ -1394,6 +1417,32 @@
             const breakdown = calculateQuoteForTimeSlotWithParams('08:00-08:15', calculator)
             calculatedQuote.value = breakdown.total
           }
+        }
+        
+        // 计算标准价格
+        const calculateStandardPricing = () => {
+          // 使用默认参数计算标准价格
+          const defaultParams = {
+            basePrice: pricingConfig.basePrice,
+            distance: 10, // 默认10公里
+            overtimeCharge: false,
+            weather: 'normal',
+            vehicleType: 'normal',
+            isExpress: false,
+            additionalFee: 0
+          }
+          
+          const breakdown = calculateQuoteForTimeSlotWithParams('08:00-08:15', defaultParams)
+          
+          // 更新标准定价数据
+          standardPricing.basePrice = pricingConfig.basePrice
+          standardPricing.distance = pricingConfig.mileageRate
+          standardPricing.overtimeCharge = false
+          standardPricing.weather = 'normal'
+          standardPricing.vehicleType = 'normal'
+          standardPricing.isExpress = false
+          standardPricing.additionalFee = 0
+          standardPricing.total = breakdown.total
         }
         
         // 添加时间段
@@ -1754,6 +1803,7 @@
             
             // 初始化报价计算
             calculateQuote()
+            calculateStandardPricing() // 确保标准价格也被计算
             recalculatePendingOrders()
 
             console.log('报价管理配置加载完成')
@@ -1784,11 +1834,13 @@
           selectedTimeSlot,
           selectedTimeSlots,
           showTable,
+          standardPricing,
           addTimeSlot,
           removeTimeSlot,
           timeSlotExists,
           toggleTable,
           updateSlotQuote,
+          calculateStandardPricing,
           getQuoteClass,
           pendingOrders,
           loading,
