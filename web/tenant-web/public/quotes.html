@@ -559,6 +559,16 @@
       font-size: 12px;
     }
     
+    .standard-reference {
+      font-size: 0.7em;
+      color: #6c757d;
+      margin-top: 4px;
+      padding: 2px 4px;
+      background-color: #f8f9fa;
+      border-radius: 3px;
+      display: inline-block;
+    }
+    
     .btn-success {
       background-color: #28a745;
       color: white;
@@ -1086,14 +1096,14 @@
               <thead>
                 <tr>
                   <th>时间段</th>
-                  <th>起步价 (元)<br><small>标准: {{ standardPricing.basePrice }}</small></th>
-                  <th>里程 (公里)<br><small>标准: {{ standardPricing.distance }}</small></th>
-                  <th>超时附加费<br><small>标准: {{ standardPricing.overtimeCharge }}</small></th>
-                  <th>天气附加费<br><small>标准: {{ standardPricing.weather }}</small></th>
-                  <th>车型<br><small>标准: {{ standardPricing.vehicleType }}</small></th>
-                  <th>加急服务<br><small>标准: {{ standardPricing.isExpress }}</small></th>
-                  <th>附加费 (元)<br><small>标准: {{ standardPricing.additionalFee }}</small></th>
-                  <th>总计<br><small>标准: {{ standardPricing.total }}</small></th>
+                  <th>起步价 (元)</th>
+                  <th>里程 (公里)</th>
+                  <th>超时附加费</th>
+                  <th>天气附加费</th>
+                  <th>车型</th>
+                  <th>加急服务</th>
+                  <th>附加费 (元)</th>
+                  <th>总计</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -1101,7 +1111,7 @@
                 <template v-for="slot in selectedTimeSlots" :key="slot.timeSlot">
                   <!-- 标准价格行 -->
                   <tr class="standard-price-row">
-                    <td colspan="11" class="standard-price-cell">
+                    <td colspan="10" class="standard-price-cell">
                       <div class="standard-price-header">平台标准价格 ({{ slot.timeSlot }})</div>
                       <div class="standard-price-values">
                         <span>起步价: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</span>
@@ -1126,6 +1136,7 @@
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
                       />
+                      <div class="standard-reference">标准: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</div>
                     </td>
                     <td>
                       <input 
@@ -1137,6 +1148,7 @@
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
                       />
+                      <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).distanceRate.toFixed(2) }}/km</div>
                     </td>
                     <td>
                       <select 
@@ -1147,6 +1159,7 @@
                         <option value="false">无附加费</option>
                         <option value="true">启用附加费</option>
                       </select>
+                      <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
                       <select 
@@ -1159,6 +1172,7 @@
                         <option value="snow">雪天</option>
                         <option value="storm">风暴</option>
                       </select>
+                      <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
                       <select 
@@ -1169,6 +1183,7 @@
                         <option value="normal">常温车</option>
                         <option value="refrigerated">冷藏车</option>
                       </select>
+                      <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
                       <select 
@@ -1179,6 +1194,7 @@
                         <option :value="false">否</option>
                         <option :value="true">是</option>
                       </select>
+                      <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
                       <input 
@@ -1190,8 +1206,12 @@
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
                       />
+                      <div class="standard-reference">标准: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).additionalFee.toFixed(2) }}</div>
                     </td>
-                    <td class="total-price">¥{{ slot.quote.toFixed(2) }}</td>
+                    <td class="total-price">
+                      ¥{{ slot.quote.toFixed(2) }}
+                      <div class="standard-reference">标准: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).total.toFixed(2) }}</div>
+                    </td>
                     <td>
                       <div class="action-buttons">
                         <button 
