@@ -538,6 +538,45 @@
       font-size: 0.85em;
     }
     
+    .active-price {
+      background-color: #d4edda !important;
+    }
+    
+    .active-input {
+      background-color: #e2e3e5 !important;
+      opacity: 0.7;
+    }
+    
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .action-buttons .btn {
+      margin: 2px 0;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover:not(:disabled) {
+      background-color: #218838;
+    }
+    
+    .btn-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .btn-warning:hover:not(:disabled) {
+      background-color: #e0a800;
+    }
+    
     .total-price {
       font-weight: bold;
       color: #007bff;
@@ -1062,7 +1101,7 @@
                 <template v-for="slot in selectedTimeSlots" :key="slot.timeSlot">
                   <!-- 标准价格行 -->
                   <tr class="standard-price-row">
-                    <td colspan="10" class="standard-price-cell">
+                    <td colspan="11" class="standard-price-cell">
                       <div class="standard-price-header">平台标准价格 ({{ slot.timeSlot }})</div>
                       <div class="standard-price-values">
                         <span>起步价: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</span>
@@ -1075,7 +1114,7 @@
                   </tr>
                   
                   <!-- 承运商自定义价格行 -->
-                  <tr>
+                  <tr :class="{ 'active-price': slot.isActive }">
                     <td>{{ slot.timeSlot }}</td>
                     <td>
                       <input 
@@ -1084,7 +1123,8 @@
                         @input="updateSlotQuote(slot)"
                         min="0" 
                         step="0.01"
-                        :disabled="loading"
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }"
                       />
                     </td>
                     <td>
@@ -1094,14 +1134,16 @@
                         @input="updateSlotQuote(slot)"
                         min="0" 
                         step="0.1"
-                        :disabled="loading"
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }"
                       />
                     </td>
                     <td>
                       <select 
                         v-model="slot.params.overtimeCharge" 
                         @change="updateSlotQuote(slot)"
-                        :disabled="loading">
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }">
                         <option value="false">无附加费</option>
                         <option value="true">启用附加费</option>
                       </select>
@@ -1110,7 +1152,8 @@
                       <select 
                         v-model="slot.params.weather" 
                         @change="updateSlotQuote(slot)"
-                        :disabled="loading">
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }">
                         <option value="normal">正常</option>
                         <option value="rain">雨天</option>
                         <option value="snow">雪天</option>
@@ -1121,7 +1164,8 @@
                       <select 
                         v-model="slot.params.vehicleType" 
                         @change="updateSlotQuote(slot)"
-                        :disabled="loading">
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }">
                         <option value="normal">常温车</option>
                         <option value="refrigerated">冷藏车</option>
                       </select>
@@ -1130,7 +1174,8 @@
                       <select 
                         v-model="slot.params.isExpress" 
                         @change="updateSlotQuote(slot)"
-                        :disabled="loading">
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }">
                         <option :value="false">否</option>
                         <option :value="true">是</option>
                       </select>
@@ -1142,12 +1187,37 @@
                         @input="updateSlotQuote(slot)"
                         min="0" 
                         step="0.01"
-                        :disabled="loading"
+                        :disabled="loading || slot.isActive"
+                        :class="{ 'active-input': slot.isActive }"
                       />
                     </td>
                     <td class="total-price">¥{{ slot.quote.toFixed(2) }}</td>
                     <td>
-                      <button @click="removeTimeSlot(slot.timeSlot)" class="btn btn-danger btn-sm">删除</button>
+                      <div class="action-buttons">
+                        <button 
+                          v-if="!slot.isActive" 
+                          @click="activateSlot(slot)" 
+                          class="btn btn-success btn-sm"
+                          :disabled="loading"
+                        >
+                          生效
+                        </button>
+                        <button 
+                          v-if="slot.isActive" 
+                          @click="deactivateSlot(slot)" 
+                          class="btn btn-warning btn-sm"
+                          :disabled="loading"
+                        >
+                          修改
+                        </button>
+                        <button 
+                          @click="removeTimeSlot(slot.timeSlot)" 
+                          class="btn btn-danger btn-sm"
+                          :disabled="loading || slot.isActive"
+                        >
+                          删除
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -1515,7 +1585,9 @@
               additionalFee: calculator.additionalFee
             },
             quote: 0,
-            breakdown: {}
+            breakdown: {},
+            isActive: false, // 默认不激活
+            originalParams: {} // 用于存储原始参数
           }
           
           // 计算该时间段的报价
@@ -1732,6 +1804,50 @@
           }
         }
         
+        // 激活时间段（生效）
+        const activateSlot = async (slot) => {
+          // 检查是否有正在执行的订单
+          const hasActiveOrders = await checkActiveOrdersForTimeSlot(slot.timeSlot);
+          
+          if (hasActiveOrders) {
+            const confirmChange = confirm(`该时间段有正在执行的订单，确认后将影响新订单使用此价格，是否继续？`);
+            if (!confirmChange) return;
+          }
+          
+          // 激活时间段
+          slot.isActive = true;
+          slot.originalParams = { ...slot.params }; // 保存原始参数
+          
+          // 更新UI状态
+          console.log(`时间段 ${slot.timeSlot} 已生效`);
+          alert(`时间段 ${slot.timeSlot} 已生效，价格已锁定`);
+        }
+        
+        // 取消激活时间段（修改）
+        const deactivateSlot = async (slot) => {
+          // 检查是否有正在执行的订单
+          const hasActiveOrders = await checkActiveOrdersForTimeSlot(slot.timeSlot);
+          
+          if (hasActiveOrders) {
+            const confirmChange = confirm(`该时间段有正在执行的订单，修改后仅对新订单生效，是否继续？`);
+            if (!confirmChange) return;
+          }
+          
+          // 取消激活时间段
+          slot.isActive = false;
+          
+          // 更新UI状态
+          console.log(`时间段 ${slot.timeSlot} 已进入修改状态`);
+          alert(`时间段 ${slot.timeSlot} 已进入修改状态`);
+        }
+        
+        // 检查时间段是否有正在执行的订单
+        const checkActiveOrdersForTimeSlot = async (timeSlot) => {
+          // 这里模拟检查逻辑，实际应用中应调用后端API
+          // 模拟返回false表示没有活跃订单
+          return false;
+        }
+        
         // 切叠/展开表格
         const toggleTable = () => {
           showTable.value = !showTable.value
@@ -1931,6 +2047,9 @@
           updateSlotQuote,
           calculateStandardPricing,
           getStandardPriceForTimeSlot,
+          activateSlot,
+          deactivateSlot,
+          checkActiveOrdersForTimeSlot,
           getQuoteClass,
           pendingOrders,
           loading,
