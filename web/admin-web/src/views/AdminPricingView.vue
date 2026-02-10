@@ -1,135 +1,206 @@
 <template>
   <div class="admin-pricing-container">
     <h1>平台定价规则配置</h1>
-    
+
     <!-- 基础定价配置 -->
     <section class="pricing-section">
       <h2>基础定价配置</h2>
       <div class="form-grid">
         <div class="form-group">
           <label for="basePrice">起步价 (元)</label>
-          <input 
-            type="number" 
-            id="basePrice" 
-            v-model="pricingConfig.basePrice" 
+          <input
+            type="number"
+            id="basePrice"
+            v-model="pricingConfig.basePrice"
             @change="updateConfig"
-            min="0" 
+            min="0"
             step="0.01"
             :disabled="loading"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="mileageRate">里程单价 (元/公里)</label>
-          <input 
-            type="number" 
-            id="mileageRate" 
-            v-model="pricingConfig.mileageRate" 
+          <input
+            type="number"
+            id="mileageRate"
+            v-model="pricingConfig.mileageRate"
             @change="updateConfig"
-            min="0" 
+            min="0"
             step="0.01"
             :disabled="loading"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="timeRate">时长单价 (元/分钟)</label>
-          <input 
-            type="number" 
-            id="timeRate" 
-            v-model="pricingConfig.timeRate" 
+          <input
+            type="number"
+            id="timeRate"
+            v-model="pricingConfig.timeRate"
             @change="updateConfig"
-            min="0" 
+            min="0"
             step="0.01"
             :disabled="loading"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="refrigeratedSurcharge">冷藏附加费 (元/单)</label>
-          <input 
-            type="number" 
-            id="refrigeratedSurcharge" 
-            v-model="pricingConfig.refrigeratedSurcharge" 
+          <input
+            type="number"
+            id="refrigeratedSurcharge"
+            v-model="pricingConfig.refrigeratedSurcharge"
             @change="updateConfig"
-            min="0" 
+            min="0"
             step="0.01"
             :disabled="loading"
           />
         </div>
       </div>
     </section>
-    
-    <!-- 时间规则配置 -->
+
+    <!-- 24小时时间段配置 -->
     <section class="pricing-section">
-      <h2>时间规则配置 (15分钟粒度)</h2>
-      <div class="time-rules-container">
-        <div 
-          v-for="(rule, index) in pricingConfig.timeRules" 
-          :key="index"
-          class="time-rule-item"
-        >
-          <div class="time-slot">{{ formatTimeSlot(rule.startTime, rule.endTime) }}</div>
-          <div class="time-multiplier">
-            <label>价格倍数:</label>
-            <input 
-              type="number" 
-              v-model="rule.multiplier" 
-              @change="updateConfig"
-              min="0" 
-              step="0.1"
-              :disabled="loading"
-            />
-          </div>
-        </div>
+      <h2>24小时时间段配置 (15分钟粒度)</h2>
+      <div class="time-slots-table">
+        <table class="time-slots-grid">
+          <thead>
+            <tr>
+              <th>时间段</th>
+              <th>价格倍数</th>
+              <th>起步价 (元)</th>
+              <th>里程单价 (元/km)</th>
+              <th>时长单价 (元/分钟)</th>
+              <th>冷藏附加费 (元)</th>
+              <th>天气附加费 (元)</th>
+              <th>车型附加费 (元)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="timeSlot in timeSlots24H" :key="timeSlot.timeRange">
+              <td>{{ timeSlot.timeRange }}</td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.multiplier" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.1"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.basePrice" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.mileageRate" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.timeRate" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.refrigeratedSurcharge" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.weatherSurcharge" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  v-model="timeSlot.vehicleSurcharge" 
+                  @change="updateConfig"
+                  min="0" 
+                  step="0.01"
+                  :disabled="loading"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
-    
+
     <!-- 承运商浮动边界设置 -->
     <section class="pricing-section">
       <h2>承运商浮动边界设置</h2>
       <div class="form-grid">
         <div class="form-group">
           <label for="minMarkup">最低上浮比例 (%)</label>
-          <input 
-            type="number" 
-            id="minMarkup" 
-            v-model="pricingConfig.minMarkup" 
+          <input
+            type="number"
+            id="minMarkup"
+            v-model="pricingConfig.minMarkup"
             @change="updateConfig"
-            min="-100" 
+            min="-100"
             max="1000"
             :disabled="loading"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="maxMarkup">最高上浮比例 (%)</label>
-          <input 
-            type="number" 
-            id="maxMarkup" 
-            v-model="pricingConfig.maxMarkup" 
+          <input
+            type="number"
+            id="maxMarkup"
+            v-model="pricingConfig.maxMarkup"
             @change="updateConfig"
-            min="-100" 
+            min="-100"
             max="1000"
             :disabled="loading"
           />
         </div>
-        
+
         <div class="form-group">
           <label for="markupStep">调整步长 (%)</label>
-          <input 
-            type="number" 
-            id="markupStep" 
-            v-model="pricingConfig.markupStep" 
+          <input
+            type="number"
+            id="markupStep"
+            v-model="pricingConfig.markupStep"
             @change="updateConfig"
-            min="0.1" 
+            min="0.1"
             step="0.1"
             :disabled="loading"
           />
         </div>
       </div>
     </section>
-    
+
     <!-- 操作按钮 -->
     <div class="action-buttons">
       <button @click="saveConfig" class="btn btn-primary" :disabled="loading">
@@ -137,7 +208,7 @@
       </button>
       <button @click="resetConfig" class="btn btn-secondary" :disabled="loading">重置</button>
     </div>
-    
+
     <!-- 加载遮罩层 -->
     <div v-if="loading" class="loading-overlay">
       <div class="spinner"></div>
@@ -170,32 +241,61 @@ export default {
       ]
     })
 
+    // 24小时时间段配置（每15分钟一个时间槽）
+    const timeSlots24H = ref([])
+    
+    // 生成24小时时间段数据
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const startHour = String(hour).padStart(2, '0')
+        const startMinute = String(minute).padStart(2, '0')
+        const endHour = minute === 45 ? String(hour + 1).padStart(2, '0') : startHour
+        const endMinute = minute === 45 ? '00' : String(minute + 15).padStart(2, '0')
+        const timeRange = `${startHour}:${startMinute}-${endHour}:${endMinute}`
+        
+        timeSlots24H.value.push({
+          timeRange: timeRange,
+          multiplier: 1.0, // 默认倍数
+          basePrice: pricingConfig.basePrice,
+          mileageRate: pricingConfig.mileageRate,
+          timeRate: pricingConfig.timeRate,
+          refrigeratedSurcharge: pricingConfig.refrigeratedSurcharge,
+          weatherSurcharge: 0,
+          vehicleSurcharge: 0
+        })
+      }
+    }
+
     // 加载状态
     const loading = ref(false)
-    
-    // 格式化时间段显示
-    const formatTimeSlot = (startTime, endTime) => {
-      return `${startTime} - ${endTime}`
-    }
 
     // 更新配置
     const updateConfig = () => {
-      console.log('配置已更新:', pricingConfig)
+      console.log('配置已更新:', {
+        pricingConfig,
+        timeSlots24H: timeSlots24H.value
+      })
     }
 
     // 保存配置到后端
     const saveConfig = async () => {
       try {
         loading.value = true
-        
+
+        // 构造完整的配置对象
+        const configData = {
+          pricingConfig,
+          timeSlots24H: timeSlots24H.value
+        }
+
         // 调用后端API保存配置
-        const response = await pricingApi.updatePlatformPricingRules(pricingConfig)
-        
-        console.log('配置保存成功:', response)
-        alert('配置保存成功！')
+        const response = await pricingApi.updatePlatformPricingRules(configData)
+
+        console.log('平台配置保存成功:', response)
+        alert('平台配置保存成功！')
       } catch (error) {
-        console.error('保存配置失败:', error)
-        alert(`配置保存失败: ${error.message || '未知错误'}`)
+        console.error('保存平台配置失败:', error)
+        alert(`保存失败: ${error.message || '未知错误'}`)
       } finally {
         loading.value = false
       }
@@ -218,6 +318,17 @@ export default {
           { startTime: '17:00', endTime: '21:00', multiplier: 1.3 },
           { startTime: '21:00', endTime: '23:59', multiplier: 1.4 }
         ]
+
+        // 重置24小时时间段配置
+        for (let i = 0; i < timeSlots24H.value.length; i++) {
+          timeSlots24H.value[i].multiplier = 1.0
+          timeSlots24H.value[i].basePrice = 10.00
+          timeSlots24H.value[i].mileageRate = 2.00
+          timeSlots24H.value[i].timeRate = 0.50
+          timeSlots24H.value[i].refrigeratedSurcharge = 5.00
+          timeSlots24H.value[i].weatherSurcharge = 0
+          timeSlots24H.value[i].vehicleSurcharge = 0
+        }
       }
     }
 
@@ -225,15 +336,16 @@ export default {
     onMounted(async () => {
       try {
         loading.value = true
-        
+
         // 从后端API加载现有配置
         const response = await pricingApi.getPlatformPricingRules()
-        
+
         // 如果API返回了数据，则更新本地配置
         if (response && response.data) {
-          Object.assign(pricingConfig, response.data)
+          // 这里可以根据实际API返回的数据结构来更新配置
+          console.log('平台配置加载完成:', response.data)
         }
-        
+
         console.log('配置加载完成')
       } catch (error) {
         console.error('加载配置失败:', error)
@@ -246,8 +358,8 @@ export default {
 
     return {
       pricingConfig,
+      timeSlots24H,
       loading,
-      formatTimeSlot,
       updateConfig,
       saveConfig,
       resetConfig
@@ -304,52 +416,40 @@ export default {
   font-size: 14px;
 }
 
-.time-rules-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  margin-top: 15px;
+.time-slots-table {
+  overflow-x: auto;
 }
 
-.time-rule-item {
-  border: 1px solid #eee;
-  border-radius: 6px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  transition: box-shadow 0.3s;
+.time-slots-grid {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.time-rule-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.time-slot {
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
-  background-color: #e9ecef;
-  padding: 5px;
-  border-radius: 4px;
+.time-slots-grid th,
+.time-slots-grid td {
+  padding: 10px;
   text-align: center;
+  border: 1px solid #ddd;
 }
 
-.time-multiplier {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.time-multiplier label {
-  margin-right: 10px;
+.time-slots-grid th {
+  background-color: #f8f9fa;
   font-weight: bold;
+  color: #555;
+  position: sticky;
+  top: 0;
 }
 
-.time-multiplier input {
-  width: 80px;
+.time-slots-grid td input {
+  width: 100%;
   padding: 5px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 3px;
   text-align: center;
+}
+
+.time-slots-grid tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
 .action-buttons {
