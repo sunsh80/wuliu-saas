@@ -390,6 +390,77 @@
       color: #666;
       font-size: 14px;
     }
+    
+    .calculator-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .control-group label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    
+    .control-group input,
+    .control-group select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .hourly-quote-table {
+      overflow-x: auto;
+    }
+    
+    .quote-hourly-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    .quote-hourly-table th,
+    .quote-hourly-table td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    
+    .quote-hourly-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+      color: #555;
+      position: sticky;
+      top: 0;
+    }
+    
+    .quote-hourly-table td {
+      min-width: 80px;
+      white-space: nowrap;
+    }
+    
+    .quote-low {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .quote-medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .quote-high {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
 
     .pending-orders-section {
       background: #fff;
@@ -848,80 +919,96 @@
       <!-- 报价计算器 -->
       <section class="quote-calculator-section">
         <h2>报价计算器</h2>
-        <div class="calculator-grid">
-          <div class="calculator-inputs">
-            <div class="form-group">
-              <label>距离 (公里)</label>
-              <input 
-                type="number" 
-                v-model="calculator.distance" 
-                @input="calculateQuote"
-                min="0" 
-                step="0.1"
-                :disabled="loading"
-              />
-            </div>
-            
-            <div class="form-group">
-              <label>时长 (分钟)</label>
-              <input 
-                type="number" 
-                v-model="calculator.duration" 
-                @input="calculateQuote"
-                min="0" 
-                step="1"
-                :disabled="loading"
-              />
-            </div>
-            
-            <div class="form-group">
-              <label>是否冷藏</label>
-              <select v-model="calculator.isRefrigerated" @change="calculateQuote" :disabled="loading">
-                <option :value="false">否</option>
-                <option :value="true">是</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label>天气状况</label>
-              <select v-model="calculator.weather" @change="calculateQuote" :disabled="loading">
-                <option value="normal">正常</option>
-                <option value="rain">雨天</option>
-                <option value="snow">雪天</option>
-                <option value="storm">风暴</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label>时间槽</label>
-              <select v-model="calculator.timeSlot" @change="calculateQuote" :disabled="loading">
-                <option value="peak">高峰</option>
-                <option value="normal">平峰</option>
-                <option value="offPeak">低谷</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label>是否加急</label>
-              <select v-model="calculator.isExpress" @change="calculateQuote" :disabled="loading">
-                <option :value="false">否</option>
-                <option :value="true">是</option>
-              </select>
-            </div>
+        <div class="calculator-controls">
+          <div class="control-group">
+            <label>起步价 (元)</label>
+            <input 
+              type="number" 
+              v-model="calculator.basePrice" 
+              @input="calculateQuote"
+              min="0" 
+              step="0.01"
+              :disabled="loading"
+            />
           </div>
           
-          <div class="calculator-result">
-            <h3>预估报价: ¥{{ calculatedQuote.toFixed(2) }}</h3>
-            <div class="quote-breakdown">
-              <p>基础费用: ¥{{ quoteBreakdown.baseFee.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.distanceFee > 0">距离费用: ¥{{ quoteBreakdown.distanceFee.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.durationFee > 0">时长费用: ¥{{ quoteBreakdown.durationFee.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.refrigeratedSurcharge > 0">冷藏附加费: ¥{{ quoteBreakdown.refrigeratedSurcharge.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.weatherSurcharge > 0">天气附加费: ¥{{ quoteBreakdown.weatherSurcharge.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.expressSurcharge > 0">加急附加费: ¥{{ quoteBreakdown.expressSurcharge.toFixed(2) }}</p>
-              <p v-if="quoteBreakdown.timeMultiplier > 1">时间倍数: ×{{ quoteBreakdown.timeMultiplier.toFixed(2) }}</p>
-            </div>
+          <div class="control-group">
+            <label>里程 (公里)</label>
+            <input 
+              type="number" 
+              v-model="calculator.distance" 
+              @input="calculateQuote"
+              min="0" 
+              step="0.1"
+              :disabled="loading"
+            />
           </div>
+          
+          <div class="control-group">
+            <label>超时附加费 (15分钟后)</label>
+            <select v-model="calculator.overtimeCharge" @change="calculateQuote" :disabled="loading">
+              <option value="false">无附加费</option>
+              <option value="true">启用附加费</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label>天气附加费</label>
+            <select v-model="calculator.weather" @change="calculateQuote" :disabled="loading">
+              <option value="normal">正常</option>
+              <option value="rain">雨天</option>
+              <option value="snow">雪天</option>
+              <option value="storm">风暴</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label>车型</label>
+            <select v-model="calculator.vehicleType" @change="calculateQuote" :disabled="loading">
+              <option value="normal">常温车</option>
+              <option value="refrigerated">冷藏车</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label>加急服务</label>
+            <select v-model="calculator.isExpress" @change="calculateQuote" :disabled="loading">
+              <option :value="false">否</option>
+              <option :value="true">是</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label>附加费 (元)</label>
+            <input 
+              type="number" 
+              v-model="calculator.additionalFee" 
+              @input="calculateQuote"
+              min="0" 
+              step="0.01"
+              :disabled="loading"
+            />
+          </div>
+        </div>
+        
+        <!-- 24小时报价表格 -->
+        <div class="hourly-quote-table">
+          <table class="quote-hourly-table">
+            <thead>
+              <tr>
+                <th>时间段</th>
+                <th v-for="hour in timeSlots" :key="hour">{{ hour }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>报价 (元)</td>
+                <td v-for="slot in hourlyQuotes" :key="slot.timeSlot" :class="getQuoteClass(slot.quote)">
+                  ¥{{ slot.quote.toFixed(2) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
       
@@ -1081,12 +1168,36 @@
         
         // 计算器
         const calculator = reactive({
+          basePrice: 10.00,
           distance: 10,
-          duration: 45,
-          isRefrigerated: false,
+          overtimeCharge: false,
           weather: 'normal',
-          timeSlot: 'normal',
-          isExpress: false
+          vehicleType: 'normal',
+          isExpress: false,
+          additionalFee: 0
+        })
+        
+        // 时间槽数组（每15分钟一个）
+        const timeSlots = ref([])
+        for (let hour = 0; hour < 24; hour++) {
+          for (let minute = 0; minute < 60; minute += 15) {
+            const startHour = String(hour).padStart(2, '0')
+            const startMinute = String(minute).padStart(2, '0')
+            const endHour = minute === 45 ? String(hour + 1).padStart(2, '0') : startHour
+            const endMinute = minute === 45 ? '00' : String(minute + 15).padStart(2, '0')
+            timeSlots.value.push(`${startHour}:${startMinute}-${endHour}:${endMinute}`)
+          }
+        }
+        
+        // 每个时间段的报价
+        const hourlyQuotes = ref([])
+        
+        // 初始化每个小时的报价
+        timeSlots.value.forEach(timeSlot => {
+          hourlyQuotes.value.push({
+            timeSlot: timeSlot,
+            quote: 0
+          })
         })
         
         // 计算结果
@@ -1095,9 +1206,11 @@
           baseFee: 0,
           distanceFee: 0,
           durationFee: 0,
-          refrigeratedSurcharge: 0,
+          overtimeSurcharge: 0,
+          vehicleSurcharge: 0,
           weatherSurcharge: 0,
           expressSurcharge: 0,
+          additionalFee: 0,
           timeMultiplier: 1
         })
         
@@ -1177,49 +1290,79 @@
         
         // 计算报价
         const calculateQuote = () => {
-          // 这里实现报价计算逻辑
-          let baseFee = pricingConfig.basePrice
-          let distanceFee = calculator.distance * pricingConfig.mileageRate
-          let durationFee = calculator.duration * pricingConfig.timeRate
+          // 计算所有时间段的报价
+          hourlyQuotes.value.forEach((slot, index) => {
+            let baseFee = calculator.basePrice || pricingConfig.basePrice
+            let distanceFee = calculator.distance * pricingConfig.mileageRate
+            
+            // 时长费用（使用距离估算时长，例如每公里5分钟）
+            let duration = calculator.distance * 5 // 估算时长（分钟）
+            let durationFee = duration * pricingConfig.timeRate
+            
+            // 超时附加费
+            let overtimeSurcharge = 0
+            if (calculator.overtimeCharge === 'true' || calculator.overtimeCharge === true) {
+              // 偶定超过15分钟后每分钟加收0.5元
+              let extraMinutes = Math.max(0, duration - 15)
+              overtimeSurcharge = extraMinutes * 0.5
+            }
+            
+            // 车型附加费（冷藏车）
+            let vehicleSurcharge = 0
+            if (calculator.vehicleType === 'refrigerated') {
+              vehicleSurcharge = pricingConfig.refrigeratedSurcharge
+            }
+            
+            // 天气附加费
+            let weatherSurcharge = 0
+            if (calculator.weather !== 'normal' && weatherStrategies[calculator.weather]?.enabled) {
+              weatherSurcharge = weatherStrategies[calculator.weather].surcharge
+            }
+            
+            // 加急附加费
+            let expressSurcharge = 0
+            if (calculator.isExpress && additionalServices.expressEnabled) {
+              expressSurcharge = baseFee * (additionalServices.expressMultiplier - 1)
+            }
+            
+            // 时间段影响（根据时间段设置不同的倍数）
+            let timeMultiplier = 1
+            const timeSlot = slot.timeSlot
+            const startHour = parseInt(timeSlot.split(':')[0])
+            
+            // 根据时间段设置不同的倍数
+            if ((startHour >= 7 && startHour < 9) || (startHour >= 17 && startHour < 19)) {
+              // 高峰时段
+              timeMultiplier = 1 + (timePricing.peakMultiplier / 100)
+            } else if (startHour >= 9 && startHour < 17) {
+              // 平峰时段
+              timeMultiplier = 1 + (timePricing.normalMultiplier / 100)
+            } else {
+              // 低谷时段
+              timeMultiplier = 1 + (timePricing.offPeakMultiplier / 100)
+            }
+            
+            // 附加费
+            let additionalFee = calculator.additionalFee || 0
+            
+            // 总计
+            let total = (baseFee + distanceFee + durationFee + vehicleSurcharge + weatherSurcharge + expressSurcharge + overtimeSurcharge + additionalFee) * timeMultiplier
+            
+            // 更新该时间段的报价
+            hourlyQuotes.value[index].quote = total
+          })
           
-          // 冷藏附加费
-          let refrigeratedSurcharge = calculator.isRefrigerated ? pricingConfig.refrigeratedSurcharge : 0
-          
-          // 天气附加费
-          let weatherSurcharge = 0
-          if (calculator.weather !== 'normal' && weatherStrategies[calculator.weather]?.enabled) {
-            weatherSurcharge = weatherStrategies[calculator.weather].surcharge
+          // 更新当前选择时间段的报价到主显示
+          if (hourlyQuotes.value.length > 0) {
+            calculatedQuote.value = hourlyQuotes.value[0].quote
           }
-          
-          // 加急附加费
-          let expressSurcharge = 0
-          if (calculator.isExpress && additionalServices.expressEnabled) {
-            expressSurcharge = baseFee * (additionalServices.expressMultiplier - 1)
-          }
-          
-          // 时间倍数
-          let timeMultiplier = 1
-          if (calculator.timeSlot === 'peak') {
-            timeMultiplier = 1 + (timePricing.peakMultiplier / 100)
-          } else if (calculator.timeSlot === 'normal') {
-            timeMultiplier = 1 + (timePricing.normalMultiplier / 100)
-          } else if (calculator.timeSlot === 'offPeak') {
-            timeMultiplier = 1 + (timePricing.offPeakMultiplier / 100)
-          }
-          
-          // 总计
-          let total = (baseFee + distanceFee + durationFee + refrigeratedSurcharge + weatherSurcharge + expressSurcharge) * timeMultiplier
-          
-          calculatedQuote.value = total
-          
-          // 更新费用明细
-          quoteBreakdown.baseFee = baseFee
-          quoteBreakdown.distanceFee = distanceFee
-          quoteBreakdown.durationFee = durationFee
-          quoteBreakdown.refrigeratedSurcharge = refrigeratedSurcharge
-          quoteBreakdown.weatherSurcharge = weatherSurcharge
-          quoteBreakdown.expressSurcharge = expressSurcharge
-          quoteBreakdown.timeMultiplier = timeMultiplier
+        }
+        
+        // 获取报价等级的CSS类
+        const getQuoteClass = (quote) => {
+          if (quote < 50) return 'quote-low'
+          if (quote < 100) return 'quote-medium'
+          return 'quote-high'
         }
         
         // 重新计算待报价订单
@@ -1371,7 +1514,7 @@
             // 初始化报价计算
             calculateQuote()
             recalculatePendingOrders()
-            
+
             console.log('报价管理配置加载完成')
           } catch (error) {
             console.error('加载报价管理配置失败:', error)
@@ -1396,6 +1539,9 @@
           calculator,
           calculatedQuote,
           quoteBreakdown,
+          timeSlots,
+          hourlyQuotes,
+          getQuoteClass,
           pendingOrders,
           loading,
           updateConfig,
