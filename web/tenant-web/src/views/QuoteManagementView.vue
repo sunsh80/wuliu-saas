@@ -615,22 +615,22 @@ export default {
       let baseFee = pricingConfig.basePrice
       let distanceFee = calculator.distance * pricingConfig.mileageRate
       let durationFee = calculator.duration * pricingConfig.timeRate
-      
+
       // 冷藏附加费
       let refrigeratedSurcharge = calculator.isRefrigerated ? pricingConfig.refrigeratedSurcharge : 0
-      
+
       // 天气附加费
       let weatherSurcharge = 0
       if (calculator.weather !== 'normal' && weatherStrategies[calculator.weather]?.enabled) {
         weatherSurcharge = weatherStrategies[calculator.weather].surcharge
       }
-      
+
       // 加急附加费
       let expressSurcharge = 0
       if (calculator.isExpress && additionalServices.expressEnabled) {
         expressSurcharge = baseFee * (additionalServices.expressMultiplier - 1)
       }
-      
+
       // 时间倍数
       let timeMultiplier = 1
       if (calculator.timeSlot === 'peak') {
@@ -640,12 +640,12 @@ export default {
       } else if (calculator.timeSlot === 'offPeak') {
         timeMultiplier = 1 + (timePricing.offPeakMultiplier / 100)
       }
-      
+
       // 总计
       let total = (baseFee + distanceFee + durationFee + refrigeratedSurcharge + weatherSurcharge + expressSurcharge) * timeMultiplier
-      
+
       calculatedQuote.value = total
-      
+
       // 更新费用明细
       quoteBreakdown.baseFee = baseFee
       quoteBreakdown.distanceFee = distanceFee
@@ -654,24 +654,53 @@ export default {
       quoteBreakdown.weatherSurcharge = weatherSurcharge
       quoteBreakdown.expressSurcharge = expressSurcharge
       quoteBreakdown.timeMultiplier = timeMultiplier
+      
+      // 重新计算所有待报价订单，因为计算器参数变化会影响所有订单的报价
+      recalculatePendingOrders()
     }
     
     // 重新计算待报价订单
     const recalculatePendingOrders = () => {
+      // 获取当前用户选择的时间段
+      const currentTimeSlot = calculator.timeSlot;
+      
       pendingOrders.value.forEach(order => {
         // 使用订单的具体参数来计算报价
         // 这里简化处理，实际应用中需要根据每个订单的具体信息来计算
-        calculator.distance = order.distance
-        calculator.duration = Math.round(order.distance * 0.1) // 简化的时长估算
-        calculator.isRefrigerated = order.cargoDescription.includes('食品') || order.cargoDescription.includes('药品')
-        calculator.weather = 'normal'
-        calculator.timeSlot = 'normal'
-        calculator.isExpress = false
-        
-        // 重新计算报价
-        calculateQuote()
-        order.calculatedQuote = calculatedQuote.value
-      })
+        let baseFee = pricingConfig.basePrice;
+        let distanceFee = order.distance * pricingConfig.mileageRate;
+        let durationFee = Math.round(order.distance * 0.1) * pricingConfig.timeRate; // 简化的时长估算
+
+        // 冷藏附加费
+        let refrigeratedSurcharge = (order.cargoDescription.includes('食品') || order.cargoDescription.includes('药品')) ? pricingConfig.refrigeratedSurcharge : 0;
+
+        // 天气附加费 - 对于订单列表，暂时使用正常天气
+        let weatherSurcharge = 0;
+        if (calculator.weather !== 'normal' && weatherStrategies[calculator.weather]?.enabled) {
+          weatherSurcharge = weatherStrategies[calculator.weather].surcharge;
+        }
+
+        // 加急附加费 - 对于订单列表，暂时不考虑加急
+        let expressSurcharge = 0;
+        if (calculator.isExpress && additionalServices.expressEnabled) {
+          expressSurcharge = baseFee * (additionalServices.expressMultiplier - 1);
+        }
+
+        // 时间倍数 - 使用用户在计算器中选择的时间段
+        let timeMultiplier = 1;
+        if (currentTimeSlot === 'peak') {
+          timeMultiplier = 1 + (timePricing.peakMultiplier / 100);
+        } else if (currentTimeSlot === 'normal') {
+          timeMultiplier = 1 + (timePricing.normalMultiplier / 100);
+        } else if (currentTimeSlot === 'offPeak') {
+          timeMultiplier = 1 + (timePricing.offPeakMultiplier / 100);
+        }
+
+        // 总计
+        let total = (baseFee + distanceFee + durationFee + refrigeratedSurcharge + weatherSurcharge + expressSurcharge) * timeMultiplier;
+
+        order.calculatedQuote = total;
+      });
     }
     
     // 应用智能建议

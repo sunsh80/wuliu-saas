@@ -569,23 +569,6 @@
       display: inline-block;
     }
     
-    .standard-value {
-      background-color: #f0f8ff;
-      font-weight: 500;
-      color: #0066cc;
-      text-align: center;
-    }
-    
-    .quote-dynamic-table th[rowspan], .quote-dynamic-table td[rowspan] {
-      vertical-align: middle;
-      text-align: center;
-    }
-    
-    .quote-dynamic-table input, .quote-dynamic-table select {
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
     .btn-success {
       background-color: #28a745;
       color: white;
@@ -1128,27 +1111,27 @@
                 <template v-for="slot in selectedTimeSlots" :key="slot.timeSlot">
                   <!-- 标准价格行 -->
                   <tr class="standard-price-row">
-                    <td>{{ slot.timeSlot }}</td>
-                    <td class="standard-value">¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</td>
-                    <td class="standard-value">{{ getStandardPriceForTimeSlot(slot.timeSlot).distanceRate.toFixed(2) }}/km</td>
-                    <td class="standard-value">{{ getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge.toFixed(2) : '无' }}</td>
-                    <td class="standard-value">{{ getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge.toFixed(2) : '无' }}</td>
-                    <td class="standard-value">{{ getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge.toFixed(2) : '无' }}</td>
-                    <td class="standard-value">{{ getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge.toFixed(2) : '无' }}</td>
-                    <td class="standard-value">¥{{ getStandardPriceForTimeSlot(slot.timeSlot).additionalFee.toFixed(2) }}</td>
-                    <td class="standard-value">¥{{ getStandardPriceForTimeSlot(slot.timeSlot).total.toFixed(2) }}</td>
-                    <td></td>
+                    <td colspan="10" class="standard-price-cell">
+                      <div class="standard-price-header">平台标准价格 ({{ slot.timeSlot }})</div>
+                      <div class="standard-price-values">
+                        <span>起步价: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</span>
+                        <span>里程费: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).distanceRate.toFixed(2) }}/km</span>
+                        <span>天气附加: {{ getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge.toFixed(2) : '无' }}</span>
+                        <span>车型附加: {{ getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge.toFixed(2) : '无' }}</span>
+                        <span>总计: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).total.toFixed(2) }}</span>
+                      </div>
+                    </td>
                   </tr>
-
+                  
                   <!-- 承运商自定义价格行 -->
                   <tr :class="{ 'active-price': slot.isActive }">
                     <td>{{ slot.timeSlot }}</td>
                     <td>
-                      <input
-                        type="number"
-                        v-model.number="slot.params.basePrice"
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.basePrice" 
                         @input="updateSlotQuote(slot)"
-                        min="0"
+                        min="0" 
                         step="0.01"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
@@ -1156,11 +1139,11 @@
                       <div class="standard-reference">标准: ¥{{ getStandardPriceForTimeSlot(slot.timeSlot).basePrice.toFixed(2) }}</div>
                     </td>
                     <td>
-                      <input
-                        type="number"
-                        v-model.number="slot.params.distance"
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.distance" 
                         @input="updateSlotQuote(slot)"
-                        min="0"
+                        min="0" 
                         step="0.1"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
@@ -1168,8 +1151,8 @@
                       <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).distanceRate.toFixed(2) }}/km</div>
                     </td>
                     <td>
-                      <select
-                        v-model="slot.params.overtimeCharge"
+                      <select 
+                        v-model="slot.params.overtimeCharge" 
                         @change="updateSlotQuote(slot)"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }">
@@ -1179,8 +1162,8 @@
                       <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).overtimeSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
-                      <select
-                        v-model="slot.params.weather"
+                      <select 
+                        v-model="slot.params.weather" 
                         @change="updateSlotQuote(slot)"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }">
@@ -1192,8 +1175,8 @@
                       <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).weatherSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
-                      <select
-                        v-model="slot.params.vehicleType"
+                      <select 
+                        v-model="slot.params.vehicleType" 
                         @change="updateSlotQuote(slot)"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }">
@@ -1203,8 +1186,8 @@
                       <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).vehicleSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
-                      <select
-                        v-model="slot.params.isExpress"
+                      <select 
+                        v-model="slot.params.isExpress" 
                         @change="updateSlotQuote(slot)"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }">
@@ -1214,11 +1197,11 @@
                       <div class="standard-reference">标准: {{ getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge > 0 ? '¥' + getStandardPriceForTimeSlot(slot.timeSlot).expressSurcharge.toFixed(2) : '无' }}</div>
                     </td>
                     <td>
-                      <input
-                        type="number"
-                        v-model.number="slot.params.additionalFee"
+                      <input 
+                        type="number" 
+                        v-model.number="slot.params.additionalFee" 
                         @input="updateSlotQuote(slot)"
-                        min="0"
+                        min="0" 
                         step="0.01"
                         :disabled="loading || slot.isActive"
                         :class="{ 'active-input': slot.isActive }"
@@ -1231,24 +1214,24 @@
                     </td>
                     <td>
                       <div class="action-buttons">
-                        <button
-                          v-if="!slot.isActive"
-                          @click="activateSlot(slot)"
+                        <button 
+                          v-if="!slot.isActive" 
+                          @click="activateSlot(slot)" 
                           class="btn btn-success btn-sm"
                           :disabled="loading"
                         >
                           生效
                         </button>
-                        <button
-                          v-if="slot.isActive"
-                          @click="deactivateSlot(slot)"
+                        <button 
+                          v-if="slot.isActive" 
+                          @click="deactivateSlot(slot)" 
                           class="btn btn-warning btn-sm"
                           :disabled="loading"
                         >
                           修改
                         </button>
-                        <button
-                          @click="removeTimeSlot(slot.timeSlot)"
+                        <button 
+                          @click="removeTimeSlot(slot.timeSlot)" 
                           class="btn btn-danger btn-sm"
                           :disabled="loading || slot.isActive"
                         >
