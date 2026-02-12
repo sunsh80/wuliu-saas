@@ -1,55 +1,55 @@
-openapi: 3.0.3
+﻿openapi: 3.0.3
 info:
-  title: 多租户物流平台 API
-  version: 1.0.2-safe 技术栈:Node.js + Express + SQLite + OpenAPI Backend 认证机制:express-session(基于 Cookie 的会话） 安全模型：通过 TenantSessionAuth 安全处理器校验 req.session.userId 多租户支持:tenants 表存储租户,users 表存储租户员工 & 小程序顾客
+  title: 澶氱鎴风墿娴佸钩锟?API
+  version: 1.0.2-safe 鎶€鏈爤:Node.js + Express + SQLite + OpenAPI Backend 璁よ瘉鏈哄埗:express-session(鍩轰簬 Cookie 鐨勪細璇濓級 瀹夊叏妯″瀷锛氶€氳繃 TenantSessionAuth 瀹夊叏澶勭悊鍣ㄦ牎锟?req.session.userId 澶氱鎴锋敮锟?tenants 琛ㄥ瓨鍌ㄧ锟?users 琛ㄥ瓨鍌ㄧ鎴峰憳锟?& 灏忕▼搴忛【锟?
   description: |
-    支持客户（下单方）与承运方（接单方）双角色的物流订单系统。
-    - `/api/admin/...`：平台管理员
-    - `/api/customer/...`：客户租户
-    - `/api/carrier/...`：承运方租户
-    - `/api/public/...`：公共接口
-    🔹 本次增容(v1.0.2-safe):
-    - 保留所有 v1.0.1 字段、路由、状态不变
-    - 新增承运方能力画像（可选）
-    - 租户本身可以在一定条件下转变为承运方，客户，仓库实体
-    - 新增体积、时效等可选字段
-    - 新增匹配相关接口（不改动原有 claim/award 流程）
+    鏀寔瀹㈡埛锛堜笅鍗曟柟锛変笌鎵胯繍鏂癸紙鎺ュ崟鏂癸級鍙岃鑹茬殑鐗╂祦璁㈠崟绯荤粺锟?
+    - `/api/admin/...`锛氬钩鍙扮鐞嗗憳
+    - `/api/customer/...`锛氬鎴风锟?
+    - `/api/carrier/...`锛氭壙杩愭柟绉熸埛
+    - `/api/public/...`锛氬叕鍏辨帴锟?
+    馃敼 鏈澧炲(v1.0.2-safe):
+    - 淇濈暀鎵€锟?v1.0.1 瀛楁銆佽矾鐢便€佺姸鎬佷笉锟?
+    - 鏂板鎵胯繍鏂硅兘鍔涚敾鍍忥紙鍙€夛級
+    - 绉熸埛鏈韩鍙互鍦ㄤ竴瀹氭潯浠朵笅杞彉涓烘壙杩愭柟锛屽鎴凤紝浠撳簱瀹炰綋
+    - 鏂板浣撶Н銆佹椂鏁堢瓑鍙€夊瓧锟?
+    - 鏂板鍖归厤鐩稿叧鎺ュ彛锛堜笉鏀瑰姩鍘熸湁 claim/award 娴佺▼锟?
 servers:
   - url: http://localhost:3000
-    description: 开发环境
+    description: 寮€鍙戠幆锟?
 tags:
   - name: setup
-    description: 平台初始化（首次安装）
+    description: 骞冲彴鍒濆鍖栵紙棣栨瀹夎锟?
   - name: admin-auth
-    description: 平台管理员 - 认证与会话
+    description: 骞冲彴绠＄悊锟?- 璁よ瘉涓庝細锟?
   - name: admin-user
-    description: 平台管理员 - 用户管理
+    description: 骞冲彴绠＄悊锟?- 鐢ㄦ埛绠＄悊
   - name: admin-tenant
-    description: 平台管理员 - 租户管理
+    description: 骞冲彴绠＄悊锟?- 绉熸埛绠＄悊
   - name: admin-order
-    description: 平台管理员 - 订单管理
+    description: 骞冲彴绠＄悊锟?- 璁㈠崟绠＄悊
   - name: customer-order
-    description: 客户租户 - 创建与查看自己的订单
+    description: 瀹㈡埛绉熸埛 - 鍒涘缓涓庢煡鐪嬭嚜宸辩殑璁㈠崟
   - name: carrier-order
-    description: 承运方租户 - 认领、执行订单
+    description: 鎵胯繍鏂圭锟?- 璁ら銆佹墽琛岃锟?
   - name: public
-    description: 公共接口（小程序使用，未来废弃）
+    description: 鍏叡鎺ュ彛锛堝皬绋嬪簭浣跨敤锛屾湭鏉ュ簾寮冿級
   - name: auth
-    description: 租户认证与会话
+    description: 绉熸埛璁よ瘉涓庝細锟?
   - name: matching
-    description: 智能匹配（新增，可选使用）
+    description: 鏅鸿兘鍖归厤锛堟柊澧烇紝鍙€変娇鐢級
 components:
   securitySchemes:
     AdminSessionAuth:
       type: apiKey
       in: cookie
       name: connect.sid
-      description: 平台管理员登录后自动携带（由 Express Session 管理）
+      description: 骞冲彴绠＄悊鍛樼櫥褰曞悗鑷姩鎼哄甫锛堢敱 Express Session 绠＄悊锟?
     TenantSessionAuth:
       type: apiKey
       in: cookie
       name: connect.sid
-      description: 租户登录后自动携带（由 Express Session 管理）
+      description: 绉熸埛鐧诲綍鍚庤嚜鍔ㄦ惡甯︼紙锟?Express Session 绠＄悊锟?
   schemas:
     CustomerWebRegistration:
       type: object
@@ -81,11 +81,11 @@ components:
     Name:
       type: string
       pattern: ^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,50}$
-      example: 张三
+      example: 寮犱笁
     Address:
       type: string
       pattern: ^[\u4e00-\u9fa5a-zA-Z0-9\s\S]{1,200}$
-      example: 北京市朝阳区某某街道123号
+      example: 鍖椾含甯傛湞闃冲尯鏌愭煇琛楅亾123锟?
     TenantApplication:
       type: object
       required:
@@ -187,7 +187,7 @@ components:
           example: '2026-01-14T18:00:00Z'
         note:
           type: string
-          example: 自有车辆,24小时内装车
+          example: 鑷湁杞﹁締,24灏忔椂鍐呰锟?
     QuoteItem:
       type: object
       properties:
@@ -224,10 +224,10 @@ components:
       properties:
         pickup_address:
           type: string
-          example: 北京市朝阳区XX大厦
+          example: 鍖椾含甯傛湞闃冲尯XX澶у帵
         delivery_address:
           type: string
-          example: 上海市浦东新区YY园区
+          example: 涓婃捣甯傛郸涓滄柊鍖篩Y鍥尯
         weight_kg:
           type: number
           format: float
@@ -236,43 +236,43 @@ components:
         cargo_type:
           type: string
           enum:
-            - 家具家电
-            - 装修建材
-            - 办公用品
-            - 快递包裹
-            - 其他
-          description: 货物类型
-          example: 家具家电
+            - 瀹跺叿瀹剁數
+            - 瑁呬慨寤烘潗
+            - 鍔炲叕鐢ㄥ搧
+            - 蹇€掑寘锟?
+            - 鍏朵粬
+          description: 璐х墿绫诲瀷
+          example: 瀹跺叿瀹剁數
         cargo_remark:
           type: string
-          description: 货物备注
-          example: 易碎品，请小心搬运
+          description: 璐х墿澶囨敞
+          example: 鏄撶鍝侊紝璇峰皬蹇冩惉锟?
         length:
           type: number
           minimum: 0.01
-          description: 货物长度(米)
+          description: 璐х墿闀垮害(锟?
           example: 1.2
         width:
           type: number
           minimum: 0.01
-          description: 货物宽度(米)
+          description: 璐х墿瀹藉害(锟?
           example: 0.8
         height:
           type: number
           minimum: 0.01
-          description: 货物高度(米)
+          description: 璐х墿楂樺害(锟?
           example: 0.6
         vehicle_type:
           type: string
           enum:
-            - 无人车
-            - 有人车
-          description: 车型要求
-          example: 有人车
+            - 鏃犱汉锟?
+            - 鏈変汉锟?
+          description: 杞﹀瀷瑕佹眰
+          example: 鏈変汉锟?
         pickup_time:
           type: string
           format: date-time
-          description: 预约取货时间
+          description: 棰勭害鍙栬揣鏃堕棿
           example: '2026-01-15T10:00:00Z'
         volume_m3:
           type: number
@@ -294,7 +294,7 @@ components:
           example: '13800138000'
         description:
           type: string
-          example: 易碎品，请轻拿轻放
+          example: 鏄撶鍝侊紝璇疯交鎷胯交锟?
     OrderItem:
       type: object
       properties:
@@ -349,44 +349,44 @@ components:
         order_id:
           type: string
           example: ORD-20260205-001
-          description: 订单的唯一标识符，用于前端展示和跳转详情页
+          description: 璁㈠崟鐨勫敮涓€鏍囪瘑绗︼紝鐢ㄤ簬鍓嶇灞曠ず鍜岃烦杞鎯呴〉
         updated_at:
           type: string
           format: date-time
           example: '2026-02-05T10:35:00Z'
-          description: 订单最后更新时间
+          description: 璁㈠崟鏈€鍚庢洿鏂版椂锟?
         sender_info:
           type: string
-          example: '{"name": "张三", "phone": "13800138000"}'
-          description: 发货人信息（JSON 字符串格式）
+          example: '{"name": "寮犱笁", "phone": "13800138000"}'
+          description: 鍙戣揣浜轰俊鎭紙JSON 瀛楃涓叉牸寮忥級
         receiver_info:
           type: string
-          example: '{"name": "李四", "phone": "13900139000"}'
-          description: 收货人信息（JSON 字符串格式）
+          example: '{"name": "鏉庡洓", "phone": "13900139000"}'
+          description: 鏀惰揣浜轰俊鎭紙JSON 瀛楃涓叉牸寮忥級
         cargo_type:
           type: string
           example: furniture
-          description: 货物类型
+          description: 璐х墿绫诲瀷
         length:
           type: number
           example: 1.2
-          description: 货物长度（米）
+          description: 璐х墿闀垮害锛堢背锟?
         width:
           type: number
           example: 0.8
-          description: 货物宽度（米）
+          description: 璐х墿瀹藉害锛堢背锟?
         height:
           type: number
           example: 0.6
-          description: 货物高度（米）
+          description: 璐х墿楂樺害锛堢背锟?
         description:
           type: string
-          example: 请务必小心轻放
-          description: 订单备注
+          example: 璇峰姟蹇呭皬蹇冭交锟?
+          description: 璁㈠崟澶囨敞
         total_price:
           type: number
           example: 299.99
-          description: 订单总价格
+          description: 璁㈠崟鎬讳环锟?
       required:
         - id
         - order_id
@@ -413,7 +413,7 @@ components:
           example: true
         message:
           type: string
-          example: 获取成功
+          example: 鑾峰彇鎴愬姛
         data:
           type: object
           properties:
@@ -444,7 +444,7 @@ components:
           example: TENANT_ROLE_NOT_ENABLED
         message:
           type: string
-          example: 当前租户未启用客户角色
+          example: 褰撳墠绉熸埛鏈惎鐢ㄥ鎴疯锟?
     TenantListItem:
       type: object
       properties:
@@ -605,7 +605,7 @@ components:
           example: 1
         rule_name:
           type: string
-          example: 标准定价规则
+          example: 鏍囧噯瀹氫环瑙勫垯
         base_price:
           type: number
           example: 10
@@ -663,120 +663,120 @@ components:
       properties:
         rule_name:
           type: string
-          example: 标准定价规则
-          description: 定价规则名称
+          example: 鏍囧噯瀹氫环瑙勫垯
+          description: 瀹氫环瑙勫垯鍚嶇О
         base_price:
           type: number
           example: 10
-          description: 基础价格
+          description: 鍩虹浠锋牸
         price_per_km:
           type: number
           example: 2.5
-          description: 每公里价格
+          description: 姣忓叕閲屼环锟?
         price_per_hour:
           type: number
           example: 5
-          description: 每小时价格
+          description: 姣忓皬鏃朵环锟?
         price_per_kg:
           type: number
           example: 1
-          description: 每公斤价格
+          description: 姣忓叕鏂や环锟?
         cold_storage_surcharge:
           type: number
           example: 0.5
-          description: 冷藏附加费
+          description: 鍐疯棌闄勫姞锟?
         peak_hour_multiplier:
           type: number
           example: 1.5
-          description: 高峰时段倍率
+          description: 楂樺嘲鏃舵鍊嶇巼
         off_peak_hour_multiplier:
           type: number
           example: 0.8
-          description: 非高峰时段倍率
+          description: 闈為珮宄版椂娈靛€嶇巼
         weather_multiplier:
           type: number
           example: 1.2
-          description: 天气倍率
+          description: 澶╂皵鍊嶇巼
         min_price:
           type: number
           example: 5
-          description: 最低价格
+          description: 鏈€浣庝环锟?
         max_price:
           type: number
           example: 1000
-          description: 最高价格
+          description: 鏈€楂樹环锟?
         time_slot_rules:
           type: object
-          description: 时段规则
+          description: 鏃舵瑙勫垯
         region_rules:
           type: object
-          description: 地区规则
+          description: 鍦板尯瑙勫垯
         vehicle_type_rules:
           type: object
-          description: 车型规则
+          description: 杞﹀瀷瑙勫垯
         active:
           type: boolean
           example: true
-          description: 是否激活
+          description: 鏄惁婵€锟?
     UpdatePricingRuleRequest:
       type: object
       properties:
         rule_name:
           type: string
-          example: 标准定价规则
-          description: 定价规则名称
+          example: 鏍囧噯瀹氫环瑙勫垯
+          description: 瀹氫环瑙勫垯鍚嶇О
         base_price:
           type: number
           example: 10
-          description: 基础价格
+          description: 鍩虹浠锋牸
         price_per_km:
           type: number
           example: 2.5
-          description: 每公里价格
+          description: 姣忓叕閲屼环锟?
         price_per_hour:
           type: number
           example: 5
-          description: 每小时价格
+          description: 姣忓皬鏃朵环锟?
         price_per_kg:
           type: number
           example: 1
-          description: 每公斤价格
+          description: 姣忓叕鏂や环锟?
         cold_storage_surcharge:
           type: number
           example: 0.5
-          description: 冷藏附加费
+          description: 鍐疯棌闄勫姞锟?
         peak_hour_multiplier:
           type: number
           example: 1.5
-          description: 高峰时段倍率
+          description: 楂樺嘲鏃舵鍊嶇巼
         off_peak_hour_multiplier:
           type: number
           example: 0.8
-          description: 非高峰时段倍率
+          description: 闈為珮宄版椂娈靛€嶇巼
         weather_multiplier:
           type: number
           example: 1.2
-          description: 天气倍率
+          description: 澶╂皵鍊嶇巼
         min_price:
           type: number
           example: 5
-          description: 最低价格
+          description: 鏈€浣庝环锟?
         max_price:
           type: number
           example: 1000
-          description: 最高价格
+          description: 鏈€楂樹环锟?
         time_slot_rules:
           type: object
-          description: 时段规则
+          description: 鏃舵瑙勫垯
         region_rules:
           type: object
-          description: 地区规则
+          description: 鍦板尯瑙勫垯
         vehicle_type_rules:
           type: object
-          description: 车型规则
+          description: 杞﹀瀷瑙勫垯
         active:
           type: boolean
-          description: 是否激活
+          description: 鏄惁婵€锟?
     Pagination:
       type: object
       properties:
@@ -809,7 +809,7 @@ components:
           example: 1
         config_name:
           type: string
-          example: 标准配送定价
+          example: 鏍囧噯閰嶉€佸畾锟?
         base_price:
           type: number
           example: 15
@@ -869,123 +869,123 @@ components:
         carrier_id:
           type: integer
           example: 1
-          description: 承运商ID
+          description: 鎵胯繍鍟咺D
         config_name:
           type: string
-          example: 标准配送定价
-          description: 配置名称
+          example: 鏍囧噯閰嶉€佸畾锟?
+          description: 閰嶇疆鍚嶇О
         base_price:
           type: number
           example: 15
-          description: 基础价格
+          description: 鍩虹浠锋牸
         price_per_km:
           type: number
           example: 3
-          description: 每公里价格
+          description: 姣忓叕閲屼环锟?
         price_per_hour:
           type: number
           example: 6
-          description: 每小时价格
+          description: 姣忓皬鏃朵环锟?
         price_per_kg:
           type: number
           example: 1.5
-          description: 每公斤价格
+          description: 姣忓叕鏂や环锟?
         cold_storage_surcharge:
           type: number
           example: 0.8
-          description: 冷藏附加费
+          description: 鍐疯棌闄勫姞锟?
         peak_hour_multiplier:
           type: number
           example: 1.8
-          description: 高峰时段倍率
+          description: 楂樺嘲鏃舵鍊嶇巼
         off_peak_hour_multiplier:
           type: number
           example: 0.7
-          description: 非高峰时段倍率
+          description: 闈為珮宄版椂娈靛€嶇巼
         weather_multiplier:
           type: number
           example: 1.3
-          description: 天气倍率
+          description: 澶╂皵鍊嶇巼
         min_price:
           type: number
           example: 8
-          description: 最低价格
+          description: 鏈€浣庝环锟?
         max_price:
           type: number
           example: 200
-          description: 最高价格
+          description: 鏈€楂樹环锟?
         time_slot_rules:
           type: object
-          description: 时段规则
+          description: 鏃舵瑙勫垯
         region_rules:
           type: object
-          description: 地区规则
+          description: 鍦板尯瑙勫垯
         vehicle_type_rules:
           type: object
-          description: 车型规则
+          description: 杞﹀瀷瑙勫垯
         active:
           type: boolean
           example: true
-          description: 是否激活
+          description: 鏄惁婵€锟?
     UpdateCarrierPricingConfigRequest:
       type: object
       properties:
         config_name:
           type: string
-          example: 标准配送定价
-          description: 配置名称
+          example: 鏍囧噯閰嶉€佸畾锟?
+          description: 閰嶇疆鍚嶇О
         base_price:
           type: number
           example: 15
-          description: 基础价格
+          description: 鍩虹浠锋牸
         price_per_km:
           type: number
           example: 3
-          description: 每公里价格
+          description: 姣忓叕閲屼环锟?
         price_per_hour:
           type: number
           example: 6
-          description: 每小时价格
+          description: 姣忓皬鏃朵环锟?
         price_per_kg:
           type: number
           example: 1.5
-          description: 每公斤价格
+          description: 姣忓叕鏂や环锟?
         cold_storage_surcharge:
           type: number
           example: 0.8
-          description: 冷藏附加费
+          description: 鍐疯棌闄勫姞锟?
         peak_hour_multiplier:
           type: number
           example: 1.8
-          description: 高峰时段倍率
+          description: 楂樺嘲鏃舵鍊嶇巼
         off_peak_hour_multiplier:
           type: number
           example: 0.7
-          description: 非高峰时段倍率
+          description: 闈為珮宄版椂娈靛€嶇巼
         weather_multiplier:
           type: number
           example: 1.3
-          description: 天气倍率
+          description: 澶╂皵鍊嶇巼
         min_price:
           type: number
           example: 8
-          description: 最低价格
+          description: 鏈€浣庝环锟?
         max_price:
           type: number
           example: 200
-          description: 最高价格
+          description: 鏈€楂樹环锟?
         time_slot_rules:
           type: object
-          description: 时段规则
+          description: 鏃舵瑙勫垯
         region_rules:
           type: object
-          description: 地区规则
+          description: 鍦板尯瑙勫垯
         vehicle_type_rules:
           type: object
-          description: 车型规则
+          description: 杞﹀瀷瑙勫垯
         active:
           type: boolean
-          description: 是否激活
+          description: 鏄惁婵€锟?
     OrderDetails:
       type: object
       properties:
@@ -1015,10 +1015,10 @@ components:
           example: van
         pickup_address:
           type: string
-          example: 北京市海淀区中关村大街1号
+          example: 鍖椾含甯傛捣娣€鍖轰腑鍏虫潙澶ц1锟?
         delivery_address:
           type: string
-          example: 北京市朝阳区国贸大厦
+          example: 鍖椾含甯傛湞闃冲尯鍥借锤澶у帵
         cargo_type:
           type: string
           example: electronics
@@ -1030,7 +1030,7 @@ components:
           example: 1
         carrier_name:
           type: string
-          example: 顺丰速运
+          example: 椤轰赴閫熻繍
         avg_rating:
           type: number
           example: 4.8
@@ -1076,27 +1076,27 @@ components:
         loading_fee:
           type: number
           example: 50
-          description: 装卸费
+          description: 瑁呭嵏锟?
         waiting_fee:
           type: number
           example: 30
-          description: 等待费
+          description: 绛夊緟锟?
         overtime_fee:
           type: number
           example: 100
-          description: 超时费
+          description: 瓒呮椂锟?
         special_handling_fee:
           type: number
           example: 80
-          description: 特殊处理费
+          description: 鐗规畩澶勭悊锟?
         cold_storage_fee:
           type: number
           example: 40
-          description: 冷藏附加费
+          description: 鍐疯棌闄勫姞锟?
         insurance_fee:
           type: number
           example: 20
-          description: 保险费
+          description: 淇濋櫓锟?
         other_fees:
           type: array
           items:
@@ -1104,28 +1104,28 @@ components:
             properties:
               name:
                 type: string
-                example: 夜间配送费
+                example: 澶滈棿閰嶉€佽垂
               amount:
                 type: number
                 example: 60
               description:
                 type: string
-                example: 夜间配送额外费用
+                example: 澶滈棿閰嶉€侀澶栬垂锟?
   responses:
     UnauthorizedError:
-      description: 未认证
+      description: 鏈锟?
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     ForbiddenError:
-      description: 权限不足（如角色不匹配）
+      description: 鏉冮檺涓嶈冻锛堝瑙掕壊涓嶅尮閰嶏級
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     NotFoundError:
-      description: 资源未找到
+      description: 璧勬簮鏈壘锟?
       content:
         application/json:
           schema:
@@ -1139,9 +1139,9 @@ components:
                 example: NOT_FOUND
               message:
                 type: string
-                example: 资源未找到
+                example: 璧勬簮鏈壘锟?
     InternalServerError:
-      description: 服务器内部错误
+      description: 鏈嶅姟鍣ㄥ唴閮ㄩ敊锟?
       content:
         application/json:
           schema:
@@ -1155,9 +1155,9 @@ components:
                 example: INTERNAL_SERVER_ERROR
               message:
                 type: string
-                example: 服务器内部错误
+                example: 鏈嶅姟鍣ㄥ唴閮ㄩ敊锟?
     BadRequestError:
-      description: 请求参数错误
+      description: 璇锋眰鍙傛暟閿欒
       content:
         application/json:
           schema:
@@ -1171,35 +1171,35 @@ components:
                 example: BAD_REQUEST
               message:
                 type: string
-                example: 请求参数错误
+                example: 璇锋眰鍙傛暟閿欒
 paths:
   /api/admin/tenants:
     get:
       tags:
         - admin-tenant
       operationId: listAllTenants
-      summary: 获取所有租户（分页、可筛选）
-      description: 获取平台所有租户的列表，支持分页、状态筛选和关键词搜索。
+      summary: 鑾峰彇鎵€鏈夌鎴凤紙鍒嗛〉銆佸彲绛涢€夛級
+      description: 鑾峰彇骞冲彴鎵€鏈夌鎴风殑鍒楄〃锛屾敮鎸佸垎椤点€佺姸鎬佺瓫閫夊拰鍏抽敭璇嶆悳绱拷?
       security:
         - AdminSessionAuth: []
       parameters:
         - name: page
           in: query
-          description: 页码
+          description: 椤电爜
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
           required: false
           schema:
             type: integer
             default: 10
         - name: status
           in: query
-          description: 筛选租户状态
+          description: 绛涢€夌鎴风姸锟?
           required: false
           schema:
             type: string
@@ -1211,13 +1211,13 @@ paths:
               - inactive
         - name: search
           in: query
-          description: 搜索租户名称或联系人
+          description: 鎼滅储绉熸埛鍚嶇О鎴栬仈绯讳汉
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: 租户列表
+          description: 绉熸埛鍒楄〃
           content:
             application/json:
               schema:
@@ -1241,8 +1241,8 @@ paths:
       tags:
         - admin-tenant
       operationId: getTenantById
-      summary: 获取单个租户详情
-      description: 获取指定ID租户的完整信息，包括基本信息、车辆、财务和客服信息。
+      summary: 鑾峰彇鍗曚釜绉熸埛璇︽儏
+      description: 鑾峰彇鎸囧畾ID绉熸埛鐨勫畬鏁翠俊鎭紝鍖呮嫭鍩烘湰淇℃伅銆佽溅杈嗐€佽储鍔″拰瀹㈡湇淇℃伅锟?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1253,7 +1253,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 租户详情
+          description: 绉熸埛璇︽儏
           content:
             application/json:
               schema:
@@ -1271,8 +1271,8 @@ paths:
       tags:
         - admin-tenant
       operationId: updateTenantBasicInfo
-      summary: 更新租户基本信息
-      description: 更新指定ID租户的基本信息（如状态、联系人等）。
+      summary: 鏇存柊绉熸埛鍩烘湰淇℃伅
+      description: 鏇存柊鎸囧畾ID绉熸埛鐨勫熀鏈俊鎭紙濡傜姸鎬併€佽仈绯讳汉绛夛級锟?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1309,7 +1309,7 @@ paths:
                   type: string
       responses:
         '200':
-          description: 更新成功
+          description: 鏇存柊鎴愬姛
           content:
             application/json:
               schema:
@@ -1331,13 +1331,13 @@ paths:
     get:
       tags:
         - admin-reports
-      summary: 获取平台概览统计数据
+      summary: 鑾峰彇骞冲彴姒傝缁熻鏁版嵁
       operationId: getOverviewStats
       security:
         - AdminSessionAuth: []
       responses:
         '200':
-          description: 平台概览统计数据
+          description: 骞冲彴姒傝缁熻鏁版嵁
           content:
             application/json:
               schema:
@@ -1381,28 +1381,28 @@ paths:
       tags:
         - admin-tenant
       operationId: listApprovedTenants
-      summary: 获取已批准的租户列表
-      description: 获取所有已批准状态的租户列表
+      summary: 鑾峰彇宸叉壒鍑嗙殑绉熸埛鍒楄〃
+      description: 鑾峰彇鎵€鏈夊凡鎵瑰噯鐘舵€佺殑绉熸埛鍒楄〃
       security:
         - AdminSessionAuth: []
       parameters:
         - name: page
           in: query
-          description: 页码
+          description: 椤电爜
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
           required: false
           schema:
             type: integer
             default: 10
       responses:
         '200':
-          description: 已批准租户列表
+          description: 宸叉壒鍑嗙鎴峰垪锟?
           content:
             application/json:
               schema:
@@ -1426,34 +1426,34 @@ paths:
       tags:
         - admin-tenant
       operationId: listRejectedTenants
-      summary: 获取已驳回的租户列表
-      description: 获取所有已驳回状态的租户列表
+      summary: 鑾峰彇宸查┏鍥炵殑绉熸埛鍒楄〃
+      description: 鑾峰彇鎵€鏈夊凡椹冲洖鐘舵€佺殑绉熸埛鍒楄〃
       security:
         - AdminSessionAuth: []
       parameters:
         - name: page
           in: query
-          description: 页码
+          description: 椤电爜
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
           required: false
           schema:
             type: integer
             default: 10
         - name: search
           in: query
-          description: 搜索关键词（租户名称或联系方式）
+          description: 鎼滅储鍏抽敭璇嶏紙绉熸埛鍚嶇О鎴栬仈绯绘柟寮忥級
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: 已驳回租户列表
+          description: 宸查┏鍥炵鎴峰垪锟?
           content:
             application/json:
               schema:
@@ -1477,8 +1477,8 @@ paths:
       tags:
         - admin-tenant
       operationId: updateTenantFinancialInfo
-      summary: 更新租户财务信息
-      description: 更新指定ID租户的财务信息。
+      summary: 鏇存柊绉熸埛璐㈠姟淇℃伅
+      description: 鏇存柊鎸囧畾ID绉熸埛鐨勮储鍔′俊鎭拷?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1495,7 +1495,7 @@ paths:
               $ref: '#/components/schemas/TenantFinancialInfo'
       responses:
         '200':
-          description: 更新成功
+          description: 鏇存柊鎴愬姛
           content:
             application/json:
               schema:
@@ -1516,8 +1516,8 @@ paths:
       tags:
         - admin-tenant
       operationId: updateTenantContactInfo
-      summary: 更新租户联系信息
-      description: 更新指定ID租户的财务和客服联系信息。
+      summary: 鏇存柊绉熸埛鑱旂郴淇℃伅
+      description: 鏇存柊鎸囧畾ID绉熸埛鐨勮储鍔″拰瀹㈡湇鑱旂郴淇℃伅锟?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1534,7 +1534,7 @@ paths:
               $ref: '#/components/schemas/TenantContactInfo'
       responses:
         '200':
-          description: 更新成功
+          description: 鏇存柊鎴愬姛
           content:
             application/json:
               schema:
@@ -1555,34 +1555,34 @@ paths:
       tags:
         - admin-vehicle
       operationId: listAllVehicles
-      summary: 获取所有车辆列表
-      description: 获取平台中所有车辆的信息
+      summary: 鑾峰彇鎵€鏈夎溅杈嗗垪锟?
+      description: 鑾峰彇骞冲彴涓墍鏈夎溅杈嗙殑淇℃伅
       security:
         - AdminSessionAuth: []
       parameters:
         - name: page
           in: query
-          description: 页码
+          description: 椤电爜
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
           required: false
           schema:
             type: integer
             default: 10
         - name: search
           in: query
-          description: 搜索关键词（车牌号、车型等）
+          description: 鎼滅储鍏抽敭璇嶏紙杞︾墝鍙枫€佽溅鍨嬬瓑锟?
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: 车辆列表
+          description: 杞﹁締鍒楄〃
           content:
             application/json:
               schema:
@@ -1605,8 +1605,8 @@ paths:
       tags:
         - admin-vehicle
       operationId: addTenantVehicle
-      summary: 添加车辆
-      description: 添加一辆车辆信息
+      summary: 娣诲姞杞﹁締
+      description: 娣诲姞涓€杈嗚溅杈嗕俊锟?
       security:
         - AdminSessionAuth: []
       requestBody:
@@ -1617,7 +1617,7 @@ paths:
               $ref: '#/components/schemas/VehicleInfo'
       responses:
         '201':
-          description: 添加成功
+          description: 娣诲姞鎴愬姛
           content:
             application/json:
               schema:
@@ -1638,32 +1638,32 @@ paths:
       tags:
         - admin-vehicle
       operationId: searchVehicles
-      summary: 搜索车辆
-      description: 根据条件搜索车辆
+      summary: 鎼滅储杞﹁締
+      description: 鏍规嵁鏉′欢鎼滅储杞﹁締
       security:
         - AdminSessionAuth: []
       parameters:
         - name: plate_number
           in: query
-          description: 车牌号
+          description: 杞︾墝锟?
           required: false
           schema:
             type: string
         - name: type
           in: query
-          description: 车辆类型
+          description: 杞﹁締绫诲瀷
           required: false
           schema:
             type: string
         - name: status
           in: query
-          description: 车辆状态
+          description: 杞﹁締鐘讹拷?
           required: false
           schema:
             type: string
       responses:
         '200':
-          description: 匹配的车辆列表
+          description: 鍖归厤鐨勮溅杈嗗垪锟?
           content:
             application/json:
               schema:
@@ -1682,8 +1682,8 @@ paths:
       tags:
         - admin-vehicle
       operationId: getVehicleById
-      summary: 获取指定车辆详情
-      description: 获取指定ID的车辆详细信息
+      summary: 鑾峰彇鎸囧畾杞﹁締璇︽儏
+      description: 鑾峰彇鎸囧畾ID鐨勮溅杈嗚缁嗕俊锟?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1694,7 +1694,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: 车辆详情
+          description: 杞﹁締璇︽儏
           content:
             application/json:
               schema:
@@ -1713,8 +1713,8 @@ paths:
       tags:
         - admin-tenant
       operationId: addTenantVehicle
-      summary: 添加租户车辆
-      description: 为指定ID的租户添加一辆车辆信息。
+      summary: 娣诲姞绉熸埛杞﹁締
+      description: 涓烘寚瀹欼D鐨勭鎴锋坊鍔犱竴杈嗚溅杈嗕俊鎭拷?
       security:
         - AdminSessionAuth: []
       parameters:
@@ -1731,7 +1731,7 @@ paths:
               $ref: '#/components/schemas/VehicleInfo'
       responses:
         '201':
-          description: 添加成功
+          description: 娣诲姞鎴愬姛
           content:
             application/json:
               schema:
@@ -1751,13 +1751,13 @@ paths:
           $ref: '#/components/responses/NotFoundError'
   /api/health:
     get:
-      summary: 健康检查
+      summary: 鍋ュ悍妫€锟?
       operationId: healthCheck
       tags:
         - public
       responses:
         '200':
-          description: 服务正常运行
+          description: 鏈嶅姟姝ｅ父杩愯
           content:
             application/json:
               schema:
@@ -1767,14 +1767,14 @@ paths:
                     type: string
                     example: ok
         '500':
-          description: 服务内部错误
+          description: 鏈嶅姟鍐呴儴閿欒
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/customer/order/bind:
     post:
-      summary: 将订单绑定到客户（通过手机号）
+      summary: 灏嗚鍗曠粦瀹氬埌瀹㈡埛锛堥€氳繃鎵嬫満鍙凤級
       operationId: bindOrderToCustomer
       security:
         - TenantSessionAuth: []
@@ -1792,7 +1792,7 @@ paths:
                 - order_id
       responses:
         '200':
-          description: 绑定成功
+          description: 缁戝畾鎴愬姛
           content:
             application/json:
               schema:
@@ -1805,16 +1805,16 @@ paths:
                   data:
                     type: object
         '400':
-          description: 参数错误或客户不存在
+          description: 鍙傛暟閿欒鎴栧鎴蜂笉瀛樺湪
         '401':
-          description: 未登录
+          description: 鏈櫥锟?
         '404':
-          description: 订单未找到或已绑定
+          description: 璁㈠崟鏈壘鍒版垨宸茬粦锟?
   /api/customer/orders:
     post:
       tags:
         - customer-order
-      summary: 客户创建新订单
+      summary: 瀹㈡埛鍒涘缓鏂拌锟?
       operationId: createCustomerOrder
       security:
         - TenantSessionAuth: []
@@ -1826,7 +1826,7 @@ paths:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
         '201':
-          description: 订单创建成功
+          description: 璁㈠崟鍒涘缓鎴愬姛
           content:
             application/json:
               schema:
@@ -1841,13 +1841,13 @@ paths:
     get:
       tags:
         - customer-order
-      summary: 获取客户自己的订单列表
+      summary: 鑾峰彇瀹㈡埛鑷繁鐨勮鍗曞垪锟?
       operationId: listCustomerOrders
       security:
         - TenantSessionAuth: []
       responses:
         '200':
-          description: 订单列表
+          description: 璁㈠崟鍒楄〃
           content:
             application/json:
               schema:
@@ -1858,7 +1858,7 @@ paths:
     get:
       tags:
         - customer-order
-      summary: 获取单个客户订单详情
+      summary: 鑾峰彇鍗曚釜瀹㈡埛璁㈠崟璇︽儏
       operationId: getCustomerOrder
       security:
         - TenantSessionAuth: []
@@ -1870,7 +1870,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 订单详情
+          description: 璁㈠崟璇︽儏
           content:
             application/json:
               schema:
@@ -1882,7 +1882,7 @@ paths:
     put:
       tags:
         - customer-order
-      summary: 更新客户订单（如修改地址、备注等）
+      summary: 鏇存柊瀹㈡埛璁㈠崟锛堝淇敼鍦板潃銆佸娉ㄧ瓑锟?
       operationId: updateCustomerOrder
       security:
         - TenantSessionAuth: []
@@ -1907,7 +1907,7 @@ paths:
                   type: string
       responses:
         '200':
-          description: 更新成功
+          description: 鏇存柊鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -1915,7 +1915,7 @@ paths:
     delete:
       tags:
         - customer-order
-      summary: 删除客户订单（仅限未认领状态）
+      summary: 鍒犻櫎瀹㈡埛璁㈠崟锛堜粎闄愭湭璁ら鐘舵€侊級
       operationId: deleteCustomerOrder
       security:
         - TenantSessionAuth: []
@@ -1927,7 +1927,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 删除成功
+          description: 鍒犻櫎鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -1936,7 +1936,7 @@ paths:
     get:
       tags:
         - customer-order
-      summary: 获取订单的报价列表（支持多承运商竞价）
+      summary: 鑾峰彇璁㈠崟鐨勬姤浠峰垪琛紙鏀寔澶氭壙杩愬晢绔炰环锟?
       operationId: getOrderQuotes
       security:
         - TenantSessionAuth: []
@@ -1946,10 +1946,10 @@ paths:
           required: true
           schema:
             type: string
-          description: 订单ID
+          description: 璁㈠崟ID
       responses:
         '200':
-          description: 报价列表
+          description: 鎶ヤ环鍒楄〃
           content:
             application/json:
               schema:
@@ -1989,7 +1989,7 @@ paths:
                               example: '2026-01-14T18:00:00Z'
                             remarks:
                               type: string
-                              example: 可加急，但需额外费用
+                              example: 鍙姞鎬ワ紝浣嗛渶棰濆璐圭敤
                             status:
                               type: string
                               example: pending
@@ -2005,11 +2005,11 @@ paths:
     get:
       tags:
         - setup
-      summary: 检查平台是否已完成初始化（是否存在管理员）
+      summary: 妫€鏌ュ钩鍙版槸鍚﹀凡瀹屾垚鍒濆鍖栵紙鏄惁瀛樺湪绠＄悊鍛橈級
       operationId: getSetupStatus
       responses:
         '200':
-          description: 返回初始化状态
+          description: 杩斿洖鍒濆鍖栫姸锟?
           content:
             application/json:
               schema:
@@ -2019,7 +2019,7 @@ paths:
                     type: boolean
                     example: false
         '500':
-          description: 服务内部错误
+          description: 鏈嶅姟鍐呴儴閿欒
           content:
             application/json:
               schema:
@@ -2028,7 +2028,7 @@ paths:
     post:
       tags:
         - setup
-      summary: 创建首个平台管理员（仅限未初始化时调用）
+      summary: 鍒涘缓棣栦釜骞冲彴绠＄悊鍛橈紙浠呴檺鏈垵濮嬪寲鏃惰皟鐢級
       operationId: createFirstAdmin
       requestBody:
         required: true
@@ -2054,15 +2054,15 @@ paths:
                   example: admin@yourlogistics.com
                 platform_name:
                   type: string
-                  description: 该平台实例的名称（如“华东物流云”）
-                  example: 我的物流平台
+                  description: 璇ュ钩鍙板疄渚嬬殑鍚嶇О锛堝鈥滃崕涓滅墿娴佷簯鈥濓級
+                  example: 鎴戠殑鐗╂祦骞冲彴
                 license_key:
                   type: string
-                  description: 授权密钥（可选，用于产品授权验证）
+                  description: 鎺堟潈瀵嗛挜锛堝彲閫夛紝鐢ㄤ簬浜у搧鎺堟潈楠岃瘉锟?
                   example: LIC-2026-XXXX-YYYY-ZZZZ
       responses:
         '201':
-          description: 初始化成功
+          description: 鍒濆鍖栨垚锟?
           content:
             application/json:
               schema:
@@ -2073,30 +2073,30 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 平台初始化成功
+                    example: 骞冲彴鍒濆鍖栨垚锟?
         '400':
-          description: 请求参数错误
+          description: 璇锋眰鍙傛暟閿欒
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: 平台已初始化，禁止重复创建
+          description: 骞冲彴宸插垵濮嬪寲锛岀姝㈤噸澶嶅垱锟?
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/auth/ping:
     get:
-      summary: 检查当前会话是否有效
-      description: 用于验证用户登录状态（Session 是否有效）。
+      summary: 妫€鏌ュ綋鍓嶄細璇濇槸鍚︽湁锟?
+      description: 鐢ㄤ簬楠岃瘉鐢ㄦ埛鐧诲綍鐘舵€侊紙Session 鏄惁鏈夋晥锛夛拷?
       security:
         - TenantSessionAuth: []
       tags:
         - auth
       responses:
         '200':
-          description: Session 有效
+          description: Session 鏈夋晥
           content:
             application/json:
               schema:
@@ -2116,9 +2116,9 @@ paths:
                         example: user_123
                       name:
                         type: string
-                        example: 张三
+                        example: 寮犱笁
         '401':
-          description: Session 无效或未登录
+          description: Session 鏃犳晥鎴栨湭鐧诲綍
           content:
             application/json:
               schema:
@@ -2134,7 +2134,7 @@ paths:
     post:
       tags:
         - admin-auth
-      summary: 平台管理员登录
+      summary: 骞冲彴绠＄悊鍛樼櫥锟?
       operationId: adminLogin
       security: []
       requestBody:
@@ -2154,9 +2154,9 @@ paths:
                   example: SecurePass123!
       responses:
         '200':
-          description: 登录成功,Set-Cookie 自动设置 session
+          description: 鐧诲綍鎴愬姛,Set-Cookie 鑷姩璁剧疆 session
         '401':
-          description: 用户名或密码错误
+          description: 鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒
           content:
             application/json:
               schema:
@@ -2165,13 +2165,13 @@ paths:
     post:
       tags:
         - admin-auth
-      summary: 平台管理员登出
+      summary: 骞冲彴绠＄悊鍛樼櫥锟?
       operationId: adminLogout
       security:
         - AdminSessionAuth: []
       responses:
         '200':
-          description: 登出成功
+          description: 鐧诲嚭鎴愬姛
           content:
             application/json:
               schema:
@@ -2179,18 +2179,18 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 已安全退出
+                    example: 宸插畨鍏ㄩ€€锟?
   /api/admin/profile:
     get:
       tags:
         - admin-auth
-      summary: 获取当前管理员基本信息
+      summary: 鑾峰彇褰撳墠绠＄悊鍛樺熀鏈俊锟?
       operationId: getAdminProfile
       security:
         - AdminSessionAuth: []
       responses:
         '200':
-          description: 管理员信息
+          description: 绠＄悊鍛樹俊锟?
           content:
             application/json:
               schema:
@@ -2213,7 +2213,7 @@ paths:
     post:
       tags:
         - admin-user
-      summary: 创建新的平台管理员用户（需当前管理员权限）
+      summary: 鍒涘缓鏂扮殑骞冲彴绠＄悊鍛樼敤鎴凤紙闇€褰撳墠绠＄悊鍛樻潈闄愶級
       operationId: createAdminUser
       security:
         - AdminSessionAuth: []
@@ -2244,7 +2244,7 @@ paths:
                   default: admin
       responses:
         '201':
-          description: 管理员创建成功
+          description: 绠＄悊鍛樺垱寤烘垚锟?
           content:
             application/json:
               schema:
@@ -2255,7 +2255,7 @@ paths:
                   message:
                     type: string
         '409':
-          description: 用户名或邮箱已存在
+          description: 鐢ㄦ埛鍚嶆垨閭宸插瓨锟?
           content:
             application/json:
               schema:
@@ -2269,7 +2269,7 @@ paths:
         - AdminSessionAuth: []
       responses:
         '200':
-          description: 待审核租户列表
+          description: 寰呭鏍哥鎴峰垪锟?
           content:
             application/json:
               schema:
@@ -2283,7 +2283,7 @@ paths:
     put:
       tags:
         - admin-tenant
-      summary: 批准租户申请
+      summary: 鎵瑰噯绉熸埛鐢宠
       operationId: approveTenant
       security:
         - AdminSessionAuth: []
@@ -2309,14 +2309,14 @@ paths:
                       - carrier
       responses:
         '200':
-          description: 审核通过
+          description: 瀹℃牳閫氳繃
         '404':
           $ref: '#/components/responses/NotFoundError'
   /api/admin/tenants/{id}/reject:
     put:
       tags:
         - admin-tenant
-      summary: 拒绝租户申请
+      summary: 鎷掔粷绉熸埛鐢宠
       operationId: rejectTenant
       security:
         - AdminSessionAuth: []
@@ -2334,10 +2334,10 @@ paths:
               properties:
                 notes:
                   type: string
-                  description: 拒绝原因（可选）
+                  description: 鎷掔粷鍘熷洜锛堝彲閫夛級
       responses:
         '200':
-          description: 拒绝成功
+          description: 鎷掔粷鎴愬姛
           content:
             application/json:
               schema:
@@ -2348,7 +2348,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 租户申请已拒绝
+                    example: 绉熸埛鐢宠宸叉嫆锟?
         '404':
           $ref: '#/components/responses/NotFoundError'
   /api/admin/orders:
@@ -2360,7 +2360,7 @@ paths:
         - AdminSessionAuth: []
       responses:
         '200':
-          description: 所有订单列表
+          description: 鎵€鏈夎鍗曞垪锟?
           content:
             application/json:
               schema:
@@ -2369,7 +2369,7 @@ paths:
     put:
       tags:
         - admin-order
-      summary: 总后台调度订单
+      summary: 鎬诲悗鍙拌皟搴﹁锟?
       operationId: updateOrderStatus
       security:
         - AdminSessionAuth: []
@@ -2404,7 +2404,7 @@ paths:
                   example: cancelled
       responses:
         '200':
-          description: 状态更新成功
+          description: 鐘舵€佹洿鏂版垚锟?
           content:
             application/json:
               schema:
@@ -2415,9 +2415,9 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 订单状态已更新
+                    example: 璁㈠崟鐘舵€佸凡鏇存柊
         '400':
-          description: 状态值无效
+          description: 鐘舵€佸€兼棤锟?
           content:
             application/json:
               schema:
@@ -2427,18 +2427,18 @@ paths:
   /api/public/orders/{id}:
     get:
       operationId: fetchPublicOrder
-      summary: 获取公开订单详情
-      description: 通过追踪号获取订单的公开信息。
+      summary: 鑾峰彇鍏紑璁㈠崟璇︽儏
+      description: 閫氳繃杩借釜鍙疯幏鍙栬鍗曠殑鍏紑淇℃伅锟?
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: 订单的追踪号 (tracking_number)
+          description: 璁㈠崟鐨勮拷韪彿 (tracking_number)
       responses:
         '200':
-          description: 订单信息获取成功
+          description: 璁㈠崟淇℃伅鑾峰彇鎴愬姛
           content:
             application/json:
               schema:
@@ -2449,14 +2449,14 @@ paths:
                   order:
                     $ref: '#/components/schemas/OrderItem'
         '404':
-          description: 订单未找到
+          description: 璁㈠崟鏈壘锟?
         '500':
-          description: 服务器内部错误.
+          description: 鏈嶅姟鍣ㄥ唴閮ㄩ敊锟?
   /api/public/orders:
     post:
       tags:
         - public
-      summary: 小程序创建订单（临时）
+      summary: 灏忕▼搴忓垱寤鸿鍗曪紙涓存椂锟?
       operationId: createPublicOrder
       requestBody:
         required: true
@@ -2466,7 +2466,7 @@ paths:
               $ref: '#/components/schemas/CreateOrderRequest'
       responses:
         '201':
-          description: 订单创建成功
+          description: 璁㈠崟鍒涘缓鎴愬姛
           content:
             application/json:
               schema:
@@ -2480,7 +2480,7 @@ paths:
     get:
       tags:
         - carrier-order
-      summary: 获取可认领的订单列表（状态=pending_claim)
+      summary: 鑾峰彇鍙棰嗙殑璁㈠崟鍒楄〃锛堢姸锟?pending_claim)
       operationId: listCarrierOrders
       security:
         - TenantSessionAuth: []
@@ -2492,7 +2492,7 @@ paths:
             type: integer
             minimum: 1
             default: 1
-          description: 页码
+          description: 椤电爜
         - name: limit
           in: query
           required: false
@@ -2501,22 +2501,22 @@ paths:
             minimum: 1
             maximum: 100
             default: 10
-          description: 每页记录数
+          description: 姣忛〉璁板綍锟?
         - name: status
           in: query
           required: false
           schema:
             type: string
-          description: 订单状态筛选
+          description: 璁㈠崟鐘舵€佺瓫锟?
         - name: search
           in: query
           required: false
           schema:
             type: string
-          description: 搜索关键词
+          description: 鎼滅储鍏抽敭锟?
       responses:
         '200':
-          description: 可认领订单列表
+          description: 鍙棰嗚鍗曞垪锟?
           content:
             application/json:
               schema:
@@ -2527,7 +2527,7 @@ paths:
     put:
       tags:
         - carrier-order
-      summary: 承运商认领订单
+      summary: 鎵胯繍鍟嗚棰嗚锟?
       operationId: claimCarrierOrder
       security:
         - TenantSessionAuth: []
@@ -2537,10 +2537,10 @@ paths:
           required: true
           schema:
             type: integer
-          description: 订单唯一标识（如 tracking_number 或系统 ID）
+          description: 璁㈠崟鍞竴鏍囪瘑锛堝 tracking_number 鎴栫郴锟?ID锟?
       responses:
         '200':
-          description: 认领成功，返回更新后的完整订单信息
+          description: 璁ら鎴愬姛锛岃繑鍥炴洿鏂板悗鐨勫畬鏁磋鍗曚俊锟?
           content:
             application/json:
               schema:
@@ -2555,7 +2555,7 @@ paths:
     put:
       tags:
         - carrier-order
-      summary: 承运方完成订单
+      summary: 鎵胯繍鏂瑰畬鎴愯锟?
       operationId: completeCarrierOrder
       security:
         - TenantSessionAuth: []
@@ -2567,7 +2567,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 完成成功
+          description: 瀹屾垚鎴愬姛
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
@@ -2576,7 +2576,7 @@ paths:
     put:
       tags:
         - carrier-order
-      summary: 承运方开始配送订单
+      summary: 鎵胯繍鏂瑰紑濮嬮厤閫佽锟?
       operationId: startDelivery
       security:
         - TenantSessionAuth: []
@@ -2586,10 +2586,10 @@ paths:
           required: true
           schema:
             type: string
-          description: 订单ID
+          description: 璁㈠崟ID
       responses:
         '200':
-          description: 开始配送成功
+          description: 寮€濮嬮厤閫佹垚锟?
           content:
             application/json:
               schema:
@@ -2611,7 +2611,7 @@ paths:
                         type: string
                         example: in_transit
         '400':
-          description: 订单状态不允许开始配送
+          description: 璁㈠崟鐘舵€佷笉鍏佽寮€濮嬮厤锟?
           content:
             application/json:
               schema:
@@ -2623,12 +2623,12 @@ paths:
   /api/carrier/orders/{order_id}/quote:
     post:
       operationId: submitCarrierQuote
-      summary: 承运商为指定订单提交报价
+      summary: 鎵胯繍鍟嗕负鎸囧畾璁㈠崟鎻愪氦鎶ヤ环
       description: |
-        承运商提交一个报价（价格、预计送达时间、备注）给指定的订单。
-        此操作不会改变订单的主状态，报价信息将存储在 quotes 表中。
-        订单状态的变更将在后续的客户选择或平台指派环节发生。
-        此端点允许承运商对状态为 'pending_claim' 的订单提交报价。
+        鎵胯繍鍟嗘彁浜や竴涓姤浠凤紙浠锋牸銆侀璁￠€佽揪鏃堕棿銆佸娉級缁欐寚瀹氱殑璁㈠崟锟?
+        姝ゆ搷浣滀笉浼氭敼鍙樿鍗曠殑涓荤姸鎬侊紝鎶ヤ环淇℃伅灏嗗瓨鍌ㄥ湪 quotes 琛ㄤ腑锟?
+        璁㈠崟鐘舵€佺殑鍙樻洿灏嗗湪鍚庣画鐨勫鎴烽€夋嫨鎴栧钩鍙版寚娲剧幆鑺傚彂鐢燂拷?
+        姝ょ鐐瑰厑璁告壙杩愬晢瀵圭姸鎬佷负 'pending_claim' 鐨勮鍗曟彁浜ゆ姤浠凤拷?
       tags:
         - Carrier
         - Quote
@@ -2640,7 +2640,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 要报价的订单ID
+          description: 瑕佹姤浠风殑璁㈠崟ID
       requestBody:
         required: true
         content:
@@ -2652,23 +2652,23 @@ paths:
                   type: number
                   format: float
                   minimum: 0.01
-                  description: 报价金额
+                  description: 鎶ヤ环閲戦
                   example: 150.75
                 deliveryTime:
                   type: string
-                  description: 预计送达时间 (ISO 8601 格式或自定义格式)
+                  description: 棰勮閫佽揪鏃堕棿 (ISO 8601 鏍煎紡鎴栬嚜瀹氫箟鏍煎紡)
                   example: '2024-05-25T18:00:00Z'
                 remarks:
                   type: string
                   maxLength: 500
-                  description: 报价备注
-                  example: 可加急，但需额外费用
+                  description: 鎶ヤ环澶囨敞
+                  example: 鍙姞鎬ワ紝浣嗛渶棰濆璐圭敤
               required:
                 - price
                 - deliveryTime
       responses:
         '201':
-          description: 报价提交成功
+          description: 鎶ヤ环鎻愪氦鎴愬姛
           content:
             application/json:
               schema:
@@ -2698,12 +2698,12 @@ paths:
                             example: '2024-05-25T18:00:00Z'
                           remarks:
                             type: string
-                            example: 可加急，但需额外费用
+                            example: 鍙姞鎬ワ紝浣嗛渶棰濆璐圭敤
                       carrierId:
                         type: integer
                         example: 456
         '400':
-          description: 请求参数错误
+          description: 璇锋眰鍙傛暟閿欒
           content:
             application/json:
               schema:
@@ -2711,13 +2711,13 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: 订单未找到或不允许报价（订单状态不是 'pending_claim' 或不属于当前承运商）
+          description: 璁㈠崟鏈壘鍒版垨涓嶅厑璁告姤浠凤紙璁㈠崟鐘舵€佷笉锟?'pending_claim' 鎴栦笉灞炰簬褰撳墠鎵胯繍鍟嗭級
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: 承运商已为此订单提交过报价
+          description: 鎵胯繍鍟嗗凡涓烘璁㈠崟鎻愪氦杩囨姤锟?
           content:
             application/json:
               schema:
@@ -2728,7 +2728,7 @@ paths:
     post:
       tags:
         - customer-order
-      summary: 客户选择承运方（成交）
+      summary: 瀹㈡埛閫夋嫨鎵胯繍鏂癸紙鎴愪氦锟?
       operationId: awardOrderToCarrier
       security:
         - TenantSessionAuth: []
@@ -2747,12 +2747,12 @@ paths:
               properties:
                 carrier_tenant_id:
                   type: string
-                  description: 被选中的承运方租户ID
+                  description: 琚€変腑鐨勬壙杩愭柟绉熸埛ID
               required:
                 - carrier_tenant_id
       responses:
         '200':
-          description: 订单已分配给承运方
+          description: 璁㈠崟宸插垎閰嶇粰鎵胯繍锟?
           content:
             application/json:
               schema:
@@ -2763,9 +2763,9 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 订单已成交，承运方已通知
+                    example: 璁㈠崟宸叉垚浜わ紝鎵胯繍鏂瑰凡閫氱煡
         '400':
-          description: 请求参数错误（如 carrier_tenant_id 无效）
+          description: 璇锋眰鍙傛暟閿欒锛堝 carrier_tenant_id 鏃犳晥锟?
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
@@ -2774,9 +2774,9 @@ paths:
     post:
       tags:
         - auth
-      summary: 租户/客户注册
+      summary: 绉熸埛/瀹㈡埛娉ㄥ唽
       operationId: registerTenantWeb
-      description: 新租户或客户提交注册信息，创建账户。
+      description: 鏂扮鎴锋垨瀹㈡埛鎻愪氦娉ㄥ唽淇℃伅锛屽垱寤鸿处鎴凤拷?
       requestBody:
         required: true
         content:
@@ -2785,7 +2785,7 @@ paths:
               $ref: '#/components/schemas/CustomerWebRegistration'
       responses:
         '201':
-          description: 注册成功
+          description: 娉ㄥ唽鎴愬姛
           content:
             application/json:
               schema:
@@ -2799,25 +2799,25 @@ paths:
                     example: Tenant registered successfully
                   data:
                     type: object
-                    description: 可选：返回新创建的租户信息或登录凭据
+                    description: 鍙€夛細杩斿洖鏂板垱寤虹殑绉熸埛淇℃伅鎴栫櫥褰曞嚟锟?
                     properties:
                       tenant_id:
                         type: string
                         example: tenant_abc123
         '400':
-          description: 请求参数不完整或格式错误
+          description: 璇锋眰鍙傛暟涓嶅畬鏁存垨鏍煎紡閿欒
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: 邮箱或手机号已存在
+          description: 閭鎴栨墜鏈哄彿宸插瓨锟?
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
-          description: 服务器内部错误
+          description: 鏈嶅姟鍣ㄥ唴閮ㄩ敊锟?
           content:
             application/json:
               schema:
@@ -2826,13 +2826,13 @@ paths:
     post:
       tags:
         - auth
-      summary: 租户登录/客户登录
+      summary: 绉熸埛鐧诲綍/瀹㈡埛鐧诲綍
       operationId: loginTenantWeb
       description: |
-        租户或客户使用邮箱或手机号登录。
-        - 请求体必须包含 `email` 或 `phone` 中的 **任意一个**，以及 `password`。
-        - 示例 1: { "email": "user@example.com", "password": "..." }
-        - 示例 2: { "phone": "13800138000", "password": "..." }
+        绉熸埛鎴栧鎴蜂娇鐢ㄩ偖绠辨垨鎵嬫満鍙风櫥褰曪拷?
+        - 璇锋眰浣撳繀椤诲寘锟?`email` 锟?`phone` 涓殑 **浠绘剰涓€锟?*锛屼互锟?`password`锟?
+        - 绀轰緥 1: { "email": "user@example.com", "password": "..." }
+        - 绀轰緥 2: { "phone": "13800138000", "password": "..." }
       requestBody:
         required: true
         content:
@@ -2843,22 +2843,22 @@ paths:
                 email:
                   type: string
                   format: email
-                  description: 租户/客户注册邮箱
+                  description: 绉熸埛/瀹㈡埛娉ㄥ唽閭
                   example: user@example.com
                 phone:
                   type: string
                   pattern: ^1[3-9][0-9]{9}$
-                  description: 租户/客户注册手机号
+                  description: 绉熸埛/瀹㈡埛娉ㄥ唽鎵嬫満锟?
                   example: '13800138000'
                 password:
                   type: string
-                  description: 登录密码
+                  description: 鐧诲綍瀵嗙爜
                   example: SecurePassword123!
               required:
                 - password
       responses:
         '200':
-          description: 登录成功
+          description: 鐧诲綍鎴愬姛
           content:
             application/json:
               schema:
@@ -2893,7 +2893,7 @@ paths:
                       - name
                       - roles
         '400':
-          description: 请求参数错误 (缺少 email 或 phone，或格式错误)
+          description: 璇锋眰鍙傛暟閿欒 (缂哄皯 email 锟?phone锛屾垨鏍煎紡閿欒)
           content:
             application/json:
               schema:
@@ -2906,7 +2906,7 @@ paths:
                     type: string
                     example: Either email or phone must be provided along with password.
         '401':
-          description: 邮箱或密码错误 / 手机号或密码错误 / 账户未激活
+          description: 閭鎴栧瘑鐮侀敊锟?/ 鎵嬫満鍙锋垨瀵嗙爜閿欒 / 璐︽埛鏈縺锟?
           content:
             application/json:
               schema:
@@ -2922,13 +2922,13 @@ paths:
     get:
       tags:
         - auth
-      summary: 获取租户基本信息
+      summary: 鑾峰彇绉熸埛鍩烘湰淇℃伅
       operationId: getTenantProfile
       security:
         - TenantSessionAuth: []
       responses:
         '200':
-          description: 租户信息
+          description: 绉熸埛淇℃伅
           content:
             application/json:
               schema:
@@ -2936,7 +2936,7 @@ paths:
     put:
       tags:
         - auth
-      summary: 更新租户基本信息
+      summary: 鏇存柊绉熸埛鍩烘湰淇℃伅
       operationId: updateTenantProfile
       security:
         - TenantSessionAuth: []
@@ -2955,13 +2955,13 @@ paths:
                   type: string
       responses:
         '200':
-          description: 信息更新成功
+          description: 淇℃伅鏇存柊鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - auth
-      summary: 租户创建新订单
+      summary: 绉熸埛鍒涘缓鏂拌锟?
       operationId: createTenantOrder
       security:
         - TenantSessionAuth: []
@@ -2989,7 +2989,7 @@ paths:
                   minimum: 0.1
       responses:
         '201':
-          description: 订单创建成功
+          description: 璁㈠崟鍒涘缓鎴愬姛
           content:
             application/json:
               schema:
@@ -3003,13 +3003,13 @@ paths:
     get:
       tags:
         - auth
-      summary: 获取租户启用的角色列表
+      summary: 鑾峰彇绉熸埛鍚敤鐨勮鑹插垪锟?
       operationId: getTenantRoles
       security:
         - TenantSessionAuth: []
       responses:
         '200':
-          description: 角色列表
+          description: 瑙掕壊鍒楄〃
           content:
             application/json:
               schema:
@@ -3025,8 +3025,8 @@ paths:
   /api/pc-tenant/apply:
     post:
       operationId: applyPcTenant
-      summary: 租户入驻申请
-      description: 新租户提交入驻申请，创建新租户账户
+      summary: 绉熸埛鍏ラ┗鐢宠
+      description: 鏂扮鎴锋彁浜ゅ叆椹荤敵璇凤紝鍒涘缓鏂扮鎴疯处锟?
       requestBody:
         required: true
         content:
@@ -3043,20 +3043,20 @@ paths:
               properties:
                 name:
                   type: string
-                  description: 公司名称
+                  description: 鍏徃鍚嶇О
                 contact_person:
                   type: string
-                  description: 联系人姓名
+                  description: 鑱旂郴浜哄锟?
                 contact_phone:
                   type: string
-                  description: 联系电话
+                  description: 鑱旂郴鐢佃瘽
                 email:
                   type: string
-                  description: 邮箱地址
+                  description: 閭鍦板潃
                 password:
                   type: string
                   minLength: 6
-                  description: 密码（至少6位）
+                  description: 瀵嗙爜锛堣嚦锟?浣嶏級
                 roles:
                   type: array
                   items:
@@ -3064,13 +3064,13 @@ paths:
                     enum:
                       - customer
                       - carrier
-                  description: 角色列表
+                  description: 瑙掕壊鍒楄〃
                 address:
                   type: string
-                  description: 公司地址
+                  description: 鍏徃鍦板潃
       responses:
         '201':
-          description: 租户创建成功
+          description: 绉熸埛鍒涘缓鎴愬姛
           content:
             application/json:
               schema:
@@ -3078,7 +3078,7 @@ paths:
                 properties:
                   id:
                     type: integer
-                    description: 租户ID
+                    description: 绉熸埛ID
                   name:
                     type: string
                   contact_person:
@@ -3097,7 +3097,7 @@ paths:
                     type: string
                     format: date-time
         '400':
-          description: 请求参数不完整或格式错误
+          description: 璇锋眰鍙傛暟涓嶅畬鏁存垨鏍煎紡閿欒
           content:
             application/json:
               schema:
@@ -3110,7 +3110,7 @@ paths:
                     type: string
                     example: MISSING_REQUIRED_FIELDS
         '409':
-          description: 邮箱已存在
+          description: 閭宸插瓨锟?
           content:
             application/json:
               schema:
@@ -3123,18 +3123,18 @@ paths:
                     type: string
                     example: EMAIL_ALREADY_REGISTERED
         '500':
-          description: 服务器内部错误
+          description: 鏈嶅姟鍣ㄥ唴閮ㄩ敊锟?
   /api/tenant-web/orders/pending:
     get:
       tags:
         - auth
-      summary: 获取可认领的订单列表（状态=created）
+      summary: 鑾峰彇鍙棰嗙殑璁㈠崟鍒楄〃锛堢姸锟?created锟?
       operationId: listPendingOrders
       security:
         - TenantSessionAuth: []
       responses:
         '200':
-          description: 可认领订单列表
+          description: 鍙棰嗚鍗曞垪锟?
           content:
             application/json:
               schema:
@@ -3145,7 +3145,7 @@ paths:
     put:
       tags:
         - auth
-      summary: 租户认领订单
+      summary: 绉熸埛璁ら璁㈠崟
       operationId: claimOrder
       security:
         - TenantSessionAuth: []
@@ -3157,7 +3157,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 认领成功
+          description: 璁ら鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -3168,7 +3168,7 @@ paths:
     put:
       tags:
         - auth
-      summary: 租户完成订单
+      summary: 绉熸埛瀹屾垚璁㈠崟
       operationId: completeOrder
       security:
         - TenantSessionAuth: []
@@ -3180,7 +3180,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 完成成功
+          description: 瀹屾垚鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
@@ -3191,13 +3191,13 @@ paths:
     post:
       tags:
         - auth
-      summary: 租户登出
+      summary: 绉熸埛鐧诲嚭
       operationId: logoutTenant
       security:
         - TenantSessionAuth: []
       responses:
         '200':
-          description: 登出成功
+          description: 鐧诲嚭鎴愬姛
           content:
             application/json:
               schema:
@@ -3205,12 +3205,12 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 已安全退出
+                    example: 宸插畨鍏ㄩ€€锟?
   /api/matching/search-carriers:
     post:
       tags:
         - matching
-      summary: 根据订单需求搜索匹配的承运方
+      summary: 鏍规嵁璁㈠崟闇€姹傛悳绱㈠尮閰嶇殑鎵胯繍锟?
       operationId: searchMatchingCarriers
       requestBody:
         required: true
@@ -3225,10 +3225,10 @@ paths:
               properties:
                 pickup_address:
                   type: string
-                  example: 北京市朝阳区XX大厦
+                  example: 鍖椾含甯傛湞闃冲尯XX澶у帵
                 delivery_address:
                   type: string
-                  example: 上海市浦东新区YY园区
+                  example: 涓婃捣甯傛郸涓滄柊鍖篩Y鍥尯
                 weight_kg:
                   type: number
                   format: float
@@ -3246,10 +3246,10 @@ paths:
                   type: array
                   items:
                     type: string
-                  description: 优先匹配的承运方ID列表
+                  description: 浼樺厛鍖归厤鐨勬壙杩愭柟ID鍒楄〃
       responses:
         '200':
-          description: 匹配的承运方列表
+          description: 鍖归厤鐨勬壙杩愭柟鍒楄〃
           content:
             application/json:
               schema:
@@ -3270,7 +3270,7 @@ paths:
     get:
       tags:
         - matching
-      summary: 获取针对特定订单的预估报价建议
+      summary: 鑾峰彇閽堝鐗瑰畾璁㈠崟鐨勯浼版姤浠峰缓锟?
       operationId: getQuoteSuggestions
       parameters:
         - name: order_id
@@ -3278,10 +3278,10 @@ paths:
           required: true
           schema:
             type: string
-          description: 订单ID
+          description: 璁㈠崟ID
       responses:
         '200':
-          description: 预估报价建议列表
+          description: 棰勪及鎶ヤ环寤鸿鍒楄〃
           content:
             application/json:
               schema:
@@ -3302,34 +3302,34 @@ paths:
     get:
       tags:
         - carrier-order
-      summary: 获取承运商的所有报价列表
+      summary: 鑾峰彇鎵胯繍鍟嗙殑鎵€鏈夋姤浠峰垪锟?
       operationId: listCarrierQuotes
       security:
         - TenantSessionAuth: []
       parameters:
         - name: page
           in: query
-          description: 页码
+          description: 椤电爜
           required: false
           schema:
             type: integer
             default: 1
         - name: limit
           in: query
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
           required: false
           schema:
             type: integer
             default: 10
         - name: order_id
           in: query
-          description: 订单ID过滤
+          description: 璁㈠崟ID杩囨护
           required: false
           schema:
             type: string
         - name: status
           in: query
-          description: 报价状态过滤
+          description: 鎶ヤ环鐘舵€佽繃锟?
           required: false
           schema:
             type: string
@@ -3340,7 +3340,7 @@ paths:
               - expired
       responses:
         '200':
-          description: 承运商报价列表
+          description: 鎵胯繍鍟嗘姤浠峰垪锟?
           content:
             application/json:
               schema:
@@ -3351,7 +3351,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 获取成功
+                    example: 鑾峰彇鎴愬姛
                   data:
                     type: object
                     properties:
@@ -3367,7 +3367,7 @@ paths:
     get:
       tags:
         - admin-pricing
-      summary: 获取平台定价规则列表
+      summary: 鑾峰彇骞冲彴瀹氫环瑙勫垯鍒楄〃
       operationId: listPlatformPricingRules
       security:
         - AdminSessionAuth: []
@@ -3377,21 +3377,21 @@ paths:
           schema:
             type: integer
             default: 1
-          description: 页码
+          description: 椤电爜
         - name: limit
           in: query
           schema:
             type: integer
             default: 10
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
         - name: active
           in: query
           schema:
             type: boolean
-          description: 是否只返回激活的规则
+          description: 鏄惁鍙繑鍥炴縺娲荤殑瑙勫垯
       responses:
         '200':
-          description: 定价规则列表
+          description: 瀹氫环瑙勫垯鍒楄〃
           content:
             application/json:
               schema:
@@ -3411,7 +3411,7 @@ paths:
     post:
       tags:
         - admin-pricing
-      summary: 创建平台定价规则
+      summary: 鍒涘缓骞冲彴瀹氫环瑙勫垯
       operationId: createPlatformPricingRule
       security:
         - AdminSessionAuth: []
@@ -3423,7 +3423,7 @@ paths:
               $ref: '#/components/schemas/CreatePricingRuleRequest'
       responses:
         '201':
-          description: 定价规则创建成功
+          description: 瀹氫环瑙勫垯鍒涘缓鎴愬姛
           content:
             application/json:
               schema:
@@ -3434,7 +3434,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 平台定价规则创建成功
+                    example: 骞冲彴瀹氫环瑙勫垯鍒涘缓鎴愬姛
                   data:
                     $ref: '#/components/schemas/PricingRule'
         '400':
@@ -3447,7 +3447,7 @@ paths:
     get:
       tags:
         - admin-pricing
-      summary: 获取单个平台定价规则
+      summary: 鑾峰彇鍗曚釜骞冲彴瀹氫环瑙勫垯
       operationId: getPlatformPricingRule
       security:
         - AdminSessionAuth: []
@@ -3457,10 +3457,10 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价规则ID
+          description: 瀹氫环瑙勫垯ID
       responses:
         '200':
-          description: 定价规则详情
+          description: 瀹氫环瑙勫垯璇︽儏
           content:
             application/json:
               schema:
@@ -3478,7 +3478,7 @@ paths:
     put:
       tags:
         - admin-pricing
-      summary: 更新平台定价规则
+      summary: 鏇存柊骞冲彴瀹氫环瑙勫垯
       operationId: updatePlatformPricingRule
       security:
         - AdminSessionAuth: []
@@ -3488,7 +3488,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价规则ID
+          description: 瀹氫环瑙勫垯ID
       requestBody:
         required: true
         content:
@@ -3497,7 +3497,7 @@ paths:
               $ref: '#/components/schemas/UpdatePricingRuleRequest'
       responses:
         '200':
-          description: 定价规则更新成功
+          description: 瀹氫环瑙勫垯鏇存柊鎴愬姛
           content:
             application/json:
               schema:
@@ -3508,7 +3508,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 平台定价规则更新成功
+                    example: 骞冲彴瀹氫环瑙勫垯鏇存柊鎴愬姛
                   data:
                     $ref: '#/components/schemas/PricingRule'
         '400':
@@ -3522,7 +3522,7 @@ paths:
     delete:
       tags:
         - admin-pricing
-      summary: 删除平台定价规则
+      summary: 鍒犻櫎骞冲彴瀹氫环瑙勫垯
       operationId: deletePlatformPricingRule
       security:
         - AdminSessionAuth: []
@@ -3532,10 +3532,10 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价规则ID
+          description: 瀹氫环瑙勫垯ID
       responses:
         '200':
-          description: 定价规则删除成功
+          description: 瀹氫环瑙勫垯鍒犻櫎鎴愬姛
           content:
             application/json:
               schema:
@@ -3546,7 +3546,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 平台定价规则删除成功
+                    example: 骞冲彴瀹氫环瑙勫垯鍒犻櫎鎴愬姛
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -3557,7 +3557,7 @@ paths:
     get:
       tags:
         - carrier-pricing
-      summary: 获取承运商定价配置列表
+      summary: 鑾峰彇鎵胯繍鍟嗗畾浠烽厤缃垪锟?
       operationId: listCarrierPricingConfigs
       security:
         - AdminSessionAuth: []
@@ -3567,21 +3567,21 @@ paths:
           schema:
             type: integer
             default: 1
-          description: 页码
+          description: 椤电爜
         - name: limit
           in: query
           schema:
             type: integer
             default: 10
-          description: 每页数量
+          description: 姣忛〉鏁伴噺
         - name: carrier_id
           in: query
           schema:
             type: integer
-          description: 承运商ID过滤
+          description: 鎵胯繍鍟咺D杩囨护
       responses:
         '200':
-          description: 承运商定价配置列表
+          description: 鎵胯繍鍟嗗畾浠烽厤缃垪锟?
           content:
             application/json:
               schema:
@@ -3601,7 +3601,7 @@ paths:
     post:
       tags:
         - carrier-pricing
-      summary: 创建承运商定价配置
+      summary: 鍒涘缓鎵胯繍鍟嗗畾浠烽厤锟?
       operationId: createCarrierPricingConfig
       security:
         - AdminSessionAuth: []
@@ -3613,7 +3613,7 @@ paths:
               $ref: '#/components/schemas/CreateCarrierPricingConfigRequest'
       responses:
         '201':
-          description: 承运商定价配置创建成功
+          description: 鎵胯繍鍟嗗畾浠烽厤缃垱寤烘垚锟?
           content:
             application/json:
               schema:
@@ -3624,7 +3624,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 承运商定价配置创建成功
+                    example: 鎵胯繍鍟嗗畾浠烽厤缃垱寤烘垚锟?
                   data:
                     $ref: '#/components/schemas/CarrierPricingConfig'
         '400':
@@ -3637,7 +3637,7 @@ paths:
     get:
       tags:
         - carrier-pricing
-      summary: 获取单个承运商定价配置
+      summary: 鑾峰彇鍗曚釜鎵胯繍鍟嗗畾浠烽厤锟?
       operationId: getCarrierPricingConfig
       security:
         - AdminSessionAuth: []
@@ -3647,10 +3647,10 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价配置ID
+          description: 瀹氫环閰嶇疆ID
       responses:
         '200':
-          description: 承运商定价配置详情
+          description: 鎵胯繍鍟嗗畾浠烽厤缃锟?
           content:
             application/json:
               schema:
@@ -3668,7 +3668,7 @@ paths:
     put:
       tags:
         - carrier-pricing
-      summary: 更新承运商定价配置
+      summary: 鏇存柊鎵胯繍鍟嗗畾浠烽厤锟?
       operationId: updateCarrierPricingConfig
       security:
         - AdminSessionAuth: []
@@ -3678,7 +3678,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价配置ID
+          description: 瀹氫环閰嶇疆ID
       requestBody:
         required: true
         content:
@@ -3687,7 +3687,7 @@ paths:
               $ref: '#/components/schemas/UpdateCarrierPricingConfigRequest'
       responses:
         '200':
-          description: 承运商定价配置更新成功
+          description: 鎵胯繍鍟嗗畾浠烽厤缃洿鏂版垚锟?
           content:
             application/json:
               schema:
@@ -3698,7 +3698,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 承运商定价配置更新成功
+                    example: 鎵胯繍鍟嗗畾浠烽厤缃洿鏂版垚锟?
                   data:
                     $ref: '#/components/schemas/CarrierPricingConfig'
         '400':
@@ -3712,7 +3712,7 @@ paths:
     delete:
       tags:
         - carrier-pricing
-      summary: 删除承运商定价配置
+      summary: 鍒犻櫎鎵胯繍鍟嗗畾浠烽厤锟?
       operationId: deleteCarrierPricingConfig
       security:
         - AdminSessionAuth: []
@@ -3722,10 +3722,10 @@ paths:
           required: true
           schema:
             type: integer
-          description: 定价配置ID
+          description: 瀹氫环閰嶇疆ID
       responses:
         '200':
-          description: 承运商定价配置删除成功
+          description: 鎵胯繍鍟嗗畾浠烽厤缃垹闄ゆ垚锟?
           content:
             application/json:
               schema:
@@ -3736,7 +3736,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 承运商定价配置删除成功
+                    example: 鎵胯繍鍟嗗畾浠烽厤缃垹闄ゆ垚锟?
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -3747,7 +3747,7 @@ paths:
     post:
       tags:
         - public
-      summary: 获取订单报价 - 客户下单时获取多家承运商报价
+      summary: 鑾峰彇璁㈠崟鎶ヤ环 - 瀹㈡埛涓嬪崟鏃惰幏鍙栧瀹舵壙杩愬晢鎶ヤ环
       operationId: getOrderQuote
       requestBody:
         required: true
@@ -3762,23 +3762,23 @@ paths:
                 distance_km:
                   type: number
                   example: 15.5
-                  description: 运输距离（公里）
+                  description: 杩愯緭璺濈锛堝叕閲岋級
                 duration_hours:
                   type: number
                   example: 2.5
-                  description: 预计运输时长（小时）
+                  description: 棰勮杩愯緭鏃堕暱锛堝皬鏃讹級
                 weight_kg:
                   type: number
                   example: 100
-                  description: 货物重量（公斤）
+                  description: 璐х墿閲嶉噺锛堝叕鏂わ級
                 is_cold_storage:
                   type: boolean
                   example: false
-                  description: 是否需要冷链运输
+                  description: 鏄惁闇€瑕佸喎閾捐繍锟?
                 time_slot:
                   type: string
                   example: morning
-                  description: 时间段（morning, afternoon, evening, night）
+                  description: 鏃堕棿娈碉紙morning, afternoon, evening, night锟?
                 weather_condition:
                   type: string
                   example: normal
@@ -3787,11 +3787,11 @@ paths:
                     - rain
                     - snow
                     - storm
-                  description: 天气状况
+                  description: 澶╂皵鐘跺喌
                 region:
                   type: string
                   example: beijing_haidian
-                  description: 运输区域
+                  description: 杩愯緭鍖哄煙
                 vehicle_type:
                   type: string
                   example: van
@@ -3800,15 +3800,15 @@ paths:
                     - truck
                     - refrigerated_truck
                     - container_truck
-                  description: 所需车型
+                  description: 鎵€闇€杞﹀瀷
                 pickup_address:
                   type: string
-                  example: 北京市海淀区中关村大街1号
-                  description: 提货地址
+                  example: 鍖椾含甯傛捣娣€鍖轰腑鍏虫潙澶ц1锟?
+                  description: 鎻愯揣鍦板潃
                 delivery_address:
                   type: string
-                  example: 北京市朝阳区国贸大厦
-                  description: 送货地址
+                  example: 鍖椾含甯傛湞闃冲尯鍥借锤澶у帵
+                  description: 閫佽揣鍦板潃
                 cargo_type:
                   type: string
                   example: electronics
@@ -3819,10 +3819,10 @@ paths:
                     - medicine
                     - documents
                     - other
-                  description: 货物类型
+                  description: 璐х墿绫诲瀷
       responses:
         '200':
-          description: 报价计算成功
+          description: 鎶ヤ环璁＄畻鎴愬姛
           content:
             application/json:
               schema:
@@ -3833,7 +3833,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 报价计算成功
+                    example: 鎶ヤ环璁＄畻鎴愬姛
                   data:
                     type: object
                     properties:
@@ -3851,7 +3851,7 @@ paths:
     post:
       tags:
         - carrier-order
-      summary: 为订单添加附加费 - 承运商提交附加服务费用
+      summary: 涓鸿鍗曟坊鍔犻檮鍔犺垂 - 鎵胯繍鍟嗘彁浜ら檮鍔犳湇鍔¤垂锟?
       operationId: addOrderAddons
       security:
         - TenantSessionAuth: []
@@ -3861,7 +3861,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 订单ID
+          description: 璁㈠崟ID
       requestBody:
         required: true
         content:
@@ -3874,32 +3874,32 @@ paths:
               properties:
                 addons_config:
                   type: object
-                  description: 附加服务配置
+                  description: 闄勫姞鏈嶅姟閰嶇疆
                   properties:
                     loading_fee:
                       type: number
                       example: 50
-                      description: 装卸费
+                      description: 瑁呭嵏锟?
                     waiting_fee:
                       type: number
                       example: 30
-                      description: 等待费
+                      description: 绛夊緟锟?
                     overtime_fee:
                       type: number
                       example: 100
-                      description: 超时费
+                      description: 瓒呮椂锟?
                     special_handling_fee:
                       type: number
                       example: 80
-                      description: 特殊处理费
+                      description: 鐗规畩澶勭悊锟?
                     cold_storage_fee:
                       type: number
                       example: 40
-                      description: 冷藏附加费
+                      description: 鍐疯棌闄勫姞锟?
                     insurance_fee:
                       type: number
                       example: 20
-                      description: 保险费
+                      description: 淇濋櫓锟?
                     other_fees:
                       type: array
                       items:
@@ -3907,24 +3907,24 @@ paths:
                         properties:
                           name:
                             type: string
-                            example: 夜间配送费
+                            example: 澶滈棿閰嶉€佽垂
                           amount:
                             type: number
                             example: 60
                           description:
                             type: string
-                            example: 夜间配送额外费用
+                            example: 澶滈棿閰嶉€侀澶栬垂锟?
                 addons_total:
                   type: number
                   example: 230
-                  description: 附加费总计
+                  description: 闄勫姞璐规€昏
                 description:
                   type: string
-                  example: 因客户要求夜间配送和特殊包装产生的附加费用
-                  description: 附加费说明
+                  example: 鍥犲鎴疯姹傚闂撮厤閫佸拰鐗规畩鍖呰浜х敓鐨勯檮鍔犺垂锟?
+                  description: 闄勫姞璐硅锟?
       responses:
         '200':
-          description: 附加费添加成功
+          description: 闄勫姞璐规坊鍔犳垚锟?
           content:
             application/json:
               schema:
@@ -3935,7 +3935,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 订单附加费添加成功
+                    example: 璁㈠崟闄勫姞璐规坊鍔犳垚锟?
                   data:
                     type: object
                     properties:
@@ -3975,7 +3975,7 @@ paths:
     patch:
       tags:
         - customer-order
-      summary: 确认订单附加费 - 客户确认或拒绝承运商提交的附加费
+      summary: 纭璁㈠崟闄勫姞锟?- 瀹㈡埛纭鎴栨嫆缁濇壙杩愬晢鎻愪氦鐨勯檮鍔犺垂
       operationId: confirmOrderAddons
       security:
         - TenantSessionAuth: []
@@ -3985,7 +3985,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 订单ID
+          description: 璁㈠崟ID
       requestBody:
         required: true
         content:
@@ -3998,10 +3998,10 @@ paths:
                 confirm:
                   type: boolean
                   example: true
-                  description: 是否确认附加费 (true=确认, false=拒绝)
+                  description: 鏄惁纭闄勫姞锟?(true=纭, false=鎷掔粷)
       responses:
         '200':
-          description: 附加费确认状态更新成功
+          description: 闄勫姞璐圭‘璁ょ姸鎬佹洿鏂版垚锟?
           content:
             application/json:
               schema:
@@ -4012,7 +4012,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: 订单附加费已确认
+                    example: 璁㈠崟闄勫姞璐瑰凡纭
                   data:
                     type: object
                     properties:
@@ -4045,6 +4045,322 @@ paths:
                         example: '2026-02-09T12:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/admin/orders/{order_id}/settlement:
+    post:
+      tags:
+        - admin-order
+      summary: 处理订单结算 - 管理员执行订单结算流程
+      operationId: processSettlement
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 璁㈠崟ID
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                force_settle:
+                  type: boolean
+                  description: 鏄惁寮哄埗缁撶畻
+                  example: false
+      responses:
+        '200':
+          description: 缁撶畻澶勭悊鎴愬姛
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Settlement completed successfully
+                  data:
+                    type: object
+                    properties:
+                      order_id:
+                        type: string
+                        example: order_123
+                      gross_amount:
+                        type: number
+                        example: 200.00
+                      commission_amount:
+                        type: number
+                        example: 20.00
+                      net_amount:
+                        type: number
+                        example: 180.00
+                      order_status:
+                        type: string
+                        example: completed
+                      wallets:
+                        type: object
+                        properties:
+                          customer:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              balance:
+                                type: number
+                          carrier:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              balance:
+                                type: number
+                          platform:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              balance:
+                                type: number
+                      transactions:
+                        type: object
+                        properties:
+                          commission:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              wallet_id:
+                                type: integer
+                              amount:
+                                type: number
+                          platform_income:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              wallet_id:
+                                type: integer
+                              amount:
+                                type: number
+                          payment:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              wallet_id:
+                                type: integer
+                              amount:
+                                type: number
+                          carrier_income:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              wallet_id:
+                                type: integer
+                              amount:
+                                type: number
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/wallet/current:
+    get:
+      tags:
+        - wallet
+      summary: 锟斤拷取锟斤拷前锟矫伙拷锟斤拷钱锟斤拷锟斤拷息
+      operationId: getCurrentUserWallet
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 钱锟斤拷锟斤拷息锟斤拷取锟缴癸拷
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      wallet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          owner_type:
+                            type: string
+                            example: "customer"
+                          owner_id:
+                            type: string
+                            example: "tenant_123"
+                          balance:
+                            type: number
+                            example: 1000.00
+                          frozen_amount:
+                            type: number
+                            example: 0.00
+                          status:
+                            type: string
+                            example: "active"
+                          currency:
+                            type: string
+                            example: "CNY"
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: "2026-02-05T10:30:00Z"
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: "2026-02-05T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/wallet/{wallet_id}/transactions:
+    get:
+      tags:
+        - wallet
+      summary: 获取钱包交易记录
+      operationId: getWalletTransactions
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: wallet_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 钱包ID
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 页码
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: 每页数量
+        - name: transaction_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [income, expense]
+          description: 交易类型过滤
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 开始日期过滤
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 结束日期过滤
+      responses:
+        '200':
+          description: 钱包交易记录获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      transactions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            wallet_id:
+                              type: integer
+                              example: 1
+                            order_id:
+                              type: string
+                              example: "order_123"
+                            transaction_type:
+                              type: string
+                              example: "income"
+                            amount:
+                              type: number
+                              example: 100.00
+                            balance_change:
+                              type: number
+                              example: 100.00
+                            description:
+                              type: string
+                              example: "订单收入"
+                            reference_id:
+                              type: string
+                              example: "REF-123456"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2026-02-05T10:30:00Z"
+                            processed_at:
+                              type: string
+                              format: date-time
+                              example: "2026-02-05T10:30:00Z"
+                      pagination:
+                        type: object
+                        properties:
+                          current_page:
+                            type: integer
+                            example: 1
+                          total_pages:
+                            type: integer
+                            example: 5
+                          total_items:
+                            type: integer
+                            example: 100
+                          per_page:
+                            type: integer
+                            example: 20
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
