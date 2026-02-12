@@ -41,13 +41,13 @@ module.exports = async (c) => {
 
     const db = getDb();
     try {
-        // 3. 验证订单存在性及归属权
-        const orderSql = ` 
-            SELECT id FROM orders WHERE id = ? AND tenant_id = ? 
+        // 3. 验证订单存在性及归属权 - 现在使用 customer_tenant_id 而不是 tenant_id
+        const orderSql = `
+            SELECT id FROM orders WHERE id = ? AND customer_tenant_id = ?
         `;
         console.log(`[getOrderQuotes] Executing query with params: [${orderId}, ${tenantId}]`); // 添加调试日志
         const order = await db.get(orderSql, [orderId, tenantId]);
-        
+
         if (!order) {
             console.log("❌ 订单未找到或不属于当前租户。");
             return {

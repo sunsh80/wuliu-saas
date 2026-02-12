@@ -1936,7 +1936,7 @@ paths:
     get:
       tags:
         - customer-order
-      summary: 获取订单的报价列表
+      summary: 获取订单的报价列表（支持多承运商竞价）
       operationId: getOrderQuotes
       security:
         - TenantSessionAuth: []
@@ -1977,6 +1977,8 @@ paths:
                                 name:
                                   type: string
                                 tenant_name:
+                                  type: string
+                                phone:
                                   type: string
                             price:
                               type: number
@@ -2624,8 +2626,9 @@ paths:
       summary: 承运商为指定订单提交报价
       description: |
         承运商提交一个报价（价格、预计送达时间、备注）给指定的订单。
-        此操作不会改变订单的主状态(status)报价信息将存储在 quotes 表中。
+        此操作不会改变订单的主状态，报价信息将存储在 quotes 表中。
         订单状态的变更将在后续的客户选择或平台指派环节发生。
+        此端点允许承运商对状态为 'pending_claim' 的订单提交报价。
       tags:
         - Carrier
         - Quote
@@ -2708,7 +2711,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: 订单未找到或不允许报价
+          description: 订单未找到或不允许报价（订单状态不是 'pending_claim' 或不属于当前承运商）
           content:
             application/json:
               schema:

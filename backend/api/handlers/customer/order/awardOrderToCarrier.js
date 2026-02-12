@@ -54,7 +54,7 @@ module.exports = async (c) => {
       };
     }
     
-    // 验证订单当前状态是否允许被授予
+    // 驗证订单当前状态是否允许被授予
     if (!['created', 'pending_claim', 'quoted'].includes(order.status)) {
       console.log(`[awardOrderToCarrier] Order ${order_id} is not in a state that allows awarding: ${order.status}`);
       return {

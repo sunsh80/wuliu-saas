@@ -74,21 +74,21 @@
 
 ### 14. 承运商报价环节ok
 - 文件：@backend/api/handlers/carrier/order/submitCarrierQuote.js
-- 判断条件：用户具有'carrier'角色，订单状态为'claimed'，且为已认领的订单
-- 断点：需要承运商角色权限，订单必须已被该承运商认领
+- 判断条件：用户具有'carrier'角色，订单状态为'pending_claim'，且为已认领的订单
+- 断点：需要承运商角色权限，订单必须已被该承运商认领.认领之后，订单状态不变，改承运商不能再认领，但是其余多名承运商可以对同一个订单进行报价，形成竞价模式。
 
 ### 15. 客户获取指定订单的所有承运商报价列表ok
 - 文件：@backend/api/handlers/customer/order/getOrderQuotes.js, @wx-program/pages/orderTrack/orderTrack.js
-- 判断条件：客户登录，订单状态为'quoted'，客户可查看所有承运商的报价
+- 判断条件：客户登录，订单状态为'pending_claim'，客户可查看所有承运商的报价
 
-### 16. 客户查看报价环节ok
+### 16. 客户查看订单详情，报价环节ok
 - 文件：@wx-program/pages/orderTrack/orderTrack.js, @backend/api/handlers/customer/order/getCustomerOrder.js
-- 判断条件：客户登录后，订单状态为'quoted'
+- 判断条件：客户登录后，订单状态为'pending_claim'
 - 断点：需要客户登录才能查看报价
 
 ### 17. 客户选择承运商环节ok
 - 文件：@wx-program/pages/orderTrack/orderTrack.js, @backend/api/handlers/customer/order/awardOrderToCarrier.js
-- 判断条件：客户登录，订单状态为'quoted'，客户选择承运商
+- 判断条件：客户登录，客户选择承运商，订单状态为'awarded'
 - 断点：需要客户登录并主动选择
 
 ### 18. 客户支付订单//未开发

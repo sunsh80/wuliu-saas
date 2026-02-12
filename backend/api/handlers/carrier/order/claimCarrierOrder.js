@@ -39,11 +39,11 @@ module.exports = async (c) => {
       return { status: 404, body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_PENDING_CLAIM' } };
     }
 
-    // 2. 更新订单为 'claimed' 状态，并设置 carrier_id
+    // 2. 更新订单的 carrier_id，但保持 'pending_claim' 状态以允许多个承运商报价
     // 使用 UPDATE WHERE 条件来保证原子性，防止并发冲突
-    console.log(`🔍 [STEP 2] Updating order ${order_id} to 'claimed' by carrier ${userId}`);
+    console.log(`🔍 [STEP 2] Setting carrier ${userId} for order ${order_id} while keeping status 'pending_claim' to allow multiple carriers to quote`);
     const updateResult = await db.run(
-      `UPDATE orders SET carrier_id = ?, status = 'claimed', updated_at = datetime('now') WHERE id = ? AND status = 'pending_claim'`,
+      `UPDATE orders SET carrier_id = ?, updated_at = datetime('now') WHERE id = ? AND status = 'pending_claim'`,
       [userId, order_id]
     );
 

@@ -55,18 +55,18 @@ module.exports = async (c) => {
     const db = getDb();
 
     try {
-        // 4. 验证订单状态和归属权
-        console.log(`🔍 步骤 1: 验证订单 ${orderId} 是否为 'claimed' 状态且归属于承运商 ${userId}。`);
+        // 4. 验证订单状态和归属权 - 现在允许订单处于 'pending_claim' 状态以支持多承运商报价
+        console.log(`🔍 步骤 1: 验证订单 ${orderId} 是否为 'pending_claim' 状态且归属于承运商 ${userId}。`);
         const orderCheckSql = `
             SELECT id, status, carrier_id
             FROM orders
-            WHERE id = ? AND status = 'claimed' AND carrier_id = ?
+            WHERE id = ? AND status = 'pending_claim' AND carrier_id = ?
         `;
         const order = await db.get(orderCheckSql, [orderId, userId]);
 
         if (!order) {
-            console.log("❌ 订单未找到，未处于 'claimed' 状态，或未分配给请求的承运商。");
-            return { status: 404, body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_CLAIMED_BY_USER', message: "订单未找到，未处于 'claimed' 状态，或非您认领。" } };
+            console.log("❌ 订单未找到，未处于 'pending_claim' 状态，或未分配给请求的承运商。");
+            return { status: 404, body: { success: false, error: 'ORDER_NOT_FOUND_OR_NOT_PENDING_CLAIM_BY_USER', message: "订单未找到，未处于 'pending_claim' 状态，或非您认领。" } };
         }
 
         console.log("✅ 订单验证成功。正在继续提交报价。");
@@ -81,21 +81,22 @@ module.exports = async (c) => {
 
         console.log("✅ 报价已成功插入 'quotes' 表。");
 
-        // 6. 更新订单状态
-        console.log(`🔍 步骤 3: 将订单 ${orderId} 的状态更新为 'quoted'。`);
-        const updateOrderStatusSql = `
-            UPDATE orders
-            SET status = 'quoted', updated_at = datetime('now')
-            WHERE id = ? AND status = 'claimed'
-        `;
-        const updateStatusResult = await db.run(updateOrderStatusSql, [orderId]);
+        // 6. 不再更新订单状态，保持 'pending_claim' 以允许多个承运商报价
+        console.log(`🔍 步骤 3: 保持订单 ${orderId} 的状态为 'pending_claim' 以允许多个承运商报价。`);
+        // 注释掉原有的状态更新逻辑
+        // const updateOrderStatusSql = `
+        //     UPDATE orders
+        //     SET status = 'quoted', updated_at = datetime('now')
+        //     WHERE id = ? AND status = 'claimed'
+        // `;
+        // const updateStatusResult = await db.run(updateOrderStatusSql, [orderId]);
 
-        if (updateStatusResult.changes === 0) {
-            console.error("💥 严重错误: 更新订单状态失败。订单可能在验证后被并发修改。");
-            return { status: 409, body: { success: false, error: 'CONCURRENT_MODIFICATION_ERROR', message: "由于并发修改，更新订单状态失败。请重试。" } };
-        }
+        // if (updateStatusResult.changes === 0) {
+        //     console.error("💥 严重错误: 更新订单状态失败。订单可能在验证后被并发修改。");
+        //     return { status: 409, body: { success: false, error: 'CONCURRENT_MODIFICATION_ERROR', message: "由于并发修改，更新订单状态失败。请重试。" } };
+        // }
 
-        console.log("✅ 订单状态已成功更新为 'quoted'。");
+        console.log("✅ 订单状态保持为 'pending_claim'，允许多个承运商报价。");
 
         // 7. 准备并发送成功响应
         console.log("🎉 订单", orderId, "的报价提交流程成功完成。");
