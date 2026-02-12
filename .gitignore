@@ -10,4 +10,4 @@ project.private.config.json
 
 # 开发工具
 .vscode/
-*.log
+*.log"backend/data/mydatabase.db" 

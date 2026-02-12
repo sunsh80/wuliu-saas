@@ -1,0 +1,258 @@
+[2026-01-22T13:22:49.562Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:22:49.568Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:22:49.569Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:22:49.570Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:22:49.718Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:22:49.719Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:22:49.720Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:23:04.936Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.21s, 状态: passed)
+[2026-01-22T13:23:06.939Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:23:27.269Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.33s, 状态: passed)
+[2026-01-22T13:23:29.286Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:23:29.527Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:23:31.535Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:23:31.769Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:23:33.783Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:23:34.116Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.33s, 状态: passed)
+[2026-01-22T13:23:36.130Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:23:36.362Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:23:38.367Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:23:38.368Z] [INFO] ============================================================
+[2026-01-22T13:23:38.369Z] [INFO] 总时间: 48.80 秒
+[2026-01-22T13:23:38.369Z] [INFO] 总测试数: 6
+[2026-01-22T13:23:38.370Z] [INFO] 通过: 6
+[2026-01-22T13:23:38.371Z] [INFO] 失败: 0
+[2026-01-22T13:23:38.371Z] [INFO] 跳过: 0
+[2026-01-22T13:23:38.373Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:23:38.373Z] [INFO] ============================================================
+[2026-01-22T13:23:38.374Z] [INFO] 📋 详细结果:
+[2026-01-22T13:23:38.375Z] [INFO] ✅ automated_test.js (15.21s)
+[2026-01-22T13:23:38.376Z] [INFO] ✅ comprehensive_api_test.js (20.33s)
+[2026-01-22T13:23:38.376Z] [INFO] ✅ carrier_login_test.js (0.24s)
+[2026-01-22T13:23:38.377Z] [INFO] ✅ complete_carrier_flow_test.js (0.23s)
+[2026-01-22T13:23:38.377Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.33s)
+[2026-01-22T13:23:38.378Z] [INFO] ✅ comprehensive_role_test.js (0.23s)
+[2026-01-22T13:23:38.379Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:23:39.383Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:23:39.513Z] [INFO] ✅ 清理完成
+[2026-01-22T13:26:08.691Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:26:08.696Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:26:08.697Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:26:08.698Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:26:08.855Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:26:08.856Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:26:08.857Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:26:24.052Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.19s, 状态: passed)
+[2026-01-22T13:26:26.068Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:26:46.442Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.37s, 状态: passed)
+[2026-01-22T13:26:48.456Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:26:48.703Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.25s, 状态: passed)
+[2026-01-22T13:26:50.710Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:26:50.949Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:26:52.959Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:26:53.194Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:26:55.201Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:26:55.426Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.22s, 状态: passed)
+[2026-01-22T13:26:57.437Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:26:57.437Z] [INFO] ============================================================
+[2026-01-22T13:26:57.438Z] [INFO] 总时间: 48.74 秒
+[2026-01-22T13:26:57.439Z] [INFO] 总测试数: 6
+[2026-01-22T13:26:57.439Z] [INFO] 通过: 6
+[2026-01-22T13:26:57.440Z] [INFO] 失败: 0
+[2026-01-22T13:26:57.440Z] [INFO] 跳过: 0
+[2026-01-22T13:26:57.441Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:26:57.441Z] [INFO] ============================================================
+[2026-01-22T13:26:57.442Z] [INFO] 📋 详细结果:
+[2026-01-22T13:26:57.442Z] [INFO] ✅ automated_test.js (15.19s)
+[2026-01-22T13:26:57.443Z] [INFO] ✅ comprehensive_api_test.js (20.37s)
+[2026-01-22T13:26:57.444Z] [INFO] ✅ carrier_login_test.js (0.25s)
+[2026-01-22T13:26:57.444Z] [INFO] ✅ complete_carrier_flow_test.js (0.24s)
+[2026-01-22T13:26:57.445Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.23s)
+[2026-01-22T13:26:57.445Z] [INFO] ✅ comprehensive_role_test.js (0.22s)
+[2026-01-22T13:26:57.448Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:26:58.451Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:26:58.575Z] [INFO] ✅ 清理完成
+[2026-01-22T13:33:01.893Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:33:01.899Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:33:01.900Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:33:01.901Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:33:02.049Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:33:02.050Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:33:02.051Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:33:17.247Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.20s, 状态: passed)
+[2026-01-22T13:33:19.249Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:33:39.565Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.32s, 状态: passed)
+[2026-01-22T13:33:41.574Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:33:41.821Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.25s, 状态: passed)
+[2026-01-22T13:33:43.826Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:33:44.063Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:33:46.065Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:33:46.399Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.33s, 状态: passed)
+[2026-01-22T13:33:48.401Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:33:48.644Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:33:50.654Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:33:50.655Z] [INFO] ============================================================
+[2026-01-22T13:33:50.656Z] [INFO] 总时间: 48.75 秒
+[2026-01-22T13:33:50.656Z] [INFO] 总测试数: 6
+[2026-01-22T13:33:50.657Z] [INFO] 通过: 6
+[2026-01-22T13:33:50.658Z] [INFO] 失败: 0
+[2026-01-22T13:33:50.658Z] [INFO] 跳过: 0
+[2026-01-22T13:33:50.659Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:33:50.659Z] [INFO] ============================================================
+[2026-01-22T13:33:50.660Z] [INFO] 📋 详细结果:
+[2026-01-22T13:33:50.660Z] [INFO] ✅ automated_test.js (15.20s)
+[2026-01-22T13:33:50.661Z] [INFO] ✅ comprehensive_api_test.js (20.32s)
+[2026-01-22T13:33:50.662Z] [INFO] ✅ carrier_login_test.js (0.25s)
+[2026-01-22T13:33:50.662Z] [INFO] ✅ complete_carrier_flow_test.js (0.24s)
+[2026-01-22T13:33:50.663Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.33s)
+[2026-01-22T13:33:50.663Z] [INFO] ✅ comprehensive_role_test.js (0.24s)
+[2026-01-22T13:33:50.665Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:33:51.667Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:33:51.786Z] [INFO] ✅ 清理完成
+[2026-01-22T13:36:40.024Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:36:40.029Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:36:40.030Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:36:40.030Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:36:40.180Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:36:40.181Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:36:40.182Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:36:55.377Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.20s, 状态: passed)
+[2026-01-22T13:36:57.380Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:37:17.703Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.32s, 状态: passed)
+[2026-01-22T13:37:19.718Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:37:19.968Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.25s, 状态: passed)
+[2026-01-22T13:37:21.976Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:37:22.204Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:37:24.208Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:37:24.534Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.33s, 状态: passed)
+[2026-01-22T13:37:26.540Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:37:26.784Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:37:28.800Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:37:28.801Z] [INFO] ============================================================
+[2026-01-22T13:37:28.802Z] [INFO] 总时间: 48.77 秒
+[2026-01-22T13:37:28.802Z] [INFO] 总测试数: 6
+[2026-01-22T13:37:28.803Z] [INFO] 通过: 6
+[2026-01-22T13:37:28.803Z] [INFO] 失败: 0
+[2026-01-22T13:37:28.804Z] [INFO] 跳过: 0
+[2026-01-22T13:37:28.804Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:37:28.805Z] [INFO] ============================================================
+[2026-01-22T13:37:28.807Z] [INFO] 📋 详细结果:
+[2026-01-22T13:37:28.808Z] [INFO] ✅ automated_test.js (15.20s)
+[2026-01-22T13:37:28.808Z] [INFO] ✅ comprehensive_api_test.js (20.32s)
+[2026-01-22T13:37:28.809Z] [INFO] ✅ carrier_login_test.js (0.25s)
+[2026-01-22T13:37:28.810Z] [INFO] ✅ complete_carrier_flow_test.js (0.23s)
+[2026-01-22T13:37:28.810Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.33s)
+[2026-01-22T13:37:28.811Z] [INFO] ✅ comprehensive_role_test.js (0.24s)
+[2026-01-22T13:37:28.812Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:37:29.827Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:37:29.966Z] [INFO] ✅ 清理完成
+[2026-01-22T13:45:47.608Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:45:47.614Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:45:47.615Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:45:47.616Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:45:47.766Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:45:47.767Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:45:47.768Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:46:02.957Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.19s, 状态: passed)
+[2026-01-22T13:46:04.960Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:46:25.277Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.32s, 状态: passed)
+[2026-01-22T13:46:27.288Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:46:27.527Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:46:29.534Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:46:29.767Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:46:31.776Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:46:32.011Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:46:34.015Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:46:34.240Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.22s, 状态: passed)
+[2026-01-22T13:46:36.251Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:46:36.252Z] [INFO] ============================================================
+[2026-01-22T13:46:36.253Z] [INFO] 总时间: 48.64 秒
+[2026-01-22T13:46:36.253Z] [INFO] 总测试数: 6
+[2026-01-22T13:46:36.254Z] [INFO] 通过: 6
+[2026-01-22T13:46:36.254Z] [INFO] 失败: 0
+[2026-01-22T13:46:36.255Z] [INFO] 跳过: 0
+[2026-01-22T13:46:36.255Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:46:36.256Z] [INFO] ============================================================
+[2026-01-22T13:46:36.257Z] [INFO] 📋 详细结果:
+[2026-01-22T13:46:36.257Z] [INFO] ✅ automated_test.js (15.19s)
+[2026-01-22T13:46:36.258Z] [INFO] ✅ comprehensive_api_test.js (20.32s)
+[2026-01-22T13:46:36.258Z] [INFO] ✅ carrier_login_test.js (0.24s)
+[2026-01-22T13:46:36.259Z] [INFO] ✅ complete_carrier_flow_test.js (0.23s)
+[2026-01-22T13:46:36.260Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.23s)
+[2026-01-22T13:46:36.260Z] [INFO] ✅ comprehensive_role_test.js (0.22s)
+[2026-01-22T13:46:36.262Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:46:37.266Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:46:37.385Z] [INFO] ✅ 清理完成
+[2026-01-22T13:51:25.996Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:51:26.001Z] [INFO] 🚀 API测试运行器初始化完成
+[2026-01-22T13:51:26.002Z] [INFO] 🚀 开始自动化API测试运行...
+[2026-01-22T13:51:26.003Z] [INFO] 🚀 检查后端服务状态...
+[2026-01-22T13:51:26.152Z] [INFO] ✅ 后端服务健康检查成功
+[2026-01-22T13:51:26.152Z] [INFO] ✅ 后端服务已在运行中
+[2026-01-22T13:51:26.153Z] [INFO] 🧪 正在运行测试: automated_test.js
+[2026-01-22T13:51:41.351Z] [INFO] 🏁 automated_test.js 完成 (耗时: 15.20s, 状态: passed)
+[2026-01-22T13:51:43.363Z] [INFO] 🧪 正在运行测试: comprehensive_api_test.js
+[2026-01-22T13:52:03.833Z] [INFO] 🏁 comprehensive_api_test.js 完成 (耗时: 20.47s, 状态: passed)
+[2026-01-22T13:52:05.845Z] [INFO] 🧪 正在运行测试: carrier_login_test.js
+[2026-01-22T13:52:06.089Z] [INFO] 🏁 carrier_login_test.js 完成 (耗时: 0.24s, 状态: passed)
+[2026-01-22T13:52:08.091Z] [INFO] 🧪 正在运行测试: complete_carrier_flow_test.js
+[2026-01-22T13:52:08.322Z] [INFO] 🏁 complete_carrier_flow_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:52:10.324Z] [INFO] 🧪 正在运行测试: comprehensive_end_to_end_test.js
+[2026-01-22T13:52:10.657Z] [INFO] 🏁 comprehensive_end_to_end_test.js 完成 (耗时: 0.33s, 状态: passed)
+[2026-01-22T13:52:12.668Z] [INFO] 🧪 正在运行测试: comprehensive_role_test.js
+[2026-01-22T13:52:12.903Z] [INFO] 🏁 comprehensive_role_test.js 完成 (耗时: 0.23s, 状态: passed)
+[2026-01-22T13:52:14.917Z] [INFO] 📊 测试执行报告
+[2026-01-22T13:52:14.918Z] [INFO] ============================================================
+[2026-01-22T13:52:14.919Z] [INFO] 总时间: 48.91 秒
+[2026-01-22T13:52:14.919Z] [INFO] 总测试数: 6
+[2026-01-22T13:52:14.920Z] [INFO] 通过: 6
+[2026-01-22T13:52:14.920Z] [INFO] 失败: 0
+[2026-01-22T13:52:14.921Z] [INFO] 跳过: 0
+[2026-01-22T13:52:14.921Z] [INFO] 成功率: 100.00%
+[2026-01-22T13:52:14.922Z] [INFO] ============================================================
+[2026-01-22T13:52:14.922Z] [INFO] 📋 详细结果:
+[2026-01-22T13:52:14.923Z] [INFO] ✅ automated_test.js (15.20s)
+[2026-01-22T13:52:14.924Z] [INFO] ✅ comprehensive_api_test.js (20.47s)
+[2026-01-22T13:52:14.924Z] [INFO] ✅ carrier_login_test.js (0.24s)
+[2026-01-22T13:52:14.925Z] [INFO] ✅ complete_carrier_flow_test.js (0.23s)
+[2026-01-22T13:52:14.925Z] [INFO] ✅ comprehensive_end_to_end_test.js (0.33s)
+[2026-01-22T13:52:14.926Z] [INFO] ✅ comprehensive_role_test.js (0.23s)
+[2026-01-22T13:52:14.928Z] [INFO] 💾 测试报告已保存至: C:\Users\Administrator\Desktop\wuliu_project\test_report.json
+[2026-01-22T13:52:15.934Z] [INFO] 🧹 开始清理资源...
+[2026-01-22T13:52:16.064Z] [INFO] ✅ 清理完成
+[2026-01-26T10:51:42.848Z] [INFO] Checking if backend service is running...
+[2026-01-26T10:51:42.916Z] [ERROR] ✗ Backend service is not accessible. Please start the backend server first.
+[2026-01-26T10:51:42.917Z] [INFO] To start the backend, run: cd backend && npm run dev
+[2026-01-26T10:58:27.023Z] [INFO] Checking if backend service is running...
+[2026-01-26T10:58:27.081Z] [INFO] ✓ Backend service is running. Status: 200
+[2026-01-26T10:58:27.082Z] [INFO] Starting basic API connectivity tests...
+[2026-01-26T10:58:27.082Z] [INFO] Testing GET /health - Health Check
+[2026-01-26T10:58:27.103Z] [ERROR] ✗ FAILED: GET /health - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.104Z] [INFO] Testing GET /api/health - API Health Check
+[2026-01-26T10:58:27.107Z] [ERROR] ✗ FAILED: GET /api/health - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.108Z] [INFO] Basic API tests completed.
+[2026-01-26T10:58:27.108Z] [INFO] Starting comprehensive API tests...
+[2026-01-26T10:58:27.109Z] [INFO] Testing GET /health - Health Check
+[2026-01-26T10:58:27.111Z] [ERROR] ✗ FAILED: GET /health - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.112Z] [INFO] Testing GET /api/health - API Health Check
+[2026-01-26T10:58:27.115Z] [ERROR] ✗ FAILED: GET /api/health - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.116Z] [INFO] Testing POST /api/customer/order/bind - Bind Order to Customer (Public)
+[2026-01-26T10:58:27.122Z] [ERROR] ✗ FAILED: POST /api/customer/order/bind - Status: 401, Message: Request failed with status code 401
+[2026-01-26T10:58:27.123Z] [INFO] Testing GET /api/customer/orders - Get Customer Orders (Requires Auth)
+[2026-01-26T10:58:27.126Z] [ERROR] ✗ FAILED: GET /api/customer/orders - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.126Z] [INFO] Testing GET /api/customer/orders/test_order_123 - Get Single Customer Order (Requires Auth)
+[2026-01-26T10:58:27.129Z] [ERROR] ✗ FAILED: GET /api/customer/orders/test_order_123 - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.130Z] [INFO] Testing POST /api/customer/orders - Create Customer Order (Requires Auth)
+[2026-01-26T10:58:27.136Z] [ERROR] ✗ FAILED: POST /api/customer/orders - Status: 403, Message: Request failed with status code 403
+[2026-01-26T10:58:27.137Z] [INFO] Testing GET /api/carrier/orders - Get Carrier Orders (Requires Auth)
+[2026-01-26T10:58:27.140Z] [ERROR] ✗ FAILED: GET /api/carrier/orders - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.141Z] [INFO] Testing GET /api/carrier/orders/available - Get Available Orders (Requires Auth)
+[2026-01-26T10:58:27.143Z] [ERROR] ✗ FAILED: GET /api/carrier/orders/available - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.144Z] [INFO] Testing POST /api/carrier/orders/test_order_123/quote - Submit Quote (Requires Auth)
+[2026-01-26T10:58:27.149Z] [INFO] ✓ PASSED: POST /api/carrier/orders/test_order_123/quote - Status: 200, Time: 5ms
+[2026-01-26T10:58:27.149Z] [INFO] Testing GET /api/matching/orders/test_order_123 - Get Matching Info (Requires Auth)
+[2026-01-26T10:58:27.152Z] [ERROR] ✗ FAILED: GET /api/matching/orders/test_order_123 - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.153Z] [INFO] Testing GET /api/admin/tenants - Get Tenants List (Admin Auth Required)
+[2026-01-26T10:58:27.155Z] [ERROR] ✗ FAILED: GET /api/admin/tenants - Status: 500, Message: Request failed with status code 500
+[2026-01-26T10:58:27.156Z] [INFO] Comprehensive API tests completed.
+[2026-01-26T10:58:27.157Z] [INFO] Test report saved to ./api_test_report.json
