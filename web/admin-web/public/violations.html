@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流管理系统 - 违规处理</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .main-content {
+            padding: 24px;
+            margin-top: 80px; /* 为顶部栏留出空间 */
+            margin-left: 270px; /* 为侧边栏留出空间 */
+            margin-right: 20px; /* 添加右边距 */
+            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
+            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
+            background-color: #f5f5f5;
+        }
+        
+        /* 违规处理页面特定样式 */
+        .filter-section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+
+        .filter-item label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .date-separator {
+            margin: 0 10px;
+            align-self: center;
+        }
+
+        .violation-table-section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .violation-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .violation-table th,
+        .violation-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .violation-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #555;
+            position: sticky;
+            top: 0;
+        }
+
+        .violation-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .violation-type-badge,
+        .severity-badge,
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .badge-delivery-delay {
+            background-color: #ffeaa7;
+            color: #d68910;
+        }
+
+        .badge-quality-issue {
+            background-color: #fd79a8;
+            color: #a55eea;
+        }
+
+        .badge-service-complaint {
+            background-color: #fdcb6e;
+            color: #e17055;
+        }
+
+        .badge-document-error {
+            background-color: #636e72;
+            color: #b2bec3;
+        }
+
+        .badge-other {
+            background-color: #ddd;
+            color: #555;
+        }
+
+        .severity-low {
+            background-color: #00b894;
+            color: white;
+        }
+
+        .severity-medium {
+            background-color: #fdcb6e;
+            color: #2d3436;
+        }
+
+        .severity-high {
+            background-color: #e17055;
+            color: white;
+        }
+
+        .severity-critical {
+            background-color: #d63031;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #74b9ff;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #00b894;
+            color: white;
+        }
+
+        .status-in-progress {
+            background-color: #fdcb6e;
+            color: #2d3436;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .btn-outline:hover {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+            <li><a href="/pricing-rules.html"><i class="fas fa-tags"></i> <span>配价管理</span></a></li>
+            <li><a href="/violations.html" class="active"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
+            <li><a href="/commissions.html"><i class="fas fa-percent"></i> <span>抽佣管理</span></a></li>
+            <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="topbar">
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <h1>供应商违规处理</h1>
+
+        <!-- 违规记录搜索过滤器 -->
+        <section class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="supplierFilter">供应商名称:</label>
+                    <input type="text" id="supplierFilter" placeholder="输入供应商名称" />
+                </div>
+                
+                <div class="filter-item">
+                    <label for="violationTypeFilter">违规类型:</label>
+                    <select id="violationTypeFilter">
+                        <option value="">全部</option>
+                        <option value="delivery_delay">配送延迟</option>
+                        <option value="quality_issue">质量问题</option>
+                        <option value="service_complaint">服务投诉</option>
+                        <option value="document_error">单据错误</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div class="filter-item">
+                    <label>日期范围:</label>
+                    <input type="date" id="startDateFilter" />
+                    <span class="date-separator">至</span>
+                    <input type="date" id="endDateFilter" />
+                </div>
+                
+                <div class="filter-item">
+                    <button class="btn btn-primary">搜索</button>
+                    <button class="btn btn-secondary">重置</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 违规记录表格 -->
+        <section class="violation-table-section">
+            <div class="table-header">
+                <h2>违规记录列表</h2>
+                <div class="table-actions">
+                    <button class="btn btn-outline">导出数据</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="violation-table">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>供应商名称</th>
+                            <th>违规类型</th>
+                            <th>违规描述</th>
+                            <th>发生时间</th>
+                            <th>严重程度</th>
+                            <th>处理状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>顺丰速运</td>
+                            <td><span class="violation-type-badge badge-delivery-delay">配送延迟</span></td>
+                            <td>订单#ORD001配送超时2小时</td>
+                            <td>2023-10-15</td>
+                            <td><span class="severity-badge severity-medium">中</span></td>
+                            <td><span class="status-badge status-pending">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline">详情</button>
+                                <button class="btn btn-sm btn-warning">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>圆通快递</td>
+                            <td><span class="violation-type-badge badge-quality-issue">质量问题</span></td>
+                            <td>货物在运输过程中出现损坏</td>
+                            <td>2023-10-16</td>
+                            <td><span class="severity-badge severity-high">高</span></td>
+                            <td><span class="status-badge status-resolved">已处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline">详情</button>
+                                <button class="btn btn-sm btn-warning">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>韵达快递</td>
+                            <td><span class="violation-type-badge badge-service-complaint">服务投诉</span></td>
+                            <td>客户投诉配送员态度恶劣</td>
+                            <td>2023-10-17</td>
+                            <td><span class="severity-badge severity-low">低</span></td>
+                            <td><span class="status-badge status-pending">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline">详情</button>
+                                <button class="btn btn-sm btn-warning">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>中通快递</td>
+                            <td><span class="violation-type-badge badge-document-error">单据错误</span></td>
+                            <td>运单信息填写错误</td>
+                            <td>2023-10-18</td>
+                            <td><span class="severity-badge severity-low">低</span></td>
+                            <td><span class="status-badge status-resolved">已处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline">详情</button>
+                                <button class="btn btn-sm btn-warning">处理</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>申通快递</td>
+                            <td><span class="violation-type-badge badge-delivery-delay">配送延迟</span></td>
+                            <td>批量订单配送延迟超过4小时</td>
+                            <td>2023-10-19</td>
+                            <td><span class="severity-badge severity-critical">严重</span></td>
+                            <td><span class="status-badge status-pending">待处理</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline">详情</button>
+                                <button class="btn btn-sm btn-warning">处理</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login.html';
+        });
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+    </script>
+</body>
+</html>
