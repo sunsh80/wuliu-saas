@@ -7,10 +7,16 @@ db.serialize(() => {
     if (err) {
       console.error(err.message);
     } else {
-      console.log('Orders表在数据库中的实际定义:');
-      console.log(rows[0].sql);
+      if (rows.length > 0) {
+        console.log('Orders表在数据库中的实际定义:');
+        console.log(rows[0].sql);
+      } else {
+        console.log('未找到名为 orders 的表');
+      }
     }
   });
 });
 
-db.close();
+db.close(() => {
+  console.log('Database connection closed.');
+});

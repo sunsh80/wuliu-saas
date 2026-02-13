@@ -17,7 +17,7 @@ let dbInstance = null;
 function getDb() {
   if (!dbInstance) {
     console.log('🔗 首次初始化数据库连接:', DB_PATH);
-    
+
     // 创建新连接
     dbInstance = new sqlite3.Database(DB_PATH, (err) => {
       if (err) {
@@ -25,7 +25,7 @@ function getDb() {
         throw err; // 初始化失败应中断
       } else {
         console.log('✅ 数据库连接成功!');
-        
+
         // 启用外键约束
         dbInstance.run('PRAGMA foreign_keys = ON;', (err) => {
           if (err) {
@@ -35,7 +35,7 @@ function getDb() {
       }
     });
   }
-  
+
   return dbInstance;
 }
 
@@ -43,24 +43,24 @@ function getDb() {
 function getWrappedDb() {
   const db = getDb(); // 确保已初始化
   return {
-    get: (sql, params = []) => 
-      new Promise((resolve, reject) => 
+    get: (sql, params = []) =>
+      new Promise((resolve, reject) =>
         db.get(sql, params, (err, row) => err ? reject(err) : resolve(row))
       ),
-    all: (sql, params = []) => 
-      new Promise((resolve, reject) => 
+    all: (sql, params = []) =>
+      new Promise((resolve, reject) =>
         db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows))
       ),
-    run: (sql, params = []) => 
-      new Promise((resolve, reject) => 
+    run: (sql, params = []) =>
+      new Promise((resolve, reject) =>
         db.run(sql, params, function(err) { err ? reject(err) : resolve(this); })
       ),
-    exec: (sql) => 
-      new Promise((resolve, reject) => 
+    exec: (sql) =>
+      new Promise((resolve, reject) =>
         db.exec(sql, (err) => err ? reject(err) : resolve())
       ),
-    close: () => 
-      new Promise((resolve, reject) => 
+    close: () =>
+      new Promise((resolve, reject) =>
         db.close((err) => err ? reject(err) : resolve())
       ),
     raw: db
@@ -73,7 +73,7 @@ class DatabaseConnection {
     getDb(); // 触发初始化
     return getWrappedDb();
   }
-  
+
   async close() {
     if (dbInstance) {
       await new Promise((resolve, reject) => {

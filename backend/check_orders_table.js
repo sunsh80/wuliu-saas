@@ -14,4 +14,6 @@ db.serialize(() => {
   });
 });
 
-db.close();
+db.close(() => {
+  console.log('Database connection closed.');
+});

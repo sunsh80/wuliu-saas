@@ -121,25 +121,28 @@ const CORE_TABLES = {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `,
-tenant_vehicles: ` CREATE TABLE IF NOT EXISTS tenant_vehicles (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  tenant_id INTEGER NOT NULL, -- 引用 tenants 表
-  plate_number TEXT NOT NULL UNIQUE,
-  type TEXT NOT NULL,
-  length REAL,
-  width REAL,
-  height REAL,
-  max_weight REAL,
-  volume REAL,
-  status TEXT DEFAULT 'active',
-  driver_name TEXT,
-  driver_phone TEXT,
-  image_url TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE -- 正确的外键约束
-);
-`,
+  tenant_vehicles: `
+    CREATE TABLE IF NOT EXISTS tenant_vehicles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER NOT NULL, -- 引用 tenants 表
+      vehicle_model_id INTEGER, -- 引用车型库中的车型ID
+      plate_number TEXT NOT NULL UNIQUE,
+      type TEXT NOT NULL,
+      length REAL,
+      width REAL,
+      height REAL,
+      max_weight REAL,
+      volume REAL,
+      status TEXT DEFAULT 'active',
+      driver_name TEXT,
+      driver_phone TEXT,
+      image_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE, -- 正确的外键约束
+      FOREIGN KEY (vehicle_model_id) REFERENCES vehicle_models (id) ON DELETE SET NULL -- 车型ID外键约束
+    );
+  `,
   carrier_pricing_configs: `
     CREATE TABLE IF NOT EXISTS carrier_pricing_configs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -200,6 +203,31 @@ user_sessions: `CREATE TABLE IF NOT EXISTS user_sessions (
       status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'inactive', 'suspended', 'rejected')) DEFAULT 'pending',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `,
+  vehicle_models: `
+    CREATE TABLE IF NOT EXISTS vehicle_models (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      brand TEXT NOT NULL,                    -- 车辆品牌 (如：解放、东风、福田等)
+      manufacturer TEXT NOT NULL,             -- 生产厂家 (如：一汽解放、东风汽车等)
+      model_name TEXT NOT NULL,               -- 车辆型号 (如：J6P、天龙等)
+      production_year TEXT,                   -- 生产年份 (如：2023)
+      vehicle_type TEXT NOT NULL,             -- 车辆类型 (如：厢式货车、平板车、冷藏车等)
+      battery_manufacturer TEXT,              -- 电池厂家 (如：宁德时代、比亚迪等)
+      battery_model TEXT,                     -- 电池型号 (如：NCM811、LFP等)
+      autonomous_level TEXT DEFAULT 'L0',     -- 自动驾驶级别 (L0-L5)
+      max_load_capacity REAL,                 -- 最大载重(kg)
+      max_volume REAL,                        -- 最大容量(m³)
+      fuel_type TEXT,                         -- 燃料类型 (汽油、柴油、电动等)
+      engine_displacement REAL,               -- 发动机排量(L)
+      dimensions_length REAL,                 -- 长度(m)
+      dimensions_width REAL,                  -- 宽度(m)
+      dimensions_height REAL,                 -- 高度(m)
+      wheelbase REAL,                         -- 轴距(m)
+      max_speed INTEGER,                      -- 最高速度(km/h)
+      fuel_efficiency REAL,                   -- 燃油效率(L/100km)
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `
 };
@@ -297,6 +325,194 @@ async ensureColumnsExist(db) {
         ]
       );
       console.log('✅ 默认管理员已创建 (账号: admin / 密码: admin123)');
+    }
+
+    // 检查车型库中是否已有数据，如果没有则添加默认车型
+    const vehicleModelCount = await db.get('SELECT COUNT(*) as total FROM vehicle_models');
+    if (vehicleModelCount.total === 0) {
+      // 添加默认车型数据
+      const defaultVehicleModels = [
+        {
+          brand: '解放',
+          manufacturer: '一汽解放',
+          model_name: 'J6P',
+          production_year: '2023',
+          vehicle_type: '厢式货车',
+          battery_manufacturer: null,
+          battery_model: null,
+          autonomous_level: 'L2',
+          max_load_capacity: 5000,
+          max_volume: 30,
+          fuel_type: '柴油',
+          engine_displacement: 6.0,
+          dimensions_length: 6.2,
+          dimensions_width: 2.4,
+          dimensions_height: 2.5,
+          wheelbase: 3.8,
+          max_speed: 120,
+          fuel_efficiency: 8.5
+        },
+        {
+          brand: '东风',
+          manufacturer: '东风汽车',
+          model_name: '天龙',
+          production_year: '2023',
+          vehicle_type: '厢式货车',
+          battery_manufacturer: null,
+          battery_model: null,
+          autonomous_level: 'L2',
+          max_load_capacity: 6000,
+          max_volume: 35,
+          fuel_type: '柴油',
+          engine_displacement: 8.0,
+          dimensions_length: 7.2,
+          dimensions_width: 2.5,
+          dimensions_height: 2.8,
+          wheelbase: 4.2,
+          max_speed: 110,
+          fuel_efficiency: 9.2
+        },
+        {
+          brand: '福田',
+          manufacturer: '北汽福田',
+          model_name: '欧马可',
+          production_year: '2023',
+          vehicle_type: '厢式货车',
+          battery_manufacturer: null,
+          battery_model: null,
+          autonomous_level: 'L1',
+          max_load_capacity: 3500,
+          max_volume: 20,
+          fuel_type: '柴油',
+          engine_displacement: 4.0,
+          dimensions_length: 5.2,
+          dimensions_width: 2.1,
+          dimensions_height: 2.2,
+          wheelbase: 3.3,
+          max_speed: 120,
+          fuel_efficiency: 7.8
+        },
+        {
+          brand: '比亚迪',
+          manufacturer: '比亚迪',
+          model_name: 'T3',
+          production_year: '2023',
+          vehicle_type: '电动厢式货车',
+          battery_manufacturer: '比亚迪',
+          battery_model: 'LFP',
+          autonomous_level: 'L3',
+          max_load_capacity: 1500,
+          max_volume: 12,
+          fuel_type: '电动',
+          engine_displacement: null,
+          dimensions_length: 4.4,
+          dimensions_width: 1.9,
+          dimensions_height: 2.0,
+          wheelbase: 3.0,
+          max_speed: 95,
+          fuel_efficiency: 20 // kWh/100km
+        },
+        {
+          brand: '江淮',
+          manufacturer: '江淮汽车',
+          model_name: '帅铃',
+          production_year: '2023',
+          vehicle_type: '冷藏车',
+          battery_manufacturer: null,
+          battery_model: null,
+          autonomous_level: 'L2',
+          max_load_capacity: 4000,
+          max_volume: 25,
+          fuel_type: '柴油',
+          engine_displacement: 5.0,
+          dimensions_length: 5.8,
+          dimensions_width: 2.3,
+          dimensions_height: 2.4,
+          wheelbase: 3.6,
+          max_speed: 110,
+          fuel_efficiency: 8.8
+        },
+        {
+          brand: '新石器',
+          manufacturer: '新石器慧通（北京）科技有限公司',
+          model_name: '无人配送车',
+          production_year: '2023',
+          vehicle_type: '无人车',
+          battery_manufacturer: '宁德时代',
+          battery_model: 'NCM811',
+          autonomous_level: 'L4',
+          max_load_capacity: 300,
+          max_volume: 2.5,
+          fuel_type: '电动',
+          engine_displacement: null,
+          dimensions_length: 2.5,
+          dimensions_width: 1.5,
+          dimensions_height: 1.8,
+          wheelbase: 1.8,
+          max_speed: 45,
+          fuel_efficiency: 15 // kWh/100km
+        },
+        {
+          brand: '九识',
+          manufacturer: '九识智能科技有限公司',
+          model_name: 'Z5-100',
+          production_year: '2023',
+          vehicle_type: '无人配送车',
+          battery_manufacturer: '比亚迪',
+          battery_model: 'LFP',
+          autonomous_level: 'L4',
+          max_load_capacity: 200,
+          max_volume: 1.8,
+          fuel_type: '电动',
+          engine_displacement: null,
+          dimensions_length: 2.0,
+          dimensions_width: 1.3,
+          dimensions_height: 1.7,
+          wheelbase: 1.5,
+          max_speed: 40,
+          fuel_efficiency: 12 // kWh/100km
+        },
+        {
+          brand: '五菱',
+          manufacturer: '上汽通用五菱',
+          model_name: '五菱之光',
+          production_year: '2023',
+          vehicle_type: '微面',
+          battery_manufacturer: null,
+          battery_model: null,
+          autonomous_level: 'L1',
+          max_load_capacity: 800,
+          max_volume: 5,
+          fuel_type: '汽油',
+          engine_displacement: 1.2,
+          dimensions_length: 3.7,
+          dimensions_width: 1.5,
+          dimensions_height: 1.9,
+          wheelbase: 2.4,
+          max_speed: 100,
+          fuel_efficiency: 7.5
+        }
+      ];
+
+      for (const model of defaultVehicleModels) {
+        await db.run(`
+          INSERT INTO vehicle_models (
+            brand, manufacturer, model_name, production_year, vehicle_type,
+            battery_manufacturer, battery_model, autonomous_level,
+            max_load_capacity, max_volume, fuel_type, engine_displacement,
+            dimensions_length, dimensions_width, dimensions_height, wheelbase,
+            max_speed, fuel_efficiency
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          model.brand, model.manufacturer, model.model_name, model.production_year, model.vehicle_type,
+          model.battery_manufacturer, model.battery_model, model.autonomous_level,
+          model.max_load_capacity, model.max_volume, model.fuel_type, model.engine_displacement,
+          model.dimensions_length, model.dimensions_width, model.dimensions_height, model.wheelbase,
+          model.max_speed, model.fuel_efficiency
+        ]);
+      }
+
+      console.log('✅ 默认车型库数据已创建');
     }
   }
 

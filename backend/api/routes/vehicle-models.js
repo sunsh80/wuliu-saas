@@ -4,15 +4,15 @@
 
 const express = require('express');
 const router = express.Router();
-const { 
-  listVehicleModels, 
-  getVehicleModel, 
-  createVehicleModel, 
-  updateVehicleModel, 
-  deleteVehicleModel,
-  getVehicleTypes,
-  getAutonomousLevels
-} = require('../../handlers/vehicle-models');
+
+// 导入分散的车型库处理器
+const listVehicleModels = require('../../handlers/vehicle-models/index');
+const getVehicleModel = require('../../handlers/vehicle-models/get');
+const createVehicleModel = require('../../handlers/vehicle-models/post');
+const updateVehicleModel = require('../../handlers/vehicle-models/put');
+const deleteVehicleModel = require('../../handlers/vehicle-models/delete');
+const getVehicleTypes = require('../../handlers/vehicle-models/getVehicleTypes');
+const getAutonomousLevels = require('../../handlers/vehicle-models/getAutonomousLevels');
 
 // 获取车型库列表
 router.get('/', listVehicleModels);

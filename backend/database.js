@@ -1,24 +1,66 @@
 // database.js
 const sqlite3 = require('sqlite3').verbose();
-const { promisify } = require('util');
+const path = require('path');
 
-// 创建数据库连接（如果 wuliu.db 不存在会自动创建）
-const db = new sqlite3.Database('./wuliu.db', (err) => {
+// 创建数据库连接（使用项目中的标准数据库文件）
+const dbPath = path.join(__dirname, 'data', 'mydatabase.db');
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('❌ 数据库连接失败:', err.message);
   } else {
-    console.log('✅ 连接到 SQLite 数据库');
+    console.log('✅ 连接到 SQLite 数据库:', dbPath);
+    
+    // 启用外键约束
+    db.run('PRAGMA foreign_keys = ON;', (err) => {
+      if (err) {
+        console.warn('⚠️ 启用外键约束失败:', err.message);
+      } else {
+        console.log('✅ 外键约束已启用');
+      }
+    });
   }
 });
 
-// 将 db.run 包装为 Promise 函数
-const run = promisify(db.run.bind(db));
-const get = promisify(db.get.bind(db));
-const all = promisify(db.all.bind(db));
+// 提供异步包装器
+const runAsync = (sql, params) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(this);
+      }
+    });
+  });
+};
+
+const getAsync = (sql, params) => {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+};
+
+const allAsync = (sql, params) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
 
 module.exports = {
   db,
-  run,
-  get,
-  all,
+  run: runAsync,
+  get: getAsync,
+  all: allAsync,
 };
