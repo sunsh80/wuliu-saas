@@ -1,7 +1,8 @@
 // api/handlers/auth/adminLogin.js
 console.log('Trying to load db from:', __dirname);
 const { getDb } = require('../../../../db/index.js');
-const { bcrypt, jwt } = require('../../../../utils');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // ✅ 添加这个日志，确认函数被调用
 console.log("🚀 adminLogin.js handler function is executing!");
@@ -84,6 +85,13 @@ module.exports = async (c) => {
         process.env.JWT_SECRET || 'fallback_secret_key_for_testing',
         { expiresIn: '24h' }
     );
+
+    // 设置会话
+    if (c.request.session) {
+      c.request.session.userId = user.id;
+      c.request.session.userType = 'admin';
+      console.log("🔐 Session set successfully:", { userId: user.id, userType: 'admin' });
+    }
 
     return {
         status: 200,

@@ -193,6 +193,7 @@
             <li><a href="/violations.html"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
             <li><a href="/commissions.html"><i class="fas fa-percent"></i> <span>抽佣管理</span></a></li>
             <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
+            <li><a href="/vehicle-models.html"><i class="fas fa-car"></i> <span>车型库维护</span></a></li>
         </ul>
     </aside>
 
@@ -349,8 +350,9 @@
                 const row = document.createElement('tr');
 
                 // 状态标签
-                const statusClass = `status-${carrier.status.replace('_', '-')}`;
-                const statusText = getTenantStatusText(carrier.status);
+                const statusValue = carrier.status || 'unknown';
+                const statusClass = `status-${statusValue.replace('_', '-')}`;
+                const statusText = getTenantStatusText(statusValue);
 
                 // 尝试获取车辆数量（如果有的话）
                 const vehicleCount = carrier.capacity_info ? (carrier.capacity_info.vehicle_count || 0) : (carrier.vehicle_count || 0);

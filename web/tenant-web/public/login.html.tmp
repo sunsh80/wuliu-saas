@@ -239,10 +239,41 @@
               localStorage.setItem('userRole', 'tenant'); // 设置用户角色为普通租户
               console.log('Token已保存:', data.data.token.substring(0, 20) + '...');
 
-              // 跳转到承运商控制台 - 类似管理员登录的跳转方式
-              setTimeout(() => {
-                console.log('登录成功，跳转到 /carrier-dashboard.html');
-                window.location.href = '/carrier-dashboard.html';
+              showMessage('登录成功！正在跳转...', false);
+
+              // 根据用户角色跳转到相应页面
+              setTimeout(async () => {
+                // 获取用户资料以确定角色
+                const token = localStorage.getItem('tenantToken');
+                const profileResponse = await fetch('/api/tenant-web/profile', {
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                if (profileResponse.ok) {
+                  const profileData = await profileResponse.json();
+                  if (profileData.success && profileData.data) {
+                    const userRoles = profileData.data.roles || [];
+                    // 如果用户有carrier角色，跳转到承运商控制台，否则跳转到普通租户页面
+                    if (userRoles.includes('carrier')) {
+                      console.log('检测到用户有carrier角色，跳转到 /index.html');
+                      window.location.href = '/carrier-dashboard.html';
+                    } else {
+                      console.log('用户为普通租户，跳转到 /index.html');
+                      window.location.href = '/carrier-dashboard.html';
+                    }
+                  } else {
+                    // 如果无法获取用户角色，默认跳转到普通租户页面
+                    console.log('无法获取用户角色，跳转到 /index.html');
+                    window.location.href = '/index.html';
+                  }
+                } else {
+                  // 如果无法获取用户资料，默认跳转到普通租户页面
+                  console.log('获取用户资料失败，跳转到 /index.html');
+                  window.location.href = '/index.html';
+                }
               }, 1000);
             } else if (data && data.success === true) {
               // 如果没有返回token但登录成功，也允许继续（使用会话认证）
@@ -250,10 +281,39 @@
               localStorage.setItem('userRole', 'tenant'); // 设置用户角色为普通租户
               showMessage('登录成功！正在跳转...', false);
 
-              // 跳转到承运商控制台 - 类似管理员登录的跳转方式
-              setTimeout(() => {
-                console.log('登录成功，跳转到 /carrier-dashboard.html');
-                window.location.href = '/carrier-dashboard.html';
+              // 根据用户角色跳转到相应页面
+              setTimeout(async () => {
+                // 获取用户资料以确定角色
+                const token = localStorage.getItem('tenantToken');
+                const profileResponse = await fetch('/api/tenant-web/profile', {
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                if (profileResponse.ok) {
+                  const profileData = await profileResponse.json();
+                  if (profileData.success && profileData.data) {
+                    const userRoles = profileData.data.roles || [];
+                    // 如果用户有carrier角色，跳转到承运商控制台，否则跳转到普通租户页面
+                    if (userRoles.includes('carrier')) {
+                      console.log('检测到用户有carrier角色，跳转到 /index.html');
+                      window.location.href = '/carrier-dashboard.html';
+                    } else {
+                      console.log('用户为普通租户，跳转到 /index.html');
+                      window.location.href = '/carrier-dashboard.html';
+                    }
+                  } else {
+                    // 如果无法获取用户角色，默认跳转到普通租户页面
+                    console.log('无法获取用户角色，跳转到 /index.html');
+                    window.location.href = '/index.html';
+                  }
+                } else {
+                  // 如果无法获取用户资料，默认跳转到普通租户页面
+                  console.log('获取用户资料失败，跳转到 /index.html');
+                  window.location.href = '/index.html';
+                }
               }, 1000);
             } else {
               console.error('登录响应中未包含有效 token:', data);

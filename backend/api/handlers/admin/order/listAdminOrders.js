@@ -46,10 +46,15 @@ module.exports = async (c) => {
     });
 
     return {
-      status: 200,
+      statusCode: 200,
       body: {
         success: true,
-        data: orders
+        data: {
+          total: orders.length,
+          page: 1,  // 默认第一页
+          limit: orders.length,  // 限制为实际返回的数量
+          orders: orders
+        }
       }
     };
   } catch (err) {

@@ -27,7 +27,7 @@ db.serialize(() => {
       console.error('Error creating temporary table:', err);
       return db.close();
     }
-    
+
     console.log('Step 2: Copying data from old quotes table to new quotes_temp table...');
     // 2. 将数据从旧表复制到新表
     db.run('INSERT INTO quotes_temp SELECT * FROM quotes', (err) => {
@@ -35,7 +35,7 @@ db.serialize(() => {
         console.error('Error copying data:', err);
         return db.close();
       }
-      
+
       console.log('Step 3: Dropping old quotes table...');
       // 3. 删除旧表
       db.run('DROP TABLE quotes', (err) => {
@@ -43,7 +43,7 @@ db.serialize(() => {
           console.error('Error dropping old table:', err);
           return db.close();
         }
-        
+
         console.log('Step 4: Renaming quotes_temp to quotes...');
         // 4. 将新表重命名为原表名
         db.run('ALTER TABLE quotes_temp RENAME TO quotes', (err) => {
@@ -51,18 +51,22 @@ db.serialize(() => {
             console.error('Error renaming table:', err);
             return db.close();
           }
-          
+
           console.log('Step 5: Verifying the new table structure...');
           // 5. 验证新表结构
-          db.each("SELECT sql FROM sqlite_master WHERE type='table' AND name='quotes'", (err, row) => {
+          db.all("SELECT sql FROM sqlite_master WHERE type='table' AND name='quotes'", (err, rows) => {
             if (err) {
               console.error('Error verifying table structure:', err);
             } else {
-              console.log('New quotes table structure:');
-              console.log(row.sql);
-              
-              console.log('Migration completed successfully!');
-              console.log('The quotes table now supports multiple quotes from different carriers for the same order.');
+              if (rows.length > 0) {
+                console.log('New quotes table structure:');
+                console.log(rows[0].sql);
+
+                console.log('Migration completed successfully!');
+                console.log('The quotes table now supports multiple quotes from different carriers for the same order.');
+              } else {
+                console.log('Could not verify the new table structure');
+              }
             }
           });
         });

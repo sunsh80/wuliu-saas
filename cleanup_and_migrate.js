@@ -43,9 +43,9 @@ async function cleanupAndMigrate() {
     } catch (err) {
       console.log('No existing quotes_temp table to clean up');
     }
-    
+
     console.log('Starting migration: Removing UNIQUE constraint from quotes table to enable multi-carrier bidding...');
-    
+
     console.log('Step 1: Creating new quotes_temp table without UNIQUE constraint...');
     await runQuery(`
       CREATE TABLE quotes_temp (
@@ -61,29 +61,29 @@ async function cleanupAndMigrate() {
         FOREIGN KEY (carrier_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
-    
+
     console.log('Step 2: Copying data from old quotes table to new quotes_temp table...');
     await runQuery('INSERT INTO quotes_temp SELECT id, order_id, carrier_id, quote_price, quote_delivery_time, quote_remarks, created_at, updated_at FROM quotes');
-    
+
     console.log('Step 3: Getting table info to verify data transfer...');
     const countBefore = await getAll('SELECT COUNT(*) as count FROM quotes');
     const countAfter = await getAll('SELECT COUNT(*) as count FROM quotes_temp');
     console.log(`Records in old table: ${countBefore[0].count}, Records in new table: ${countAfter[0].count}`);
-    
+
     console.log('Step 4: Dropping old quotes table...');
     await runQuery('DROP TABLE quotes');
-    
+
     console.log('Step 5: Renaming quotes_temp to quotes...');
     await runQuery('ALTER TABLE quotes_temp RENAME TO quotes');
-    
+
     console.log('Step 6: Verifying the new table structure...');
     const tableInfo = await getAll("SELECT sql FROM sqlite_master WHERE type='table' AND name='quotes'");
     console.log('New quotes table structure:');
     console.log(tableInfo[0].sql);
-    
+
     console.log('Migration completed successfully!');
     console.log('The quotes table now supports multiple quotes from different carriers for the same order.');
-    
+
   } catch (error) {
     console.error('Migration failed:', error);
   } finally {

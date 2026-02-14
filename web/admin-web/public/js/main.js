@@ -80,7 +80,7 @@ function logout() {
 // 页面加载完成后执行的初始化函数
 document.addEventListener('DOMContentLoaded', function() {
     // 检查当前页面是否需要登录验证
-    const protectedPages = ['/index.html', '/orders.html', '/customers.html', '/carriers.html', '/tenants.html', '/reports.html'];
+    const protectedPages = ['/index.html', '/orders.html', '/customers.html', '/carriers.html', '/tenants.html', '/reports.html', '/application-list.html', '/pricing-rules.html', '/violations.html', '/commissions.html', '/settings.html', '/vehicle-models.html', '/vehicles.html', '/dashboard.html'];
     const currentPath = window.location.pathname;
 
     if (protectedPages.includes(currentPath) && currentPath !== '/login.html') {

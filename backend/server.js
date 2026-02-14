@@ -66,10 +66,6 @@ async function startServer() {
     console.log('✅ 配置加载成功:', config.server.name);
 
     // ===== 额外API路由 =====
-    // 车型库API路由
-    const vehicleModelsRouter = require('./api/routes/admin/vehicle-models');
-    app.use('/api/admin/vehicle-models', vehicleModelsRouter);
-    
     // 承运商车辆API路由（与车型库集成）
     const tenantVehiclesRouter = require('./api/routes/tenant-web/vehicles');
     app.use('/api/tenant-web/vehicles', tenantVehiclesRouter);

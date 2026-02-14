@@ -79,21 +79,25 @@ async function login(event) {
             body: { username, password } // 使用对象，apiRequestWithoutAuth 会自动转换为 JSON
         });
 
-        // 假设后端返回格式为 { success: true, token: "..." } 或 { error: "..." }
-        // 根据 script3.js 中的登录逻辑，后端返回的是 { token: "..." }
-        if (response.token) {
+        // 检查响应格式，根据后端实际返回的数据结构处理
+        if (response.success && response.data && response.data.token) {
             // 登录成功，保存 token
-            localStorage.setItem('adminToken', response.token);
+            localStorage.setItem('adminToken', response.data.token);
             // 可以显示成功消息（可选）
             loginMessage.textContent = '登录成功！正在跳转...';
             loginMessage.className = 'success'; // 假设你有 .success CSS 类
             // 跳转到主页面
             window.location.href = '/index.html';
-        }
+        } else if (response.token) {
+            // 兼容另一种可能的响应格式
+            localStorage.setItem('adminToken', response.token);
+            loginMessage.textContent = '登录成功！正在跳转...';
+            loginMessage.className = 'success';
+            window.location.href = '/index.html';
         } else {
             // 如果后端返回了错误信息，但状态码是 2xx，可以根据实际 API 调整
             // 通常登录失败 status code 会是 4xx，上面的 !response.ok 会捕获
-            throw new Error(response.message || '登录失败，未知错误');
+            throw new Error(response.message || response.error || '登录失败，未知错误');
         }
     } catch (error) {
         console.error('登录错误:', error);

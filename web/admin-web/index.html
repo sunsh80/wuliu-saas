@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh-CN">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>物流管理系统 - 管理员端</title>
+    <script>
+      // 检查用户是否已登录
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        // 如果已登录，重定向到仪表板
+        window.location.href = '/dashboard.html';
+      } else {
+        // 如果未登录，重定向到登录页面
+        window.location.href = '/login.html';
+      }
+    </script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 18px;">
+      正在跳转...
+    </div>
   </body>
 </html>

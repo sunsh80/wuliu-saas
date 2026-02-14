@@ -1,58 +1,62 @@
 /**
- * 获取车型库列表API处理程序
+ * 获取车型库列表API处理程序 (适配OpenAPI Backend)
  */
 
 const { getDb } = require('../../../../db');
 
 // 获取车型库列表
-async function listVehicleModels(req, res) {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
+async function listVehicleModels(c, req, res) {
+  try {
+    // OpenAPI Backend的上下文对象结构
+    // c.request.query 包含查询参数
+    const queryParams = c.request.query || {};
+    const page = parseInt(queryParams.page) || 1;
+    const limit = parseInt(queryParams.limit) || 10;
+    const offset = (page - 1) * limit;
 
-  const db = getDb();
+    const db = getDb();
 
-  // 构建查询条件
-  let whereClause = 'WHERE 1=1';
-  let params = [];
+    // 构建查询条件
+    let whereClause = 'WHERE 1=1';
+    let params = [];
 
-  if (req.query.brand) {
-    whereClause += ' AND brand LIKE ?';
-    params.push(`%${req.query.brand}%`);
-  }
-
-  if (req.query.manufacturer) {
-    whereClause += ' AND manufacturer LIKE ?';
-    params.push(`%${req.query.manufacturer}%`);
-  }
-
-  if (req.query.model_name) {
-    whereClause += ' AND model_name LIKE ?';
-    params.push(`%${req.query.model_name}%`);
-  }
-
-  if (req.query.vehicle_type) {
-    whereClause += ' AND vehicle_type LIKE ?';
-    params.push(`%${req.query.vehicle_type}%`);
-  }
-
-  if (req.query.autonomous_level) {
-    whereClause += ' AND autonomous_level = ?';
-    params.push(req.query.autonomous_level);
-  }
-
-  // 查询总数
-  const countQuery = `SELECT COUNT(*) as total FROM vehicle_models ${whereClause}`;
-
-  db.get(countQuery, params, (err, countResult) => {
-    if (err) {
-      console.error('查询车型总数失败:', err);
-      return res.status(500).json({
-        success: false,
-        message: '查询车型列表失败',
-        error: err.message
-      });
+    if (queryParams.brand) {
+      whereClause += ' AND brand LIKE ?';
+      params.push(`%${queryParams.brand}%`);
     }
+
+    if (queryParams.manufacturer) {
+      whereClause += ' AND manufacturer LIKE ?';
+      params.push(`%${queryParams.manufacturer}%`);
+    }
+
+    if (queryParams.model_name) {
+      whereClause += ' AND model_name LIKE ?';
+      params.push(`%${queryParams.model_name}%`);
+    }
+
+    if (queryParams.vehicle_type) {
+      whereClause += ' AND vehicle_type LIKE ?';
+      params.push(`%${queryParams.vehicle_type}%`);
+    }
+
+    if (queryParams.autonomous_level) {
+      whereClause += ' AND autonomous_level = ?';
+      params.push(queryParams.autonomous_level);
+    }
+
+    // 查询总数
+    const countQuery = `SELECT COUNT(*) as total FROM vehicle_models ${whereClause}`;
+
+    const countResult = await new Promise((resolve, reject) => {
+      db.get(countQuery, params, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
 
     const total = countResult.total;
 
@@ -64,17 +68,19 @@ async function listVehicleModels(req, res) {
       LIMIT ? OFFSET ?
     `;
 
-    db.all(query, [...params, limit, offset], (err, vehicleModels) => {
-      if (err) {
-        console.error('查询车型列表失败:', err);
-        return res.status(500).json({
-          success: false,
-          message: '查询车型列表失败',
-          error: err.message
-        });
-      }
+    const vehicleModels = await new Promise((resolve, reject) => {
+      db.all(query, [...params, limit, offset], (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
 
-      res.json({
+    return {
+      statusCode: 200,
+      body: {
         success: true,
         message: '获取车型库列表成功',
         data: {
@@ -88,9 +94,19 @@ async function listVehicleModels(req, res) {
             has_prev: page > 1
           }
         }
-      });
-    });
-  });
+      }
+    };
+  } catch (error) {
+    console.error('查询车型列表失败:', error);
+    return {
+      statusCode: 500,
+      body: {
+        success: false,
+        message: '查询车型列表失败',
+        error: error.message
+      }
+    };
+  }
 }
 
 module.exports = listVehicleModels;

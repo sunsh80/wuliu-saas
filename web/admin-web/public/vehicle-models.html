@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车型库维护 - 物流管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff; /* 蓝色主色调 */
+            --primary-dark: #0056b3; /* 深蓝色 */
+            --primary-light: #69b3ff; /* 浅蓝色 */
+            --sidebar-bg: #1e293b; /* 深蓝灰色侧边栏 */
+            --sidebar-item-hover: #334155; /* 侧边栏项目悬停色 */
+            --topbar-bg: #ffffff; /* 顶部栏白色 */
+            --topbar-text: #1e293b; /* 顶部栏文字深色 */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            color: #334960;
+        }
+
+        .header {
+            background-color: var(--topbar-bg);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 250px;
+            right: 0;
+            height: 60px;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+            z-index: 1001;
+        }
+
+        .sidebar-nav {
+            margin-top: 60px;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            color: #cbd5e1;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--sidebar-item-hover);
+            color: white;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            margin-top: 60px;
+            padding: 24px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 300px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .vehicle-model-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .vehicle-model-table th, .vehicle-model-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .vehicle-model-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .vehicle-model-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vehicle-model-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .autonomous-level-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .level-l0 { background-color: #94a3b8; color: white; }
+        .level-l1 { background-color: #60a5fa; color: white; }
+        .level-l2 { background-color: #34d399; color: white; }
+        .level-l3 { background-color: #fbbf24; color: #2d3436; }
+        .level-l4 { background-color: #f87171; color: white; }
+        .level-l5 { background-color: #a855f7; color: white; }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;
+            gap: 8px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .add-model-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #9ca3af;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .dimension-fields {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dimension-field {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+            <li><a href="/pricing-rules.html"><i class="fas fa-tags"></i> <span>配价管理</span></a></li>
+            <li><a href="/violations.html"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
+            <li><a href="/commissions.html"><i class="fas fa-percent"></i> <span>抽佣管理</span></a></li>
+            <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
+            <li><a href="/vehicle-models.html" class="active"><i class="fas fa-car"></i> <span>车型库维护</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- 顶部栏 -->
+    <header class="header">
+        <div class="logo">车型库维护</div>
+        <div class="user-info">
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">车型库维护</h1>
+            <button class="btn btn-primary" id="addModelBtn"><i class="fas fa-plus"></i> 添加车型</button>
+        </div>
+
+        <div class="search-filter">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索品牌、型号、厂家...">
+            <select class="filter-select" id="typeFilter">
+                <option value="">全部类型</option>
+                <option value="厢式货车">厢式货车</option>
+                <option value="平板车">平板车</option>
+                <option value="冷藏车">冷藏车</option>
+                <option value="电动货车">电动货车</option>
+                <option value="微面">微面</option>
+            </select>
+            <select class="filter-select" id="autonomousFilter">
+                <option value="">全部级别</option>
+                <option value="L0">L0</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+                <option value="L3">L3</option>
+                <option value="L4">L4</option>
+                <option value="L5">L5</option>
+            </select>
+            <button class="btn btn-primary" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
+        </div>
+
+        <div class="table-container">
+            <table class="vehicle-model-table">
+                <thead>
+                    <tr>
+                        <th>品牌</th>
+                        <th>生产厂家</th>
+                        <th>车型名称</th>
+                        <th>生产年份</th>
+                        <th>车辆类型</th>
+                        <th>自动驾驶级别</th>
+                        <th>最大载重(kg)</th>
+                        <th>最大容量(m³)</th>
+                        <th>燃料类型</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="modelsTableBody">
+                    <!-- 车型数据将通过JS动态填充 -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="paginationContainer">
+            <!-- 分页控件将通过JS动态填充 -->
+        </div>
+    </div>
+
+    <!-- 添加/编辑车型模态框 -->
+    <div class="add-model-modal" id="addModelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">添加车型</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="modelForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="brand">品牌:</label>
+                        <input type="text" id="brand" name="brand" required placeholder="如：解放、东风、新石器">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="manufacturer">生产厂家:</label>
+                        <input type="text" id="manufacturer" name="manufacturer" required placeholder="如：一汽解放、比亚迪、新石器">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modelName">车型名称:</label>
+                        <input type="text" id="modelName" name="model_name" required placeholder="如：J6P、T3、无人车系列">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productionYear">生产年份:</label>
+                        <input type="text" id="productionYear" name="production_year" placeholder="如：2023">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vehicleType">车辆类型:</label>
+                        <select id="vehicleType" name="vehicle_type" required>
+                            <option value="">请选择类型</option>
+                            <option value="厢式货车">厢式货车</option>
+                            <option value="平板车">平板车</option>
+                            <option value="冷藏车">冷藏车</option>
+                            <option value="电动货车">电动货车</option>
+                            <option value="微面">微面</option>
+                            <option value="无人车">无人车</option>
+                            <option value="自动驾驶车">自动驾驶车</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="autonomousLevel">自动驾驶级别:</label>
+                        <select id="autonomousLevel" name="autonomous_level">
+                            <option value="L0">L0 - 无自动化</option>
+                            <option value="L1">L1 - 驾驶辅助</option>
+                            <option value="L2">L2 - 部分自动化</option>
+                            <option value="L3">L3 - 有条件自动化</option>
+                            <option value="L4">L4 - 高度自动化</option>
+                            <option value="L5">L5 - 完全自动化</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxLoadCapacity">最大载重(kg):</label>
+                        <input type="number" id="maxLoadCapacity" name="max_load_capacity" min="0" step="0.1" placeholder="如：5000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxVolume">最大容量(m³):</label>
+                        <input type="number" id="maxVolume" name="max_volume" min="0" step="0.1" placeholder="如：30">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fuelType">燃料类型:</label>
+                        <select id="fuelType" name="fuel_type">
+                            <option value="柴油">柴油</option>
+                            <option value="汽油">汽油</option>
+                            <option value="电动">电动</option>
+                            <option value="混合动力">混合动力</option>
+                            <option value="氢能">氢能</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="engineDisplacement">发动机排量(L):</label>
+                        <input type="number" id="engineDisplacement" name="engine_displacement" min="0" step="0.1" placeholder="如：6.0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxSpeed">最高速度(km/h):</label>
+                        <input type="number" id="maxSpeed" name="max_speed" min="0" placeholder="如：120">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fuelEfficiency">燃油效率(L/100km):</label>
+                        <input type="number" id="fuelEfficiency" name="fuel_efficiency" min="0" step="0.1" placeholder="如：8.5">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="batteryManufacturer">电池厂家:</label>
+                    <input type="text" id="batteryManufacturer" name="battery_manufacturer" placeholder="如：宁德时代、比亚迪">
+                </div>
+                
+                <div class="form-group">
+                    <label for="batteryModel">电池型号:</label>
+                    <input type="text" id="batteryModel" name="battery_model" placeholder="如：NCM811、LFP">
+                </div>
+                
+                <div class="form-group">
+                    <label>尺寸 (长×宽×高 米):</label>
+                    <div class="dimension-fields">
+                        <div class="dimension-field">
+                            <input type="number" id="dimensionsLength" name="dimensions_length" min="0" step="0.1" placeholder="长">
+                        </div>
+                        <div class="dimension-field">
+                            <input type="number" id="dimensionsWidth" name="dimensions_width" min="0" step="0.1" placeholder="宽">
+                        </div>
+                        <div class="dimension-field">
+                            <input type="number" id="dimensionsHeight" name="dimensions_height" min="0" step="0.1" placeholder="高">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wheelbase">轴距(m):</label>
+                    <input type="number" id="wheelbase" name="wheelbase" min="0" step="0.1" placeholder="如：3.8">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">保存车型</button>
+                    <button type="button" class="btn btn-warning" id="cancelAdd">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 检查登录状态
+        function checkLoginStatus() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('userRole');
+            window.location.href = '/login.html';
+        });
+
+        // 显示添加车型模态框
+        document.getElementById('addModelBtn').addEventListener('click', function() {
+            document.getElementById('modalTitle').textContent = '添加车型';
+            document.getElementById('modelForm').reset();
+            document.getElementById('addModelModal').style.display = 'flex';
+        });
+
+        // 关闭模态框
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('addModelModal').style.display = 'none';
+        });
+
+        document.getElementById('cancelAdd').addEventListener('click', function() {
+            document.getElementById('addModelModal').style.display = 'none';
+        });
+
+        // 添加/编辑车型表单提交
+        document.getElementById('modelForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const modelData = Object.fromEntries(formData.entries());
+
+            // 将数值字段转换为适当类型
+            if (modelData.max_load_capacity) modelData.max_load_capacity = parseFloat(modelData.max_load_capacity);
+            if (modelData.max_volume) modelData.max_volume = parseFloat(modelData.max_volume);
+            if (modelData.engine_displacement) modelData.engine_displacement = parseFloat(modelData.engine_displacement);
+            if (modelData.max_speed) modelData.max_speed = parseInt(modelData.max_speed);
+            if (modelData.fuel_efficiency) modelData.fuel_efficiency = parseFloat(modelData.fuel_efficiency);
+            if (modelData.dimensions_length) modelData.dimensions_length = parseFloat(modelData.dimensions_length);
+            if (modelData.dimensions_width) modelData.dimensions_width = parseFloat(modelData.dimensions_width);
+            if (modelData.dimensions_height) modelData.dimensions_height = parseFloat(modelData.dimensions_height);
+            if (modelData.wheelbase) modelData.wheelbase = parseFloat(modelData.wheelbase);
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const isEdit = document.getElementById('modelForm').dataset.editId;
+                
+                let url, method;
+                if (isEdit) {
+                    url = `/api/admin/vehicle-models/${isEdit}`;
+                    method = 'PUT';
+                } else {
+                    url = '/api/admin/vehicle-models';
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(modelData)
+                });
+
+                if (response.ok) {
+                    alert(isEdit ? '车型更新成功！' : '车型添加成功！');
+                    document.getElementById('addModelModal').style.display = 'none';
+                    this.reset();
+                    delete this.dataset.editId; // 清除编辑ID
+                    loadVehicleModels(); // 重新加载车型列表
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    alert(`操作失败: ${errorData.message || errorData.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('操作车型时出错:', error);
+                alert('操作车型时出错，请稍后重试');
+            }
+        });
+
+        // 加载车型数据
+        async function loadVehicleModels(page = 1, search = '', type = '', autonomousLevel = '') {
+            if (!checkLoginStatus()) return;
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                let url = `/api/admin/vehicle-models?page=${page}&limit=10`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
+                if (type) url += `&vehicle_type=${encodeURIComponent(type)}`;
+                if (autonomousLevel) url += `&autonomous_level=${encodeURIComponent(autonomousLevel)}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        displayVehicleModels(data.data.vehicle_models || []);
+                        setupPagination(data.data.pagination || {});
+                    } else {
+                        console.error('获取车型数据失败:', data);
+                        document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="10" class="no-data">获取车型数据失败</td></tr>';
+                    }
+                } else {
+                    console.error('获取车型失败响应:', response.status);
+                    document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="10" class="no-data">获取车型数据失败</td></tr>';
+                }
+            } catch (error) {
+                console.error('加载车型时出错:', error);
+                document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="10" class="no-data">加载车型数据时出错</td></tr>';
+            }
+        }
+
+        // 显示车型数据
+        function displayVehicleModels(models) {
+            const tbody = document.getElementById('modelsTableBody');
+            if (!models || models.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="no-data">暂无车型数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            models.forEach(model => {
+                const row = document.createElement('tr');
+                
+                // 自动驾驶级别标签
+                const levelClass = `autonomous-level-badge level-${model.autonomous_level.toLowerCase()}`;
+                const levelText = model.autonomous_level || 'L0';
+
+                row.innerHTML = `
+                    <td>${model.brand || 'N/A'}</td>
+                    <td>${model.manufacturer || 'N/A'}</td>
+                    <td>${model.model_name || 'N/A'}</td>
+                    <td>${model.production_year || 'N/A'}</td>
+                    <td>${model.vehicle_type || 'N/A'}</td>
+                    <td><span class="autonomous-level-badge ${levelClass}">${levelText}</span></td>
+                    <td>${model.max_load_capacity ? model.max_load_capacity.toFixed(2) : 'N/A'}</td>
+                    <td>${model.max_volume ? model.max_volume.toFixed(2) : 'N/A'}</td>
+                    <td>${model.fuel_type || 'N/A'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="editModel('${model.id}')">编辑</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteModel('${model.id}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 设置分页
+        function setupPagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+            if (!pagination.total_pages || pagination.total_pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            const currentPage = pagination.current_page || 1;
+            const totalPages = pagination.total_pages || 1;
+
+            // 上一页按钮
+            html += `<button class="pagination-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadVehicleModels(${Math.max(1, currentPage - 1)})">
+                <i class="fas fa-chevron-left"></i>
+            </button>`;
+
+            // 页码按钮
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="loadVehicleModels(${i})">${i}</button>`;
+            }
+
+            // 下一页按钮
+            html += `<button class="pagination-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadVehicleModels(${Math.min(totalPages, currentPage + 1)})">
+                <i class="fas fa-chevron-right"></i>
+            </button>`;
+
+            container.innerHTML = html;
+        }
+
+        // 编辑车型
+        function editModel(modelId) {
+            // 这里应该获取车型详情并填充到表单中
+            alert(`编辑车型 ${modelId}`);
+            // 实际实现中，这里会获取车型详情并显示编辑模态框
+        }
+
+        // 删除车型
+        async function deleteModel(modelId) {
+            if (!confirm(`确定要删除车型 ${modelId} 吗？`)) return;
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch(`/api/admin/vehicle-models/${modelId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('车型删除成功！');
+                    loadVehicleModels(); // 重新加载车型列表
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    alert(`删除失败: ${errorData.message || errorData.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('删除车型时出错:', error);
+                alert('删除车型时出错，请稍后重试');
+            }
+        }
+
+        // 搜索和筛选事件
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchValue = this.value.trim();
+            const typeValue = document.getElementById('typeFilter').value;
+            const levelValue = document.getElementById('autonomousFilter').value;
+            loadVehicleModels(1, searchValue, typeValue, levelValue); // 重置为第一页
+        });
+
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            const typeValue = this.value;
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const levelValue = document.getElementById('autonomousFilter').value;
+            loadVehicleModels(1, searchValue, typeValue, levelValue); // 重置为第一页
+        });
+
+        document.getElementById('autonomousFilter').addEventListener('change', function() {
+            const levelValue = this.value;
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const typeValue = document.getElementById('typeFilter').value;
+            loadVehicleModels(1, searchValue, typeValue, levelValue); // 重置为第一页
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('autonomousFilter').value = '';
+            loadVehicleModels(1, '', '', ''); // 重置为第一页，无筛选
+        });
+
+        // 页面加载时检查登录状态并加载数据
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkLoginStatus()) {
+                loadVehicleModels();
+            }
+        });
+    </script>
+</body>
+</html>

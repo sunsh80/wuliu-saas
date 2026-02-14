@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>订单管理 - 物流管理系统</title>
+    <title>物流管理系统 - 主页</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -17,26 +17,33 @@
             min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
         }
 
-        .page-header {
+        .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
         }
 
-        .page-title {
+        .dashboard-title {
             font-size: 1.75rem;
             font-weight: 700;
             color: #1e293b;
             margin: 0;
         }
 
-        .page-description {
+        .dashboard-subtitle {
             color: #64748b;
             margin-top: 4px;
         }
 
-        /* 表格样式 */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* 订单表格样式 */
         .order-table {
             width: 100%;
             border-collapse: collapse;
@@ -98,76 +105,27 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        .search-box {
-            margin-bottom: 24px;
+        .recent-orders-section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            background: white;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        }
-
-        .search-box input {
-            padding: 12px 16px;
-            width: 300px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .search-box button {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .search-box button:hover {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            transform: translateY(-2px);
-        }
-
-        .pagination {
-            margin-top: 24px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 8px;
         }
 
-        .pagination button {
-            padding: 10px 16px;
-            margin: 0 2px;
-            border: 1px solid #cbd5e1;
-            background-color: white;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .pagination button:hover:not(.active) {
-            background-color: #e2e8f0;
-            border-color: #94a3b8;
-        }
-
-        .pagination button.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+            margin-right: 12px;
+            border-radius: 2px;
         }
     </style>
 </head>
@@ -179,8 +137,8 @@
             <span>物流管理系统</span>
         </div>
         <ul>
-            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
-            <li><a href="/orders.html" class="active"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+            <li><a href="/index.html" class="active"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
             <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
             <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
             <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
@@ -204,51 +162,57 @@
 
     <!-- 主内容区域 -->
     <div class="main-content">
-        <div class="page-header">
+        <div class="dashboard-header">
             <div>
-                <h1 class="page-title">订单管理</h1>
-                <p class="page-description">管理所有物流订单，跟踪订单状态和进度</p>
+                <h1 class="dashboard-title">物流管理系统 - 控制面板</h1>
+                <p class="dashboard-subtitle">实时监控您的物流业务运营状况</p>
             </div>
         </div>
 
-        <!-- 搜索框 -->
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜索订单号、客户名称...">
-            <button onclick="searchOrders()">搜索</button>
-            <button onclick="loadOrders()" style="margin-left: 10px;">重置</button>
+        <!-- 统计卡片 -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <h3>总订单数</h3>
+                <div class="count" id="totalOrders">0</div>
+            </div>
+            <div class="card">
+                <h3>待处理订单</h3>
+                <div class="count" id="pendingOrders">0</div>
+            </div>
+            <div class="card">
+                <h3>运输中订单</h3>
+                <div class="count" id="inTransitOrders">0</div>
+            </div>
+            <div class="card">
+                <h3>已完成订单</h3>
+                <div class="count" id="completedOrders">0</div>
+            </div>
         </div>
 
-        <!-- 订单表格 -->
-        <table class="order-table">
-            <thead>
-                <tr>
-                    <th>订单号</th>
-                    <th>客户</th>
-                    <th>发货地</th>
-                    <th>收货地</th>
-                    <th>重量(kg)</th>
-                    <th>状态</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="ordersTableBody">
-                <!-- 订单数据将通过JS动态填充 -->
-            </tbody>
-        </table>
-
-        <!-- 分页控件 -->
-        <div class="pagination" id="pagination">
-            <!-- 分页按钮将通过JS动态生成 -->
+        <!-- 最新订单 -->
+        <div class="recent-orders-section">
+            <h2 class="section-title">最新订单</h2>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>客户</th>
+                        <th>发货地</th>
+                        <th>收货地</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- 订单数据将通过JS动态填充 -->
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script src="/js/main.js"></script>
     <script>
-        let currentPage = 1;
-        const ordersPerPage = 10;
-        let allOrders = [];
-
         // 检查登录状态
         function checkLoginStatus() {
             const token = localStorage.getItem('adminToken');
@@ -264,8 +228,8 @@
             window.location.href = '/login.html';
         });
 
-        // 加载订单数据
-        async function loadOrders(page = 1) {
+        // 加载统计数据
+        async function loadDashboardStats() {
             try {
                 const token = localStorage.getItem('adminToken');
                 const response = await fetch('/api/admin/orders', {
@@ -278,33 +242,53 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    allOrders = data.data.orders || [];
-                    displayOrders(allOrders, page);
+                    const orders = data.data.orders || [];
+
+                    // 统计各类订单数量
+                    let total = 0;
+                    let pending = 0;
+                    let inTransit = 0;
+                    let completed = 0;
+
+                    orders.forEach(order => {
+                        total++;
+                        switch(order.status) {
+                            case 'created':
+                            case 'pending_claim':
+                            case 'claimed':
+                            case 'quoted':
+                                pending++;
+                                break;
+                            case 'in_transit':
+                                inTransit++;
+                                break;
+                            case 'delivered':
+                                completed++;
+                                break;
+                        }
+                    });
+
+                    document.getElementById('totalOrders').textContent = total;
+                    document.getElementById('pendingOrders').textContent = pending;
+                    document.getElementById('inTransitOrders').textContent = inTransit;
+                    document.getElementById('completedOrders').textContent = completed;
+
+                    // 显示最新订单
+                    displayLatestOrders(orders.slice(0, 10)); // 显示最近10个订单
                 } else {
                     console.error('获取订单数据失败:', response.status);
-                    alert('获取订单数据失败');
                 }
             } catch (error) {
-                console.error('加载订单数据时出错:', error);
-                alert('加载订单数据时出错');
+                console.error('加载统计数据时出错:', error);
             }
         }
 
-        // 显示订单
-        function displayOrders(orders, page) {
-            const startIndex = (page - 1) * ordersPerPage;
-            const endIndex = startIndex + ordersPerPage;
-            const pageOrders = orders.slice(startIndex, endIndex);
-
+        // 显示最新订单
+        function displayLatestOrders(orders) {
             const tbody = document.getElementById('ordersTableBody');
             tbody.innerHTML = '';
 
-            if (pageOrders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">暂无订单数据</td></tr>';
-                return;
-            }
-
-            pageOrders.forEach(order => {
+            orders.forEach(order => {
                 const row = document.createElement('tr');
 
                 // 获取发货地和收货地信息
@@ -333,7 +317,7 @@
                 const customerName = order.customer_tenant_name || '未知客户';
 
                 // 状态标签
-                const statusClass = `status-${order.status.replace('_', '-')} `;
+                const statusClass = `status-${order.status.replace('_', '-')}`;
                 const statusText = getStatusText(order.status);
 
                 row.innerHTML = `
@@ -341,7 +325,6 @@
                     <td>${customerName}</td>
                     <td>${pickupAddr}</td>
                     <td>${deliveryAddr}</td>
-                    <td>${order.weight_kg || 'N/A'}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                     <td>${new Date(order.created_at).toLocaleString()}</td>
                     <td>
@@ -352,56 +335,16 @@
 
                 tbody.appendChild(row);
             });
-
-            // 生成分页控件
-            generatePagination(orders.length, page);
-        }
-
-        // 生成分页控件
-        function generatePagination(totalCount, currentPage) {
-            const totalPages = Math.ceil(totalCount / ordersPerPage);
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            // 上一页
-            if (currentPage > 1) {
-                const prevBtn = document.createElement('button');
-                prevBtn.textContent = '上一页';
-                prevBtn.onclick = () => displayOrders(allOrders, currentPage - 1);
-                pagination.appendChild(prevBtn);
-            }
-
-            // 页码按钮
-            for (let i = 1; i <= totalPages; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.textContent = i;
-                pageBtn.className = i === currentPage ? 'active' : '';
-                pageBtn.onclick = () => displayOrders(allOrders, i);
-                pagination.appendChild(pageBtn);
-            }
-
-            // 下一页
-            if (currentPage < totalPages) {
-                const nextBtn = document.createElement('button');
-                nextBtn.textContent = '下一页';
-                nextBtn.onclick = () => displayOrders(allOrders, currentPage + 1);
-                pagination.appendChild(nextBtn);
-            }
         }
 
         // 获取状态文本
         function getStatusText(status) {
             const statusMap = {
-                'pending': '待审核',
-                'pending_claim': '待认领',
-                'available': '可认领',
                 'created': '已创建',
+                'pending_claim': '待认领',
                 'claimed': '已认领',
-                'quoted': '已报价',  // 保留此状态以兼容现有数据
+                'quoted': '已报价',
                 'awarded': '已选定',
-                'dispatched': '已发货',
                 'in_transit': '运输中',
                 'delivered': '已送达',
                 'cancelled': '已取消'
@@ -418,7 +361,7 @@
         // 更新订单状态
         function updateOrderStatus(orderId, currentStatus) {
             // 这里可以打开调度模态框
-            const newStatus = prompt(`当前状态: ${getStatusText(currentStatus)}\n请输入新状态 (pending, pending_claim, available, created, claimed, awarded, dispatched, in_transit, delivered, cancelled):`, '');
+            const newStatus = prompt(`当前状态: ${getStatusText(currentStatus)}\n请输入新状态 (pending_claim, awarded, in_transit, delivered, cancelled):`, '');
             if (newStatus) {
                 assignOrder(orderId, newStatus);
             }
@@ -439,7 +382,7 @@
 
                 if (response.ok) {
                     alert('订单状态更新成功！');
-                    loadOrders(currentPage); // 重新加载当前页数据
+                    loadDashboardStats(); // 重新加载数据
                 } else {
                     const errorData = await response.json();
                     alert(`更新失败: ${errorData.message || errorData.error}`);
@@ -450,27 +393,10 @@
             }
         }
 
-        // 搜索订单
-        function searchOrders() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            if (!searchTerm) {
-                displayOrders(allOrders, 1);
-                return;
-            }
-
-            const filteredOrders = allOrders.filter(order => {
-                const trackingNumber = (order.tracking_number || order.id || '').toLowerCase();
-                const customerName = (order.customer_tenant_name || '').toLowerCase();
-                return trackingNumber.includes(searchTerm) || customerName.includes(searchTerm);
-            });
-
-            displayOrders(filteredOrders, 1);
-        }
-
         // 页面加载时执行
         document.addEventListener('DOMContentLoaded', function() {
             checkLoginStatus();
-            loadOrders();
+            loadDashboardStats();
         });
     </script>
 </body>
