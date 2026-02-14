@@ -368,6 +368,10 @@
                     <td>
                         <button class="btn btn-primary" onclick="viewVehicle('${vehicle.id}')">查看</button>
                         <button class="btn btn-warning" onclick="editVehicle('${vehicle.id}')">编辑</button>
+                        <button class="btn ${vehicle.status === 'active' ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleVehicleStatus('${vehicle.id}', '${vehicle.status}')">
+                            ${vehicle.status === 'active' ? '停用' : '启用'}
+                        </button>
                     </td>
                 `;
 
@@ -381,7 +385,8 @@
                 'active': '运营中',
                 'inactive': '停运',
                 'maintenance': '维修中',
-                'decommissioned': '已报废'
+                'decommissioned': '已报废',
+                'suspended': '暂停'
             };
             return statusMap[status] || status;
         }
@@ -394,6 +399,43 @@
         // 编辑车辆
         function editVehicle(vehicleId) {
             alert(`编辑车辆 ${vehicleId}`);
+        }
+
+        // 切换车辆状态
+        async function toggleVehicleStatus(vehicleId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            const actionText = newStatus === 'inactive' ? '停用' : '启用';
+            
+            if (!confirm(`确定要${actionText}这辆车吗？`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        notes: `车辆状态由${currentStatus === 'active' ? '运营中' : '停运'}改为${newStatus === 'active' ? '运营中' : '停运'}`
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`车辆${actionText}成功！`);
+                    loadAllVehicles(); // 重新加载车辆列表
+                } else {
+                    throw new Error(result.message || `车辆${actionText}失败`);
+                }
+            } catch (error) {
+                console.error(`切换车辆状态失败:`, error);
+                alert(`操作失败: ${error.message}`);
+            }
         }
 
         // 搜索车辆

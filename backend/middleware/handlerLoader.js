@@ -19,7 +19,7 @@ function autoRegisterHandlers(api) {
       } else if (file.endsWith('.js')) {
         const operationId = path.basename(file, '.js');
         let handler;
-        
+
         // 🔍 关键：包裹 require 调用，捕获被加载文件的语法错误
         try {
           handler = require(fullPath);

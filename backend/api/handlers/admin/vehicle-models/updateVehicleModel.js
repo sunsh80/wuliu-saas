@@ -1,123 +1,135 @@
 /**
- * 更新车型API处理程序 (适配OpenAPI Backend)
+ * 更新车型API处理程序
+ * operationId: updateVehicleModel
+ * 根据OpenAPI规范实现
  */
 
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
-// 更新车型
-async function updateVehicleModel(c, req, res) {
-  const id = c.request.params.id;
-  const updates = c.request.body;
-
-  const db = getDb();
-
+module.exports = async (c) => {
   try {
+    console.log('=== UPDATE VEHICLE MODEL DEBUG ===');
+    console.log('Vehicle Model ID:', c.request.params.id);
+    console.log('Request Body:', c.request.body);
+    
+    const vehicleModelId = c.request.params.id;
+    const vehicleModelData = c.request.body;
+
+    // 验证ID参数
+    if (!vehicleModelId || isNaN(vehicleModelId)) {
+      return {
+        status: 400,
+        body: {
+          success: false,
+          message: '车型ID参数无效'
+        }
+      };
+    }
+
+    // 获取数据库实例
+    const database = getDb();
+
     // 检查车型是否存在
-    return new Promise((resolve, reject) => {
-      db.get('SELECT id FROM vehicle_models WHERE id = ?', [id], (err, existingModel) => {
-        if (err) {
-          console.error('查询车型是否存在失败:', err);
-          resolve({
-            statusCode: 500,
-            body: {
-              success: false,
-              message: '查询车型是否存在失败',
-              error: err.message
-            }
-          });
-          return;
+    const existingModel = await database.get(
+      'SELECT * FROM vehicle_models WHERE id = ?',
+      [vehicleModelId]
+    );
+
+    if (!existingModel) {
+      return {
+        status: 404,
+        body: {
+          success: false,
+          message: '车型不存在'
         }
+      };
+    }
 
-        if (!existingModel) {
-          resolve({
-            statusCode: 404,
-            body: {
-              success: false,
-              message: '车型不存在'
-            }
-          });
-          return;
-        }
+    // 检查是否与其他车型冲突（除了自己之外）
+    if (vehicleModelData.brand && vehicleModelData.model_name && vehicleModelData.manufacturer) {
+      const duplicateCheck = await database.get(
+        'SELECT id FROM vehicle_models WHERE brand = ? AND model_name = ? AND manufacturer = ? AND id != ?',
+        [vehicleModelData.brand, vehicleModelData.model_name, vehicleModelData.manufacturer, vehicleModelId]
+      );
 
-        // 构建更新语句
-        const updateFields = [];
-        const params = [];
-
-        Object.keys(updates).forEach(key => {
-          if (key !== 'id' && key !== 'created_at' && key !== 'updated_at') {
-            updateFields.push(`${key} = ?`);
-            params.push(updates[key]);
+      if (duplicateCheck) {
+        return {
+          status: 409,
+          body: {
+            success: false,
+            message: '该车型已存在'
           }
-        });
+        };
+      }
+    }
 
-        if (updateFields.length === 0) {
-          resolve({
-            statusCode: 400,
-            body: {
-              success: false,
-              message: '没有提供有效的更新字段'
-            }
-          });
-          return;
+    // 准备更新字段
+    const updatableFields = [
+      'brand', 'manufacturer', 'model_name', 'vehicle_type', 'production_year',
+      'battery_manufacturer', 'battery_model', 'autonomous_level', 'max_load_capacity',
+      'max_volume', 'fuel_type', 'engine_displacement', 'dimensions_length',
+      'dimensions_width', 'dimensions_height', 'wheelbase', 'max_speed', 'fuel_efficiency'
+    ];
+
+    const updateFields = [];
+    const values = [];
+    
+    for (const field of updatableFields) {
+      if (vehicleModelData[field] !== undefined) {
+        updateFields.push(`${field} = ?`);
+        values.push(vehicleModelData[field]);
+      }
+    }
+
+    // 添加更新时间
+    updateFields.push('updated_at = ?');
+    values.push(new Date().toISOString());
+    
+    // 添加ID用于WHERE子句
+    values.push(vehicleModelId);
+
+    if (updateFields.length <= 1) { // 只有更新时间被设置
+      return {
+        status: 400,
+        body: {
+          success: false,
+          message: '没有提供有效的更新字段'
         }
+      };
+    }
 
-        updateFields.push('updated_at = CURRENT_TIMESTAMP');
-        params.push(id);
+    // 执行更新操作
+    const sql = `UPDATE vehicle_models SET ${updateFields.join(', ')} WHERE id = ?`;
+    
+    await database.run(sql, values);
 
-        const query = `UPDATE vehicle_models SET ${updateFields.join(', ')} WHERE id = ?`;
+    // 获取更新后的车型记录
+    const updatedModel = await database.get(
+      'SELECT * FROM vehicle_models WHERE id = ?',
+      [vehicleModelId]
+    );
 
-        db.run(query, params, (err) => {
-          if (err) {
-            console.error('更新车型失败:', err);
-            resolve({
-              statusCode: 500,
-              body: {
-                success: false,
-                message: '更新车型失败',
-                error: err.message
-              }
-            });
-            return;
-          }
+    console.log('Vehicle model updated successfully:', updatedModel);
 
-          // 获取更新后的车型信息
-          db.get('SELECT * FROM vehicle_models WHERE id = ?', [id], (err, updatedModel) => {
-            if (err) {
-              console.error('查询更新后的车型失败:', err);
-              resolve({
-                statusCode: 500,
-                body: {
-                  success: false,
-                  message: '查询更新后的车型失败',
-                  error: err.message
-                }
-              });
-              return;
-            }
-
-            resolve({
-              statusCode: 200,
-              body: {
-                success: true,
-                message: '车型更新成功',
-                data: updatedModel
-              }
-            });
-          });
-        });
-      });
-    });
-  } catch (error) {
-    console.error('更新车型时发生错误:', error);
+    // 返回成功响应，符合OpenAPI规范
     return {
-      statusCode: 500,
+      status: 200,
+      body: {
+        success: true,
+        message: '车型更新成功',
+        data: updatedModel
+      }
+    };
+
+  } catch (error) {
+    console.error('更新车型失败:', error);
+    return {
+      status: 500,
       body: {
         success: false,
-        message: '更新车型时发生错误',
+        message: '更新车型失败',
         error: error.message
       }
     };
   }
-}
-
-module.exports = updateVehicleModel;
+};

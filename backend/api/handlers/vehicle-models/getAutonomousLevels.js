@@ -1,34 +1,36 @@
 /**
- * 车型库API处理程序 - 获取自动驾驶级别列表
+ * 获取自动驾驶级别列表处理器
  */
+const db = require('../../../db');
 
-const { getDb } = require('../../../db');
+module.exports = async (c) => {
+  try {
+    const levels = await db.all(`
+      SELECT DISTINCT autonomous_level
+      FROM vehicle_models
+      WHERE autonomous_level IS NOT NULL
+      ORDER BY autonomous_level ASC
+    `);
 
-// 获取自动驾驶级别列表
-function getAutonomousLevels(req, res) {
-  const db = getDb();
-
-  db.all(`
-    SELECT DISTINCT autonomous_level
-    FROM vehicle_models
-    WHERE autonomous_level IS NOT NULL
-    ORDER BY autonomous_level ASC
-  `, (err, levels) => {
-    if (err) {
-      console.error('查询自动驾驶级别失败:', err);
-      return res.status(500).json({
+    return {
+      status: 200,
+      body: {
+        success: true,
+        message: '获取自动驾驶级别成功',
+        data: {
+          autonomous_levels: levels.map(level => ({ value: level.autonomous_level }))
+        }
+      }
+    };
+  } catch (error) {
+    console.error('获取自动驾驶级别失败:', error);
+    return {
+      status: 500,
+      body: {
         success: false,
-        message: '查询自动驾驶级别失败',
-        error: err.message
-      });
-    }
-
-    res.json({
-      success: true,
-      message: '获取自动驾驶级别成功',
-      data: levels.map(level => ({ value: level.autonomous_level }))
-    });
-  });
-}
-
-module.exports = getAutonomousLevels;
+        message: '获取自动驾驶级别失败',
+        error: error.message
+      }
+    };
+  }
+};

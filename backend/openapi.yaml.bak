@@ -588,16 +588,6 @@ components:
           type: string
           format: date-time
           example: '2026-01-01T00:00:00Z'
-        status:
-          type: string
-          example: 'active'
-          description: 车型状态 (active, deleted)
-          default: 'active'
-        deleted_at:
-          type: string
-          format: date-time
-          example: '2026-01-01T00:00:00Z'
-          description: 删除时间 (软删除)
       required:
         - id
         - brand
@@ -766,10 +756,6 @@ components:
           type: number
           example: 8.5
           description: 燃油效率(L/100km)
-        status:
-          type: string
-          example: 'active'
-          description: 车型状态 (active, deleted)
     VehicleInfo:
       type: object
       properties:
@@ -803,10 +789,6 @@ components:
         updated_at:
           type: string
           format: date-time
-        vehicle_model_id:
-          type: integer
-          description: 关联的车型ID
-          example: 1
     TenantFinancialInfo:
       type: object
       properties:
@@ -1911,7 +1893,7 @@ paths:
       tags:
         - admin-vehicle-models
       summary: 获取车型库列表
-      operationId: adminListVehicleModels
+      operationId: listVehicleModels
       security:
         - AdminSessionAuth: []
       parameters:
@@ -2091,8 +2073,7 @@ paths:
     delete:
       tags:
         - admin-vehicle-models
-      summary: 删除车型（软删除）
-      description: 将车型标记为已删除状态，而不是物理删除。如果车型正在被使用，则无法删除。
+      summary: 删除车型
       operationId: deleteVehicleModel
       security:
         - AdminSessionAuth: []
@@ -2104,7 +2085,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: 车型删除成功（软删除）
+          description: 车型删除成功
           content:
             application/json:
               schema:
@@ -2199,6 +2180,47 @@ paths:
                     type: boolean
                   data:
                     $ref: '#/components/schemas/VehicleInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/admin/tenants/{id}/vehicles:
+    post:
+      tags:
+        - admin-tenant
+      operationId: addTenantVehicle
+      summary: 添加租户车辆
+      description: 为指定ID的租户添加一辆车辆信息。
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleInfo'
+      responses:
+        '201':
+          description: 添加成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/VehicleInfo'
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ForbiddenError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':

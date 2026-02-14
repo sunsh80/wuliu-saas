@@ -3,101 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>车型库维护 - 物流管理系统</title>
+    <title>车型库管理 - 物流管理系统</title>
+    <!-- 引入样式文件 -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* 主内容区域 */
-        .main-content {
-            padding: 24px;
-            margin-top: 80px; /* 为顶部栏留出空间 */
-            margin-left: 270px; /* 为侧边栏留出空间 */
-            margin-right: 20px; /* 添加右边距 */
-            width: calc(100% - 290px); /* 调整宽度以适应侧边栏 */
-            min-height: calc(100vh - 104px); /* 设置最小高度以填满视口 */
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-        }
-
-        .page-description {
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        /* 表格样式 */
-        .order-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        .order-table th, .order-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .order-table th {
-            background-color: #f1f5f9;
-            font-weight: 600;
-            color: #334155;
-            text-transform: uppercase;
-            font-size: 0.875rem;
-            letter-spacing: 0.5px;
-        }
-
-        .order-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .order-table tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            text-align: center;
-            display: inline-block;
-            min-width: 80px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 4px 2px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
+        /* 页面特定样式 */
         .search-section {
             background: white;
             padding: 20px;
@@ -134,6 +45,27 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
         }
         
         .pagination {
@@ -228,114 +160,108 @@
             flex: 1;
             min-width: 200px;
         }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
     </style>
 </head>
 <body>
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-        <div class="logo">
-            <i class="fas fa-truck-moving logo-icon"></i>
-            <span>物流管理系统</span>
-        </div>
-        <ul>
-            <li><a href="/dashboard.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
-            <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
-            <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
-            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
-            <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
-            <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
-            <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
-            <li><a href="/pricing-rules.html"><i class="fas fa-tags"></i> <span>配价管理</span></a></li>
-            <li><a href="/violations.html"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
-            <li><a href="/commissions.html"><i class="fas fa-percent"></i> <span>抽佣管理</span></a></li>
-            <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
-            <li><a href="/vehicle-models.html" class="active"><i class="fas fa-car"></i> <span>车型库维护</span></a></li>
-        </ul>
-    </aside>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-car"></i> 车型库管理</h1>
+            <nav>
+                <a href="/dashboard.html"><i class="fas fa-home"></i> 首页</a>
+                <a href="/tenants.html"><i class="fas fa-building"></i> 租户管理</a>
+                <a href="/orders.html"><i class="fas fa-list"></i> 订单管理</a>
+                <a href="/vehicles.html"><i class="fas fa-truck"></i> 车辆管理</a>
+                <a href="/vehicle-models-new.html"><i class="fas fa-car-side"></i> 车型库</a>
+                <a href="/settings.html"><i class="fas fa-cog"></i> 设置</a>
+                <a href="/login.html"><i class="fas fa-sign-out-alt"></i> 退出</a>
+            </nav>
+        </header>
 
-    <!-- 顶部栏 -->
-    <header class="topbar">
-        <div class="user-info">
-            <span>管理员</span>
-            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
-        </div>
-    </header>
-
-    <!-- 主内容区域 -->
-    <div class="main-content">
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">车型库维护</h1>
-                <p class="page-description">管理和维护车辆型号信息</p>
-            </div>
-        </div>
-
-        <div class="search-section">
-            <div class="search-form">
-                <div class="search-input">
-                    <label for="searchInput"><i class="fas fa-search"></i> 搜索车型</label>
-                    <input type="text" id="searchInput" placeholder="搜索品牌、型号、类型...">
-                </div>
-                <div class="search-input">
-                    <label for="vehicleTypeFilter"><i class="fas fa-filter"></i> 车辆类型</label>
-                    <select id="vehicleTypeFilter">
-                        <option value="">全部类型</option>
-                        <option value="厢式货车">厢式货车</option>
-                        <option value="平板车">平板车</option>
-                        <option value="冷藏车">冷藏车</option>
-                        <option value="无人车">无人车</option>
-                        <option value="电动厢式货车">电动厢式货车</option>
-                        <option value="微面">微面</option>
-                    </select>
-                </div>
-                <div class="search-input">
-                    <label for="pageLimit">每页显示</label>
-                    <select id="pageLimit">
-                        <option value="10">10条</option>
-                        <option value="20" selected>20条</option>
-                        <option value="50">50条</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i> 搜索</button>
-                    <button id="resetBtn" class="btn btn-secondary"><i class="fas fa-redo"></i> 重置</button>
-                </div>
-                <div class="action-buttons">
-                    <button id="addModelBtn" class="btn btn-success"><i class="fas fa-plus"></i> 添加车型</button>
+        <main>
+            <div class="search-section">
+                <div class="search-form">
+                    <div class="search-input">
+                        <label for="searchInput"><i class="fas fa-search"></i> 搜索车型</label>
+                        <input type="text" id="searchInput" placeholder="搜索品牌、型号、类型...">
+                    </div>
+                    <div class="search-input">
+                        <label for="vehicleTypeFilter"><i class="fas fa-filter"></i> 车辆类型</label>
+                        <select id="vehicleTypeFilter">
+                            <option value="">全部类型</option>
+                            <option value="厢式货车">厢式货车</option>
+                            <option value="平板车">平板车</option>
+                            <option value="冷藏车">冷藏车</option>
+                            <option value="无人车">无人车</option>
+                            <option value="电动厢式货车">电动厢式货车</option>
+                            <option value="微面">微面</option>
+                        </select>
+                    </div>
+                    <div class="search-input">
+                        <label for="pageLimit">每页显示</label>
+                        <select id="pageLimit">
+                            <option value="10">10条</option>
+                            <option value="20" selected>20条</option>
+                            <option value="50">50条</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button id="searchBtn" class="btn btn-primary"><i class="fas fa-search"></i> 搜索</button>
+                        <button id="resetBtn" class="btn btn-secondary"><i class="fas fa-redo"></i> 重置</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="addModelBtn" class="btn btn-success"><i class="fas fa-plus"></i> 添加车型</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="table-container">
-            <table class="order-table" id="vehicleModelsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>品牌</th>
-                        <th>制造商</th>
-                        <th>型号</th>
-                        <th>车辆类型</th>
-                        <th>最大载重(kg)</th>
-                        <th>最大容量(m³)</th>
-                        <th>自动驾驶级别</th>
-                        <th>燃料类型</th>
-                        <th>生产年份</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="vehicleModelsBody">
-                    <tr>
-                        <td colspan="11" class="loading">
-                            <i class="fas fa-spinner fa-spin"></i> 加载车型数据中...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="table-container">
+                <table id="vehicleModelsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>品牌</th>
+                            <th>制造商</th>
+                            <th>型号</th>
+                            <th>车辆类型</th>
+                            <th>最大载重(kg)</th>
+                            <th>最大容量(m³)</th>
+                            <th>自动驾驶级别</th>
+                            <th>燃料类型</th>
+                            <th>生产年份</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicleModelsBody">
+                        <tr>
+                            <td colspan="11" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> 加载车型数据中...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="pagination" id="pagination">
-            <!-- 分页控件将通过JavaScript动态生成 -->
-        </div>
+            <div class="pagination" id="pagination">
+                <!-- 分页控件将通过JavaScript动态生成 -->
+            </div>
+        </main>
     </div>
 
     <!-- 添加/编辑车型模态框 -->
@@ -447,13 +373,26 @@
 
     <script src="/js/main.js"></script>
     <script>
-        // 退出登录
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('adminToken');
-            window.location.href = '/login.html';
+        // 设置当前页面的导航项为活跃状态
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取当前页面路径
+            const currentPath = window.location.pathname.split('/').pop();
+            
+            // 获取所有导航链接
+            const navLinks = document.querySelectorAll('header nav a');
+            
+            // 移除所有链接的active类
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // 为当前页面的链接添加active类
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.includes(currentPath)) {
+                    link.classList.add('active');
+                }
+            });
         });
-
+        
         // 车型库管理页面 JavaScript
         document.addEventListener('DOMContentLoaded', function() {
             // 全局变量

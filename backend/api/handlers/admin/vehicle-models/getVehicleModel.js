@@ -1,63 +1,68 @@
 /**
- * 获取车型详情API处理程序 (适配OpenAPI Backend)
+ * 获取车型详情API处理程序
+ * operationId: getVehicleModel
+ * 根据OpenAPI规范实现
  */
 
-const { getDb } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
-// 获取车型详情
-async function getVehicleModel(c, req, res) {
-  const id = c.request.params.id;
-
-  const db = getDb();
-
+module.exports = async (c) => {
   try {
-    return new Promise((resolve, reject) => {
-      db.get('SELECT * FROM vehicle_models WHERE id = ?', [id], (err, vehicleModel) => {
-        if (err) {
-          console.error('查询车型详情失败:', err);
-          resolve({
-            statusCode: 500,
-            body: {
-              success: false,
-              message: '查询车型详情失败',
-              error: err.message
-            }
-          });
-          return;
-        }
+    console.log('=== GET VEHICLE MODEL DEBUG ===');
+    console.log('Vehicle Model ID:', c.request.params.id);
+    
+    const vehicleModelId = c.request.params.id;
 
-        if (!vehicleModel) {
-          resolve({
-            statusCode: 404,
-            body: {
-              success: false,
-              message: '车型不存在'
-            }
-          });
-          return;
+    // 验证ID参数
+    if (!vehicleModelId || isNaN(vehicleModelId)) {
+      return {
+        status: 400,
+        body: {
+          success: false,
+          message: '车型ID参数无效'
         }
+      };
+    }
 
-        resolve({
-          statusCode: 200,
-          body: {
-            success: true,
-            message: '获取车型详情成功',
-            data: vehicleModel
-          }
-        });
-      });
-    });
-  } catch (error) {
-    console.error('获取车型详情时发生错误:', error);
+    // 获取数据库实例
+    const database = getDb();
+
+    // 查询车型详情（排除已删除的车型）
+    const vehicleModel = await database.get(
+      'SELECT * FROM vehicle_models WHERE id = ? AND status != \'deleted\'',
+      [vehicleModelId]
+    );
+
+    if (!vehicleModel) {
+      return {
+        status: 404,
+        body: {
+          success: false,
+          message: '车型不存在'
+        }
+      };
+    }
+
+    console.log('Vehicle model retrieved successfully:', vehicleModel);
+
+    // 返回成功响应，符合OpenAPI规范
     return {
-      statusCode: 500,
+      status: 200,
+      body: {
+        success: true,
+        data: vehicleModel
+      }
+    };
+
+  } catch (error) {
+    console.error('获取车型详情失败:', error);
+    return {
+      status: 500,
       body: {
         success: false,
-        message: '获取车型详情时发生错误',
+        message: '获取车型详情失败',
         error: error.message
       }
     };
   }
-}
-
-module.exports = getVehicleModel;
+};

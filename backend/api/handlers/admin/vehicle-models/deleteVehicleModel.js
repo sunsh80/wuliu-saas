@@ -1,108 +1,60 @@
 /**
- * 删除车型API处理程序 (适配OpenAPI Backend)
+ * 删除车型API处理程序（软删除）
+ * operationId: deleteVehicleModel
  */
 
-const { getDatabaseManager } = require('../../../../db');
+const { getDb } = require('../../../../db/index.js');
 
-// 删除车型
-async function deleteVehicleModel(c, req, res) {
-  const id = c.request.params.id;
-
+module.exports = async (c) => {
   try {
-    // 获取数据库连接
-    const { getDb } = require('../../../../db');
     const db = getDb();
+    const id = parseInt(c.request.params.id);
 
     // 检查车型是否存在
-    return new Promise((resolve, reject) => {
-      db.get('SELECT id FROM vehicle_models WHERE id = ?', [id], (err, existingModel) => {
-        if (err) {
-          console.error('查询车型是否存在失败:', err);
-          resolve({
-            statusCode: 500,
-            body: {
-              success: false,
-              message: '查询车型是否存在失败',
-              error: err.message
-            }
-          });
-          return;
+    const existingModel = await db.get('SELECT * FROM vehicle_models WHERE id = ?', [id]);
+    if (!existingModel) {
+      return {
+        statusCode: 404,
+        body: {
+          success: false,
+          message: '车型不存在'
         }
+      };
+    }
 
-        if (!existingModel) {
-          resolve({
-            statusCode: 404,
-            body: {
-              success: false,
-              message: '车型不存在'
-            }
-          });
-          return;
+    // 检查该车型是否正在被使用（例如在tenant_vehicles表中）
+    const usedInVehicles = await db.get('SELECT 1 FROM tenant_vehicles WHERE vehicle_model_id = ? LIMIT 1', [id]);
+    if (usedInVehicles) {
+      return {
+        statusCode: 409,
+        body: {
+          success: false,
+          message: '车型正在被使用，无法删除',
+          error: 'MODEL_IN_USE'
         }
+      };
+    }
 
-        // 检查是否有车辆正在使用此车型
-        db.get('SELECT id FROM tenant_vehicles WHERE vehicle_model_id = ?', [id], (err, vehicleUsingModel) => {
-          if (err) {
-            console.error('检查车型是否被使用失败:', err);
-            resolve({
-              statusCode: 500,
-              body: {
-                success: false,
-                message: '检查车型是否被使用失败',
-                error: err.message
-              }
-            });
-            return;
-          }
+    // 执行软删除操作 - 更新状态为'deleted'并记录删除时间
+    const updateQuery = 'UPDATE vehicle_models SET status = ?, deleted_at = CURRENT_TIMESTAMP WHERE id = ?';
+    await db.run(updateQuery, ['deleted', id]);
 
-          if (vehicleUsingModel) {
-            resolve({
-              statusCode: 409,
-              body: {
-                success: false,
-                message: '车型正在被使用，无法删除'
-              }
-            });
-            return;
-          }
-
-          // 删除车型
-          db.run('DELETE FROM vehicle_models WHERE id = ?', [id], (err) => {
-            if (err) {
-              console.error('删除车型失败:', err);
-              resolve({
-                statusCode: 500,
-                body: {
-                  success: false,
-                  message: '删除车型失败',
-                  error: err.message
-                }
-              });
-              return;
-            }
-
-            resolve({
-              statusCode: 200,
-              body: {
-                success: true,
-                message: '车型删除成功'
-              }
-            });
-          });
-        });
-      });
-    });
+    return {
+      statusCode: 200,
+      body: {
+        success: true,
+        message: '车型删除成功'
+      }
+    };
   } catch (error) {
-    console.error('删除车型时发生错误:', error);
+    console.error('删除车型失败:', error);
     return {
       statusCode: 500,
       body: {
         success: false,
-        message: '删除车型时发生错误',
-        error: error.message
+        message: '删除车型失败',
+        error: 'INTERNAL_ERROR'
       }
     };
   }
-}
-
-module.exports = deleteVehicleModel;
+};
