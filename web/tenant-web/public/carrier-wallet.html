@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>钱包管理 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #f97316;
+      --sidebar-bg: #1e293b;
+      --sidebar-item-hover: #334155;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; }
+    
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 250px;
+      background-color: var(--sidebar-bg); color: white; padding: 20px 0; z-index: 1001;
+    }
+    .sidebar-nav { margin-top: 60px; }
+    .nav-item {
+      padding: 12px 24px; color: #cbd5e1; text-decoration: none; display: block;
+      transition: all 0.3s; cursor: pointer; border-left: 3px solid transparent;
+    }
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover); color: white; border-left: 3px solid var(--primary-color);
+    }
+    .nav-item i { margin-right: 12px; width: 20px; text-align: center; }
+    
+    .has-submenu > .submenu {
+      display: none; list-style: none; padding: 0; margin: 0; background-color: rgba(0, 0, 0, 0.2);
+    }
+    .has-submenu.open > .submenu { display: block; }
+    .has-submenu > .submenu .nav-item { padding-left: 52px; border-left: none; font-size: 0.95rem; }
+    .has-submenu > .submenu .nav-item:hover,
+    .has-submenu > .submenu .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.1); padding-left: 55px;
+    }
+    .submenu-toggle { cursor: pointer; justify-content: space-between; display: flex; align-items: center; }
+    .submenu-arrow { font-size: 0.8rem; transition: transform 0.3s ease; }
+    .has-submenu.open .submenu-arrow { transform: rotate(180deg); }
+
+    .header {
+      background-color: #ffffff; padding: 16px 24px; display: flex; justify-content: space-between;
+      align-items: center; position: fixed; top: 0; left: 250px; right: 0; height: 60px;
+      z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+    .main-content { margin-left: 250px; margin-top: 60px; padding: 24px; }
+
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .page-title { font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0; }
+    .page-description { color: #64748b; margin-top: 4px; }
+
+    .wallet-card {
+      background: #fff; border-radius: 8px; padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 24px;
+    }
+    .wallet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .wallet-title { font-size: 18px; font-weight: 600; color: #1e293b; margin: 0; }
+    .wallet-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white;
+    }
+    .wallet-balance { font-size: 32px; font-weight: 700; color: #1e293b; margin: 8px 0; }
+    .wallet-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    .info-item { background: #f8fafc; padding: 12px; border-radius: 6px; }
+    .info-label { font-size: 13px; color: #64748b; margin-bottom: 4px; }
+    .info-value { font-size: 18px; font-weight: 600; color: #1e293b; }
+
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    .data-table th, .data-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .data-table th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 13px; }
+    .data-table tr:hover { background-color: #f8fafc; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-frozen { background: #fef9c3; color: #854d0e; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      <div class="nav-item has-submenu open">
+        <div class="submenu-toggle">
+          <span><i class="fas fa-yen-sign"></i> 财务管理</span>
+          <i class="fas fa-chevron-down submenu-arrow"></i>
+        </div>
+        <ul class="submenu">
+          <li><a href="./carrier-finance.html" class="nav-item">财务概览</a></li>
+          <li><a href="./carrier-wallet.html" class="nav-item active">钱包管理</a></li>
+          <li><a href="./carrier-commissions.html" class="nav-item">抽佣管理</a></li>
+          <li><a href="./carrier-settlements.html" class="nav-item">结算管理</a></li>
+        </ul>
+      </div>
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./carrier-stop-points.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> 停靠点管理</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
+      <a href="./settings.html" class="nav-item"><i class="fas fa-cog"></i> 内部设置</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <header class="header">
+    <div class="logo">钱包管理</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu"><i class="fas fa-user-circle fa-lg"></i></div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">钱包管理</h1>
+      <p class="page-description">查看和管理您的钱包资金</p>
+    </div>
+
+    <div class="wallet-card">
+      <div class="wallet-header">
+        <h3 class="wallet-title">我的钱包</h3>
+        <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
+      </div>
+      <div class="wallet-balance" id="walletBalance">¥0.00</div>
+      <div class="wallet-info">
+        <div class="info-item">
+          <div class="info-label">可用余额</div>
+          <div class="info-value" id="availableBalance">¥0.00</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">冻结金额</div>
+          <div class="info-value" id="frozenAmount">¥0.00</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">本月收入</div>
+          <div class="info-value" id="monthlyIncome">¥0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-bottom: 16px;">交易记录</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>交易 ID</th>
+          <th>类型</th>
+          <th>金额</th>
+          <th>订单号</th>
+          <th>状态</th>
+          <th>时间</th>
+        </tr>
+      </thead>
+      <tbody id="transactionListBody">
+        <!-- 数据将通过 JS 动态加载 -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 二级导航
+      document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          const parentLi = this.closest('.has-submenu');
+          if (parentLi) parentLi.classList.toggle('open');
+        });
+      });
+
+      loadWalletData();
+      
+      document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('tenantToken');
+        window.location.href = './carrier-login.html';
+      });
+    });
+
+    function loadWalletData() {
+      // TODO: 从 API 获取真实数据
+      document.getElementById('walletBalance').textContent = '¥45,680.00';
+      document.getElementById('availableBalance').textContent = '¥45,680.00';
+      document.getElementById('frozenAmount').textContent = '¥0.00';
+      document.getElementById('monthlyIncome').textContent = '¥28,500.00';
+
+      const transactions = [
+        { id: 'TXN001', type: 'income', amount: 2520.00, order: 'ORD-20260219-001', status: 'completed', time: '2026-02-19 14:30' },
+        { id: 'TXN002', type: 'income', amount: 1800.00, order: 'ORD-20260219-002', status: 'completed', time: '2026-02-19 13:25' },
+        { id: 'TXN003', type: 'income', amount: 3200.00, order: 'ORD-20260219-003', status: 'pending', time: '2026-02-19 12:20' },
+        { id: 'TXN004', type: 'commission', amount: -180.00, order: 'ORD-20260219-001', status: 'completed', time: '2026-02-19 11:15' },
+        { id: 'TXN005', type: 'income', amount: 1580.00, order: 'ORD-20260219-004', status: 'completed', time: '2026-02-19 10:10' }
+      ];
+
+      const tbody = document.getElementById('transactionListBody');
+      tbody.innerHTML = '';
+
+      transactions.forEach(txn => {
+        const row = document.createElement('tr');
+        const typeLabel = { 'income': '收入', 'expense': '支出', 'commission': '抽佣' }[txn.type];
+        const statusClass = `status-${txn.status}`;
+        const statusLabel = { 'completed': '已完成', 'pending': '处理中', 'failed': '已失败' }[txn.status];
+
+        row.innerHTML = `
+          <td>${txn.id}</td>
+          <td>${typeLabel}</td>
+          <td>¥${txn.amount.toFixed(2)}</td>
+          <td>${txn.order}</td>
+          <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+          <td>${txn.time}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>

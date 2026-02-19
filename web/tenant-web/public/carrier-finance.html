@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>财务管理 - 承运商系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* 承运商主题配色 */
+    :root {
+      --primary-color: #f97316;
+      --primary-dark: #ea580c;
+      --primary-light: #fb923c;
+      --sidebar-bg: #1e293b;
+      --sidebar-item-hover: #334155;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      z-index: 1001;
+    }
+
+    .sidebar-nav {
+      margin-top: 60px;
+    }
+
+    .nav-item {
+      padding: 12px 24px;
+      color: #cbd5e1;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background-color: var(--sidebar-item-hover);
+      color: white;
+      border-left: 3px solid var(--primary-color);
+    }
+
+    .nav-item i {
+      margin-right: 12px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* 二级导航样式 */
+    .has-submenu > .submenu {
+      display: none;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .has-submenu.open > .submenu {
+      display: block;
+    }
+
+    .has-submenu > .submenu .nav-item {
+      padding-left: 52px;
+      border-left: none;
+      font-size: 0.95rem;
+    }
+
+    .has-submenu > .submenu .nav-item:hover,
+    .has-submenu > .submenu .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding-left: 55px;
+    }
+
+    .has-submenu > .submenu .nav-item.active {
+      border-left: 3px solid var(--primary-color);
+    }
+
+    .submenu-toggle {
+      cursor: pointer;
+      justify-content: space-between;
+      display: flex;
+      align-items: center;
+    }
+
+    .submenu-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+
+    .has-submenu.open .submenu-arrow {
+      transform: rotate(180deg);
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .page-description {
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .finance-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .finance-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .finance-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .finance-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .finance-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .finance-card-icon.wallet {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+    }
+
+    .finance-card-icon.commission {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    .finance-card-icon.settlement {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+    }
+
+    .finance-card-icon.revenue {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      color: white;
+    }
+
+    .finance-card-title {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .finance-card-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 8px 0;
+    }
+
+    .quick-actions {
+      background: #fff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 32px;
+    }
+
+    .quick-actions-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .quick-action-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .quick-action-item:hover {
+      background: #e0f2fe;
+      transform: translateY(-2px);
+    }
+
+    .quick-action-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    .quick-action-label {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .data-table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pending {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+  </style>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">承运商系统</div>
+    <nav class="sidebar-nav">
+      <a href="./carrier-dashboard.html" class="nav-item"><i class="fas fa-tachometer-alt"></i> 控制台</a>
+      <a href="./orders.html" class="nav-item"><i class="fas fa-shipping-fast"></i> 订单管理</a>
+      <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
+      <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
+      
+      <div class="nav-item has-submenu">
+        <div class="submenu-toggle">
+          <span><i class="fas fa-yen-sign"></i> 财务管理</span>
+          <i class="fas fa-chevron-down submenu-arrow"></i>
+        </div>
+        <ul class="submenu">
+          <li><a href="./carrier-finance.html" class="nav-item active">财务概览</a></li>
+          <li><a href="./carrier-wallet.html" class="nav-item">钱包管理</a></li>
+          <li><a href="./carrier-commissions.html" class="nav-item">抽佣管理</a></li>
+          <li><a href="./carrier-settlements.html" class="nav-item">结算管理</a></li>
+        </ul>
+      </div>
+
+      <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
+      <a href="./carrier-stop-points.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> 停靠点管理</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
+      <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
+      <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
+      <a href="./settings.html" class="nav-item"><i class="fas fa-cog"></i> 内部设置</a>
+      <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </nav>
+  </div>
+
+  <!-- 顶部栏 -->
+  <header class="header">
+    <div class="logo">财务管理</div>
+    <div class="user-info">
+      <span id="welcome-message">欢迎，承运商</span>
+      <div class="user-menu">
+        <i class="fas fa-user-circle fa-lg"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区域 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">财务概览</h1>
+      <p class="page-description">查看您的钱包、抽佣和结算信息</p>
+    </div>
+
+    <!-- 财务概览卡片 -->
+    <div class="finance-cards">
+      <div class="finance-card">
+        <div class="finance-card-header">
+          <h3 class="finance-card-title">钱包余额</h3>
+          <div class="finance-card-icon wallet">
+            <i class="fas fa-wallet"></i>
+          </div>
+        </div>
+        <div class="finance-card-value" id="walletBalance">¥0.00</div>
+        <div>可用余额：<strong id="availableBalance">¥0.00</strong></div>
+      </div>
+
+      <div class="finance-card">
+        <div class="finance-card-header">
+          <h3 class="finance-card-title">本月收入</h3>
+          <div class="finance-card-icon revenue">
+            <i class="fas fa-chart-line"></i>
+          </div>
+        </div>
+        <div class="finance-card-value" id="monthlyIncome">¥0.00</div>
+        <div>较上月 <span class="trend-up">+12.5%</span></div>
+      </div>
+
+      <div class="finance-card">
+        <div class="finance-card-header">
+          <h3 class="finance-card-title">待结算金额</h3>
+          <div class="finance-card-icon settlement">
+            <i class="fas fa-exchange-alt"></i>
+          </div>
+        </div>
+        <div class="finance-card-value" id="pendingSettlement">¥0.00</div>
+        <div>共 <strong id="pendingCount">0</strong> 笔</div>
+      </div>
+
+      <div class="finance-card">
+        <div class="finance-card-header">
+          <h3 class="finance-card-title">累计抽佣</h3>
+          <div class="finance-card-icon commission">
+            <i class="fas fa-percent"></i>
+          </div>
+        </div>
+        <div class="finance-card-value" id="totalCommission">¥0.00</div>
+        <div>本月：<strong id="monthCommission">¥0.00</strong></div>
+      </div>
+    </div>
+
+    <!-- 快捷入口 -->
+    <div class="quick-actions">
+      <h3 class="quick-actions-title">
+        <i class="fas fa-bolt"></i>
+        快捷入口
+      </h3>
+      <div class="quick-actions-grid">
+        <a href="./carrier-wallet.html" class="quick-action-item">
+          <i class="fas fa-wallet quick-action-icon"></i>
+          <span class="quick-action-label">钱包管理</span>
+        </a>
+        <a href="./carrier-commissions.html" class="quick-action-item">
+          <i class="fas fa-percent quick-action-icon"></i>
+          <span class="quick-action-label">抽佣管理</span>
+        </a>
+        <a href="./carrier-settlements.html" class="quick-action-item">
+          <i class="fas fa-exchange-alt quick-action-icon"></i>
+          <span class="quick-action-label">结算管理</span>
+        </a>
+        <a href="./orders.html" class="quick-action-item">
+          <i class="fas fa-list-alt quick-action-icon"></i>
+          <span class="quick-action-label">订单管理</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 最近交易记录 -->
+    <div class="recent-section">
+      <h3 style="margin-bottom: 20px;">最近交易记录</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>交易 ID</th>
+            <th>类型</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>时间</th>
+          </tr>
+        </thead>
+        <tbody id="recentTransactionsBody">
+          <!-- 数据将通过 JS 动态加载 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // 二级导航交互
+    document.addEventListener('DOMContentLoaded', function() {
+      const submenuToggles = document.querySelectorAll('.submenu-toggle');
+      
+      submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          const parentLi = this.closest('.has-submenu');
+          if (parentLi) {
+            parentLi.classList.toggle('open');
+          }
+        });
+      });
+
+      // 加载财务数据
+      loadFinanceData();
+      loadRecentTransactions();
+      
+      // 退出登录
+      document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('tenantToken');
+        window.location.href = './carrier-login.html';
+      });
+    });
+
+    // 加载财务数据
+    function loadFinanceData() {
+      // TODO: 从 API 获取真实数据
+      // 模拟数据
+      document.getElementById('walletBalance').textContent = '¥45,680.00';
+      document.getElementById('availableBalance').textContent = '¥45,680.00';
+      document.getElementById('monthlyIncome').textContent = '¥28,500.00';
+      document.getElementById('pendingSettlement').textContent = '¥8,200.00';
+      document.getElementById('pendingCount').textContent = '5';
+      document.getElementById('totalCommission').textContent = '¥12,350.00';
+      document.getElementById('monthCommission').textContent = '¥2,850.00';
+    }
+
+    // 加载最近交易
+    function loadRecentTransactions() {
+      // TODO: 从 API 获取真实数据
+      // 模拟数据
+      const transactions = [
+        { id: 'TXN001', type: 'income', amount: 2520.00, status: 'completed', time: '2026-02-19 14:30' },
+        { id: 'TXN002', type: 'income', amount: 1800.00, status: 'completed', time: '2026-02-19 13:25' },
+        { id: 'TXN003', type: 'income', amount: 3200.00, status: 'pending', time: '2026-02-19 12:20' },
+        { id: 'TXN004', type: 'expense', amount: 180.00, status: 'completed', time: '2026-02-19 11:15' },
+        { id: 'TXN005', type: 'income', amount: 1580.00, status: 'completed', time: '2026-02-19 10:10' }
+      ];
+
+      const tbody = document.getElementById('recentTransactionsBody');
+      tbody.innerHTML = '';
+
+      transactions.forEach(txn => {
+        const row = document.createElement('tr');
+        const typeLabel = txn.type === 'income' ? '收入' : '支出';
+        const statusClass = `status-${txn.status}`;
+        const statusLabel = {
+          'completed': '已完成',
+          'pending': '处理中',
+          'failed': '已失败'
+        }[txn.status];
+
+        row.innerHTML = `
+          <td>${txn.id}</td>
+          <td>${typeLabel}</td>
+          <td>¥${txn.amount.toFixed(2)}</td>
+          <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+          <td>${txn.time}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
