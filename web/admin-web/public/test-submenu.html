@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二级导航测试</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #f5f5f5; padding: 20px; }
+        .test-result { 
+            background: white; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success { color: #52c41a; }
+        .error { color: #ff4d4f; }
+        .info { color: #1890ff; }
+    </style>
+</head>
+<body>
+    <div class="test-result">
+        <h2>二级导航测试</h2>
+        <div id="results"></div>
+    </div>
+
+    <!-- 测试用侧边栏 -->
+    <aside class="sidebar" style="position: relative; height: auto; margin-bottom: 20px;">
+        <div class="logo">
+            <i class="fas fa-truck-moving logo-icon"></i>
+            <span>物流管理系统</span>
+        </div>
+        <ul>
+            <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+            <li class="has-submenu">
+                <a href="javascript:void(0)" class="submenu-toggle">
+                    <i class="fas fa-yen-sign"></i>
+                    <span>财务管理</span>
+                    <i class="fas fa-chevron-down submenu-arrow"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="/finance.html"><span>财务概览</span></a></li>
+                    <li><a href="/wallet-management.html"><span>钱包管理</span></a></li>
+                    <li><a href="/commissions.html"><span>抽佣管理</span></a></li>
+                    <li><a href="/settlement-management.html"><span>结算管理</span></a></li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+
+    <script src="/js/main.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        const tests = [];
+
+        // 测试 1: main.js 是否加载
+        tests.push({
+            name: 'main.js 加载',
+            result: typeof initSubmenu === 'function' ? '✅ 通过' : '❌ 失败',
+            info: typeof initSubmenu === 'function' ? 'initSubmenu 函数存在' : 'initSubmenu 函数不存在'
+        });
+
+        // 测试 2: submenu-toggle 是否存在
+        const submenuToggles = document.querySelectorAll('.submenu-toggle');
+        tests.push({
+            name: 'submenu-toggle 元素',
+            result: submenuToggles.length > 0 ? '✅ 通过' : '❌ 失败',
+            info: `找到 ${submenuToggles.length} 个 toggle 元素`
+        });
+
+        // 测试 3: submenu 是否存在
+        const submenus = document.querySelectorAll('.submenu');
+        tests.push({
+            name: 'submenu 元素',
+            result: submenus.length > 0 ? '✅ 通过' : '❌ 失败',
+            info: `找到 ${submenus.length} 个 submenu`
+        });
+
+        // 测试 4: CSS 样式是否生效
+        const submenu = document.querySelector('.submenu');
+        const computedStyle = window.getComputedStyle(submenu);
+        tests.push({
+            name: 'CSS 样式加载',
+            result: computedStyle ? '✅ 通过' : '❌ 失败',
+            info: `submenu display: ${computedStyle.display}`
+        });
+
+        // 测试 5: 点击事件是否绑定
+        let clickTested = false;
+        if (submenuToggles.length > 0) {
+            const toggle = submenuToggles[0];
+            toggle.click();
+            const parentLi = toggle.closest('li');
+            clickTested = parentLi.classList.contains('open');
+        }
+        tests.push({
+            name: '点击事件响应',
+            result: clickTested ? '✅ 通过' : '❌ 失败',
+            info: clickTested ? '点击后 open 类已添加' : '点击后 open 类未添加'
+        });
+
+        // 显示测试结果
+        tests.forEach(test => {
+            const div = document.createElement('div');
+            div.style.margin = '10px 0';
+            div.innerHTML = `
+                <strong>${test.name}:</strong> ${test.result}<br>
+                <span class="info">${test.info}</span>
+            `;
+            results.appendChild(div);
+        });
+
+        // 自动测试：3 秒后再次检查
+        setTimeout(() => {
+            const submenu2 = document.querySelector('.submenu');
+            const parentLi = document.querySelector('.has-submenu');
+            console.log(' submenu display:', window.getComputedStyle(submenu2).display);
+            console.log(' parentLi has open class:', parentLi.classList.contains('open'));
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -161,7 +161,7 @@
 - 检查SQL语法
 - 验证字段类型
 - 确保外键关系正确
-- 确保使用统一的数据库模块（如 `better-sqlite3`）
+- 确保使用统一的数据库模块（如 `sqlite3`）
 - 避免混用不同的数据库模块（如 `sqlite3` 和 `better-sqlite3`）
 
 ### 8.4. 数据库模块一致性问题
@@ -297,7 +297,8 @@ function someHandlerFunction(req, res) {
 ## ✅ 强制要求
 
 ### 1. 文件位置与格式
-- `openapi.yaml` 必须位于项目根目录。
+- `openapi.yaml` 必须位于项目backend/目录下。
+- 启动时候都需要经过OPENAPI处理器进行处理
 - 使用 **YAML 1.2** 格式，**2 空格缩进**，禁止制表符（Tab）。
 - 所有 `$ref` 路径必须用**双引号包裹**，例如：`"$ref": "#/components/schemas/OrderDTO"`
 
@@ -333,7 +334,9 @@ function someHandlerFunction(req, res) {
 - 输出 JSON 格式的 OpenAPI（必须是 YAML）
 
 ## 🔁 增量更新原则
+- 所有开发都需要在openapi当中进行定义
 - 仅修改受影响的 paths/schemas，**不要重写整个文件**
 - 保留用户可能添加的自定义扩展（如 `x-freight-priority`）
+- 已经开发或调试或修改成功的文档说明保存到本地目录
 
 > 此规则适用于所有后端语言（Java/Spring Boot, Node.js, Python/FastAPI 等）

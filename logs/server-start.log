@@ -1,0 +1,3575 @@
+🔍 开始加载配置...
+[dotenv@17.2.3] injecting env (4) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+✅ 配置加载成功，完整内容: {
+  "server": {
+    "port": 3000,
+    "name": "【沈阳战旗】数孪智运无人物流SaaS平台 API"
+  },
+  "session": {
+    "secret": "sunsh800219",
+    "cookie": {
+      "secure": false,
+      "httpOnly": true,
+      "maxAge": 86400000,
+      "signed": true,
+      "path": "/",
+      "name": "connect.sid"
+    }
+  },
+  "security": {
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 500
+    },
+    "cors": {
+      "origin": true,
+      "credentials": true
+    }
+  },
+  "openapi": {
+    "definition": "./openapi.yaml",
+    "strict": false,
+    "validate": true
+  },
+  "debug": false
+}
+✅ 中间件模块加载成功
+✅ 数据库模块加载成功
+🚀 开始初始化数据库...
+🔗 首次初始化数据库连接: ./data/mydatabase.db
+(node:10996) Warning: Accessing non-existent property 'getDb' of module exports inside circular dependency
+(Use `node --trace-warnings ...` to show where the warning was created)
+🔨 开始初始化数据库表结构...
+✅ 数据库连接成功!
+✅ 外键约束已启用
+✅ 表 users 已初始化
+✅ 表 tenants 已初始化
+✅ 表 customers 已初始化
+✅ 表 customer_applications 已初始化
+✅ 表 orders 已初始化
+✅ 表 platform_pricing_rules 已初始化
+✅ 表 tenant_vehicles 已初始化
+✅ 表 carrier_pricing_configs 已初始化
+✅ 表 user_sessions 已初始化
+✅ 表 quotes 已初始化
+✅ 表 organizations 已初始化
+✅ 表 vehicle_models 已初始化
+🎉 数据库表结构初始化完成
+✅ 数据库初始化完成
+✅ 数据库初始化完成
+✅ 注册 handler: adminApproveStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminApproveStopPoint.js
+✅ 注册 handler: adminBatchApproveStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminBatchApproveStopPoints.js
+✅ 注册 handler: adminBatchImportStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminBatchImportStopPoints.js
+✅ 注册 handler: adminCreateStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminCreateStopPoint.js
+✅ 注册 handler: adminDeleteStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminDeleteStopPoint.js
+✅ 注册 handler: adminGetApprovalStats -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminGetApprovalStats.js
+✅ 注册 handler: adminGetStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminGetStopPoint.js
+✅ 注册 handler: adminListPendingStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminListPendingStopPoints.js
+✅ 注册 handler: adminListStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminListStopPoints.js
+✅ 注册 handler: adminUpdateStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\adminUpdateStopPoint.js
+Trying to load db from: C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\auth
+🚀 adminLogin.js handler function is executing!
+✅ 注册 handler: adminLogin -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\auth\adminLogin.js
+✅ 注册 handler: adminLogout -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\auth\adminLogout.js
+✅ 注册 handler: getAdminProfile -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\auth\getAdminProfile.js
+✅ 注册 handler: getCommissionConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\commissions\getCommissionConfig.js
+✅ 注册 handler: listCommissionRecords -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\commissions\listCommissionRecords.js
+✅ 注册 handler: updateCommissionConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\commissions\updateCommissionConfig.js
+✅ 注册 handler: updateCommissionRecordStatus -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\commissions\updateCommissionRecordStatus.js
+✅ 注册 handler: listAdminOrders -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\order\listAdminOrders.js
+✅ 注册 handler: updateOrderStatus -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\order\updateOrderStatus.js
+✅ 注册 handler: createPlatformPricingRule -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\pricing\createPlatformPricingRule.js
+✅ 注册 handler: deletePlatformPricingRule -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\pricing\deletePlatformPricingRule.js
+✅ 注册 handler: getPlatformPricingRule -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\pricing\getPlatformPricingRule.js
+✅ 注册 handler: listPlatformPricingRules -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\pricing\listPlatformPricingRules.js
+✅ 注册 handler: updatePlatformPricingRule -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\pricing\updatePlatformPricingRule.js
+✅ 注册 handler: getOverviewStats -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\reports\getOverviewStats.js
+✅ 注册 handler: listSettings -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\settings\listSettings.js
+✅ 注册 handler: updateSetting -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\settings\updateSetting.js
+✅ 注册 handler: addTenantVehicle -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\addTenantVehicle.js
+✅ 注册 handler: getTenantById -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\getTenantById.js
+✅ 注册 handler: listAllTenants -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\listAllTenants.js
+✅ 注册 handler: updateTenantBasicInfo -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\updateTenantBasicInfo.js
+✅ 注册 handler: updateTenantContactInfo -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\updateTenantContactInfo.js
+✅ 注册 handler: updateTenantFinancialInfo -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenant-management\updateTenantFinancialInfo.js
+✅ 注册 handler: approveTenant -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenants\approveTenant.js
+✅ 注册 handler: listApprovedTenants -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenants\listApprovedTenants.js
+✅ 注册 handler: listPendingTenants -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenants\listPendingTenants.js
+✅ 注册 handler: listRejectedTenants -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenants\listRejectedTenants.js
+✅ 注册 handler: rejectTenant -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\tenants\rejectTenant.js
+✅ Loading createAdminUser handler...
+DEBUG createAdminUser export type: function
+✅ 注册 handler: createAdminUser -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\user\createAdminUser.js
+✅ 注册 handler: adminListVehicleModels -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-models\adminListVehicleModels.js
+✅ 注册 handler: createVehicleModel -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-models\createVehicleModel.js
+✅ 注册 handler: deleteVehicleModel -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-models\deleteVehicleModel.js
+✅ 注册 handler: getVehicleModel -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-models\getVehicleModel.js
+✅ 注册 handler: updateVehicleModel -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-models\updateVehicleModel.js
+✅ 注册 handler: getLatestPositions -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-tracking\getLatestPositions.js
+✅ 注册 handler: getVehiclePositions -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicle-tracking\getVehiclePositions.js
+✅ 注册 handler: getVehicleById -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicles\getVehicleById.js
+✅ 注册 handler: listAllVehicles -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicles\listAllVehicles.js
+✅ 注册 handler: searchVehicles -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\vehicles\searchVehicles.js
+✅ 注册 handler: createViolation -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\createViolation.js
+✅ 注册 handler: deleteViolation -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\deleteViolation.js
+✅ 注册 handler: getViolationById -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\getViolationById.js
+✅ 注册 handler: getViolationStats -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\getViolationStats.js
+✅ 注册 handler: listViolations -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\listViolations.js
+✅ 注册 handler: updateViolation -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\admin\violations\updateViolation.js
+✅ 注册 handler: carrierCreateStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\carrierCreateStopPoint.js
+✅ 注册 handler: carrierDeleteStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\carrierDeleteStopPoint.js
+✅ 注册 handler: carrierGetStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\carrierGetStopPoint.js
+✅ 注册 handler: carrierListStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\carrierListStopPoints.js
+✅ 注册 handler: carrierUpdateStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\carrierUpdateStopPoint.js
+✅ 注册 handler: addOrderAddons -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\addOrderAddons.js
+✅ 注册 handler: claimCarrierOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\claimCarrierOrder.js
+✅ 注册 handler: completeCarrierOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\completeCarrierOrder.js
+✅ 注册 handler: listCarrierOrders -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\listCarrierOrders.js
+✅ 注册 handler: startDelivery -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\startDelivery.js
+✅ 注册 handler: submitCarrierQuote -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\order\submitCarrierQuote.js
+✅ 注册 handler: createCarrierPricingConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\pricing\createCarrierPricingConfig.js
+✅ 注册 handler: deleteCarrierPricingConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\pricing\deleteCarrierPricingConfig.js
+✅ 注册 handler: getCarrierPricingConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\pricing\getCarrierPricingConfig.js
+✅ 注册 handler: listCarrierPricingConfigs -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\pricing\listCarrierPricingConfigs.js
+✅ 注册 handler: updateCarrierPricingConfig -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\carrier\pricing\updateCarrierPricingConfig.js
+✅ 注册 handler: awardOrderToCarrier -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\awardOrderToCarrier.js
+✅ 注册 handler: bindOrderToCustomer -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\bindOrderToCustomer.js
+✅ 注册 handler: confirmOrderAddons -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\confirmOrderAddons.js
+✅ 注册 handler: createCustomerOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\createCustomerOrder.js
+✅ 注册 handler: deleteCustomerOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\deleteCustomerOrder.js
+✅ 注册 handler: getCustomerOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\getCustomerOrder.js
+✅ 注册 handler: getOrderQuotes -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\getOrderQuotes.js
+✅ 注册 handler: listCustomerOrders -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\listCustomerOrders.js
+✅ 注册 handler: updateCustomerOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\customer\order\updateCustomerOrder.js
+✅ 注册 handler: healthCheck -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\healthCheck.js
+✅ 注册 handler: avRouteAdjust -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\avRouteAdjust.js
+✅ 注册 handler: avRouteCalculate -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\avRouteCalculate.js
+✅ 注册 handler: avRouteDetails -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\avRouteDetails.js
+✅ 注册 handler: avRouteMultiPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\avRouteMultiPoint.js
+✅ 注册 handler: currentPosition -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\currentPosition.js
+✅ 注册 handler: distance -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\distance.js
+✅ 注册 handler: geocode -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\geocode.js
+✅ 注册 handler: history -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\history.js
+✅ 注册 handler: onlineStatus -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\onlineStatus.js
+✅ 注册 handler: poi -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\poi.js
+✅ 注册 handler: positionUpdate -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\positionUpdate.js
+✅ 注册 handler: reverseGeocode -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\reverseGeocode.js
+✅ 注册 handler: route -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\route.js
+✅ 注册 handler: stopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\map\stopPoints.js
+✅ 注册 handler: createPublicOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\public\createPublicOrder.js
+✅ 注册 handler: fetchPublicOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\public\fetchPublicOrder.js
+✅ 注册 handler: getOrderQuote -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\public\getOrderQuote.js
+✅ 注册 handler: processSettlement -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\settlement\processSettlement.js
+✅ 注册 handler: createFirstAdmin -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\setup\createFirstAdmin.js
+✅ 注册 handler: getSetupStatus -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\setup\getSetupStatus.js
+✅ 注册 handler: applyPcTenant -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\applyPcTenant.js
+✅ 注册 handler: getTenantProfile -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\getTenantProfile.js
+✅ 注册 handler: getTenantRoles -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\getTenantRoles.js
+✅ 注册 handler: loginTenantWeb -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\loginTenantWeb.js
+### DEBUG: Loading CORRECTED registerTenantWeb.js - Handling customer vs carrier registration ###
+✅ 注册 handler: registerTenantWeb -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\registerTenantWeb.js
+✅ 注册 handler: tenantBatchUploadStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantBatchUploadStopPoints.js
+✅ 注册 handler: tenantDeleteMyStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantDeleteMyStopPoint.js
+✅ 注册 handler: tenantGetMyStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantGetMyStopPoint.js
+✅ 注册 handler: tenantListMyStopPoints -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantListMyStopPoints.js
+✅ 注册 handler: tenantUpdateMyStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantUpdateMyStopPoint.js
+✅ 注册 handler: tenantUploadStopPoint -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant\tenantUploadStopPoint.js
+✅ 注册 handler: listAvailableVehicleModels -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\listAvailableVehicleModels.js
+✅ 注册 handler: claimOrder -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\order\claimOrder.js
+✅ 注册 handler: listPendingOrders -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\order\listPendingOrders.js
+✅ 注册 handler: listCarrierQuotes -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\quotes\listCarrierQuotes.js
+✅ 注册 handler: listAvailableVehicleModels -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicle-models\listAvailableVehicleModels.js
+✅ 注册 handler: addTenantVehicleWithModel -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicles\addTenantVehicleWithModel.js
+✅ 注册 handler: deleteTenantVehicle -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicles\deleteTenantVehicle.js
+✅ 注册 handler: getTenantVehicleById -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicles\getTenantVehicleById.js
+✅ 注册 handler: listTenantVehicles -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicles\listTenantVehicles.js
+✅ 注册 handler: updateTenantVehicle -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\tenant-web\vehicles\updateTenantVehicle.js
+✅ 注册 handler: getAutonomousLevels -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\vehicle-models\getAutonomousLevels.js
+✅ 注册 handler: getVehicleTypes -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\vehicle-models\getVehicleTypes.js
+✅ 注册 handler: getCurrentUserWallet -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\wallet\getCurrentUserWallet.js
+✅ 注册 handler: getWalletTransactions -> C:\Users\Administrator\Desktop\wuliu_project\backend\api\handlers\wallet\getWalletTransactions.js
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/pickup_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/pickup_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/quote_deadline"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/pickup_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/pickup_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/quote_deadline"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "email" ignored in schema at path "#/properties/requestBody/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/requestBody/properties/required_delivery_time"
+unknown format "date" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "uri" ignored in schema at path "#/properties/requestBody/properties/image_url"
+unknown format "uri" ignored in schema at path "#/properties/requestBody/properties/image_url"
+unknown format "uri" ignored in schema at path "#/properties/requestBody/properties/image_url"
+unknown format "uri" ignored in schema at path "#/properties/requestBody/properties/image_url"
+unknown format "date" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "date" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "date-time" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date-time" ignored in schema at path "#/properties/query/properties/start_date"
+unknown format "date-time" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "date-time" ignored in schema at path "#/properties/query/properties/end_date"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/allOf/0/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/allOf/0/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/financial_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/financial_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/financial_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/financial_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/contact_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/contact_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/contact_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/allOf/1/properties/contact_info/properties/updated_at"
+unknown format "email" ignored in schema at path "#/properties/data/allOf/0/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/allOf/0/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/financial_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/financial_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/financial_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/financial_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/contact_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/contact_info/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/contact_info/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/allOf/1/properties/contact_info/properties/updated_at"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "email" ignored in schema at path "#/properties/data/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/recent_orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/recent_orders/items/properties/updated_at"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/tenants/items/properties/created_at"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/properties/tenants/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/tenants/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/items/properties/email"
+unknown format "email" ignored in schema at path "#/oneOf/0/properties/data/items/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/items/properties/email"
+unknown format "email" ignored in schema at path "#/properties/data/items/properties/email"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/order/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/order/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/required_delivery_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quote_deadline"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/estimated_arrival"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/quotes/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/orders/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle_models/items/properties/deleted_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicles/items/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/vehicle/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/vehicle/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/settlement_details/properties/processed_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/settlement_details/properties/processed_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/settlement_details/properties/processed_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/settlement_details/properties/processed_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/confirmed_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/confirmed_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/confirmed_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/confirmed_at"
+unknown format "date" ignored in schema at path "#/oneOf/0/properties/data/properties/period/properties/start_date"
+unknown format "date" ignored in schema at path "#/oneOf/0/properties/data/properties/period/properties/start_date"
+unknown format "date" ignored in schema at path "#/oneOf/0/properties/data/properties/period/properties/end_date"
+unknown format "date" ignored in schema at path "#/oneOf/0/properties/data/properties/period/properties/end_date"
+unknown format "date" ignored in schema at path "#/properties/data/properties/period/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/data/properties/period/properties/start_date"
+unknown format "date" ignored in schema at path "#/properties/data/properties/period/properties/end_date"
+unknown format "date" ignored in schema at path "#/properties/data/properties/period/properties/end_date"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/addons_confirmation_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/addons_confirmation_time"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/addons_confirmation_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/addons_confirmation_time"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/wallet/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/wallet/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/wallet/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/wallet/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/wallet/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/wallet/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/wallet/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/wallet/properties/updated_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/transactions/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/oneOf/0/properties/data/properties/transactions/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/transactions/items/properties/created_at"
+unknown format "date-time" ignored in schema at path "#/properties/data/properties/transactions/items/properties/created_at"
+Unknown operationId adminApproveStopPoint
+Unknown operationId adminBatchApproveStopPoints
+Unknown operationId adminBatchImportStopPoints
+Unknown operationId adminCreateStopPoint
+Unknown operationId adminDeleteStopPoint
+Unknown operationId adminGetApprovalStats
+Unknown operationId adminGetStopPoint
+Unknown operationId adminListPendingStopPoints
+Unknown operationId adminListStopPoints
+Unknown operationId adminUpdateStopPoint
+Unknown operationId getCommissionConfig
+Unknown operationId listCommissionRecords
+Unknown operationId updateCommissionConfig
+Unknown operationId updateCommissionRecordStatus
+Unknown operationId listSettings
+Unknown operationId updateSetting
+Unknown operationId createVehicleModel
+Unknown operationId getLatestPositions
+Unknown operationId getVehiclePositions
+Unknown operationId createViolation
+Unknown operationId deleteViolation
+Unknown operationId getViolationById
+Unknown operationId getViolationStats
+Unknown operationId listViolations
+Unknown operationId updateViolation
+Unknown operationId carrierCreateStopPoint
+Unknown operationId carrierDeleteStopPoint
+Unknown operationId carrierGetStopPoint
+Unknown operationId carrierListStopPoints
+Unknown operationId carrierUpdateStopPoint
+Unknown operationId claimCarrierOrder
+Unknown operationId confirmOrderAddons
+Unknown operationId avRouteAdjust
+Unknown operationId avRouteCalculate
+Unknown operationId avRouteDetails
+Unknown operationId avRouteMultiPoint
+Unknown operationId currentPosition
+Unknown operationId distance
+Unknown operationId geocode
+Unknown operationId history
+Unknown operationId onlineStatus
+Unknown operationId poi
+Unknown operationId positionUpdate
+Unknown operationId reverseGeocode
+Unknown operationId route
+Unknown operationId stopPoints
+Unknown operationId tenantBatchUploadStopPoints
+Unknown operationId tenantDeleteMyStopPoint
+Unknown operationId tenantGetMyStopPoint
+Unknown operationId tenantListMyStopPoints
+Unknown operationId tenantUpdateMyStopPoint
+Unknown operationId tenantUploadStopPoint
+--- DEBUG: OpenAPI Document Loaded ---
+All Paths in Document:
+  Path: /api/admin/tenants
+  Path: /api/admin/tenants/{id}
+  Path: /api/admin/reports/overview-stats
+  Path: /api/admin/tenants/approved
+  Path: /api/admin/tenants/rejected
+  Path: /api/admin/tenants/{id}/financial
+  Path: /api/admin/tenants/{id}/contact
+  Path: /api/admin/vehicles
+    -> Method: POST
+       OperationId: addTenantVehicle
+       Has Parameters: false
+  Path: /api/admin/vehicle-models
+  Path: /api/admin/vehicle-models/{id}
+  Path: /api/admin/vehicles/search
+  Path: /api/admin/vehicles/{id}
+  Path: /api/health
+  Path: /api/customer/order/bind
+    -> Method: POST
+       OperationId: bindOrderToCustomer
+       Has Parameters: false
+  Path: /api/customer/orders
+    -> Method: POST
+       OperationId: createCustomerOrder
+       Has Parameters: false
+  Path: /api/customer/orders/{order_id}
+  Path: /api/customer/orders/{order_id}/quotes
+  Path: /api/setup/status
+  Path: /api/setup/admin
+    -> Method: POST
+       OperationId: createFirstAdmin
+       Has Parameters: false
+  Path: /api/auth/ping
+  Path: /api/admin/login
+    -> Method: POST
+       OperationId: adminLogin
+       Has Parameters: false
+  Path: /api/admin/logout
+    -> Method: POST
+       OperationId: adminLogout
+       Has Parameters: false
+  Path: /api/admin/profile
+  Path: /api/admin/users
+    -> Method: POST
+       OperationId: createAdminUser
+       Has Parameters: false
+  Path: /api/admin/tenants/pending
+  Path: /api/admin/tenants/{id}/approve
+  Path: /api/admin/tenants/{id}/reject
+  Path: /api/admin/orders
+  Path: /api/admin/orders/{id}/status
+  Path: /api/public/orders/{id}
+  Path: /api/public/orders
+    -> Method: POST
+       OperationId: createPublicOrder
+       Has Parameters: false
+  Path: /api/carrier/orders/{order_id}/complete
+  Path: /api/carrier/orders/{order_id}/start-delivery
+  Path: /api/carrier/orders/{order_id}/quote
+    -> Method: POST
+       OperationId: submitCarrierQuote
+       Has Parameters: true
+       Parameters: [ 'order_id(required) [path]' ]
+  Path: /api/customer/orders/{order_id}/award
+    -> Method: POST
+       OperationId: awardOrderToCarrier
+       Has Parameters: true
+       Parameters: [ 'order_id(required) [path]' ]
+  Path: /api/tenant-web/register
+    -> Method: POST
+       OperationId: registerTenantWeb
+       Has Parameters: false
+  Path: /api/tenant-web/login
+    -> Method: POST
+       OperationId: loginTenantWeb
+       Has Parameters: false
+  Path: /api/tenant-web/profile
+    -> Method: POST
+       OperationId: createTenantOrder
+       Has Parameters: false
+  Path: /api/tenant-web/profile/roles
+  Path: /api/pc-tenant/apply
+    -> Method: POST
+       OperationId: applyPcTenant
+       Has Parameters: false
+  Path: /api/tenant-web/orders/pending
+  Path: /api/tenant-web/orders/{order_id}/claim
+  Path: /api/tenant-web/orders/{order_id}/complete
+  Path: /api/tenant-web/logout
+    -> Method: POST
+       OperationId: logoutTenant
+       Has Parameters: false
+  Path: /api/matching/search-carriers
+    -> Method: POST
+       OperationId: searchMatchingCarriers
+       Has Parameters: false
+  Path: /api/matching/get-quote-suggestions/{order_id}
+  Path: /api/carrier/quotes
+  Path: /api/carrier/orders
+  Path: /api/admin/pricing-rules
+    -> Method: POST
+       OperationId: createPlatformPricingRule
+       Has Parameters: false
+  Path: /api/admin/pricing-rules/{id}
+  Path: /api/carrier/pricing-configs
+    -> Method: POST
+       OperationId: createCarrierPricingConfig
+       Has Parameters: false
+  Path: /api/carrier/pricing-configs/{id}
+  Path: /api/order/quote
+    -> Method: POST
+       OperationId: getOrderQuote
+       Has Parameters: false
+  Path: /api/order/{id}/add-ons
+    -> Method: POST
+       OperationId: addOrderAddons
+       Has Parameters: true
+       Parameters: [ 'id(required) [path]' ]
+  Path: /api/tenant-web/vehicle-models
+  Path: /api/tenant-web/vehicles
+    -> Method: POST
+       OperationId: addTenantVehicleWithModel
+       Has Parameters: false
+  Path: /api/tenant-web/vehicles/{id}
+  Path: /api/vehicle-models/autonomous-levels
+  Path: /api/vehicle-models/types
+  Path: /api/settlement/process
+    -> Method: POST
+       OperationId: processSettlement
+       Has Parameters: false
+  Path: /api/settlement/orders/{order_id}
+  Path: /api/settlement/orders/{order_id}/confirm
+    -> Method: POST
+       OperationId: confirmOrderSettlement
+       Has Parameters: true
+       Parameters: [ 'order_id(required) [path]' ]
+  Path: /api/settlement/summary
+  Path: /api/wallet/orders/{order_id}/confirm-addons
+    -> Method: POST
+       OperationId: confirmOrderAddonsFromWallet
+       Has Parameters: true
+       Parameters: [ 'order_id(required) [path]' ]
+  Path: /api/wallet/current
+  Path: /api/wallet/{wallet_id}/transactions
+  Path: /api/map/geocode
+  Path: /api/map/reverse-geocode
+  Path: /api/map/route
+  Path: /api/map/distance
+  Path: /api/map/poi
+  Path: /api/map/stop-points
+  Path: /api/av-route/calculate
+    -> Method: POST
+       OperationId: undefined
+       Has Parameters: false
+  Path: /api/av-route/multi-point
+    -> Method: POST
+       OperationId: undefined
+       Has Parameters: false
+  Path: /api/av-route/details/{routeId}
+  Path: /api/av-route/adjust
+    -> Method: POST
+       OperationId: undefined
+       Has Parameters: false
+  Path: /api/tracking/position-update
+    -> Method: POST
+       OperationId: undefined
+       Has Parameters: false
+  Path: /api/tracking/current-position/{vehicleId}
+  Path: /api/tracking/history/{vehicleId}
+  Path: /api/tracking/online-status/{vehicleId}
+  Path: /api/carrier/stop-points
+    -> Method: POST
+       OperationId: undefined
+       Has Parameters: false
+  Path: /api/carrier/stop-points/{id}
+--- END DEBUG ---
+🔧 OpenAPI中间件初始化完成
+
+📋 已注册的 OpenAPI 路径:
+ GET /api/admin/tenants -> listAllTenants
+ GET /api/admin/tenants/{id} -> getTenantById
+ PUT /api/admin/tenants/{id} -> updateTenantBasicInfo
+ GET /api/admin/reports/overview-stats -> getOverviewStats
+ GET /api/admin/tenants/approved -> listApprovedTenants
+ GET /api/admin/tenants/rejected -> listRejectedTenants
+ PUT /api/admin/tenants/{id}/financial -> updateTenantFinancialInfo
+ PUT /api/admin/tenants/{id}/contact -> updateTenantContactInfo
+ GET /api/admin/vehicles -> listAllVehicles
+ POST /api/admin/vehicles -> addTenantVehicle
+ GET /api/admin/vehicle-models -> adminListVehicleModels
+ GET /api/admin/vehicle-models/{id} -> getVehicleModel
+ PUT /api/admin/vehicle-models/{id} -> updateVehicleModel
+ DELETE /api/admin/vehicle-models/{id} -> deleteVehicleModel
+ GET /api/admin/vehicles/search -> searchVehicles
+ GET /api/admin/vehicles/{id} -> getVehicleById
+ GET /api/health -> healthCheck
+ POST /api/customer/order/bind -> bindOrderToCustomer
+ POST /api/customer/orders -> createCustomerOrder
+ GET /api/customer/orders -> listCustomerOrders
+ GET /api/customer/orders/{order_id} -> getCustomerOrder
+ PUT /api/customer/orders/{order_id} -> updateCustomerOrder
+ DELETE /api/customer/orders/{order_id} -> deleteCustomerOrder
+ GET /api/customer/orders/{order_id}/quotes -> getOrderQuotes
+ GET /api/setup/status -> getSetupStatus
+ POST /api/setup/admin -> createFirstAdmin
+ GET /api/auth/ping -> undefined
+ POST /api/admin/login -> adminLogin
+ POST /api/admin/logout -> adminLogout
+ GET /api/admin/profile -> getAdminProfile
+ POST /api/admin/users -> createAdminUser
+ GET /api/admin/tenants/pending -> listPendingTenants
+ PUT /api/admin/tenants/{id}/approve -> approveTenant
+ PUT /api/admin/tenants/{id}/reject -> rejectTenant
+ GET /api/admin/orders -> listAdminOrders
+ PUT /api/admin/orders/{id}/status -> updateOrderStatus
+ GET /api/public/orders/{id} -> fetchPublicOrder
+ POST /api/public/orders -> createPublicOrder
+ PUT /api/carrier/orders/{order_id}/complete -> completeCarrierOrder
+ PUT /api/carrier/orders/{order_id}/start-delivery -> startDelivery
+ POST /api/carrier/orders/{order_id}/quote -> submitCarrierQuote
+ POST /api/customer/orders/{order_id}/award -> awardOrderToCarrier
+ POST /api/tenant-web/register -> registerTenantWeb
+ POST /api/tenant-web/login -> loginTenantWeb
+ GET /api/tenant-web/profile -> getTenantProfile
+ PUT /api/tenant-web/profile -> updateTenantProfile
+ POST /api/tenant-web/profile -> createTenantOrder
+ GET /api/tenant-web/profile/roles -> getTenantRoles
+ POST /api/pc-tenant/apply -> applyPcTenant
+ GET /api/tenant-web/orders/pending -> listPendingOrders
+ PUT /api/tenant-web/orders/{order_id}/claim -> claimOrder
+ PUT /api/tenant-web/orders/{order_id}/complete -> completeOrder
+ POST /api/tenant-web/logout -> logoutTenant
+ POST /api/matching/search-carriers -> searchMatchingCarriers
+ GET /api/matching/get-quote-suggestions/{order_id} -> getQuoteSuggestions
+ GET /api/carrier/quotes -> listCarrierQuotes
+ GET /api/carrier/orders -> listCarrierOrders
+ GET /api/admin/pricing-rules -> listPlatformPricingRules
+ POST /api/admin/pricing-rules -> createPlatformPricingRule
+ GET /api/admin/pricing-rules/{id} -> getPlatformPricingRule
+ PUT /api/admin/pricing-rules/{id} -> updatePlatformPricingRule
+ DELETE /api/admin/pricing-rules/{id} -> deletePlatformPricingRule
+ GET /api/carrier/pricing-configs -> listCarrierPricingConfigs
+ POST /api/carrier/pricing-configs -> createCarrierPricingConfig
+ GET /api/carrier/pricing-configs/{id} -> getCarrierPricingConfig
+ PUT /api/carrier/pricing-configs/{id} -> updateCarrierPricingConfig
+ DELETE /api/carrier/pricing-configs/{id} -> deleteCarrierPricingConfig
+ POST /api/order/quote -> getOrderQuote
+ POST /api/order/{id}/add-ons -> addOrderAddons
+ GET /api/tenant-web/vehicle-models -> listAvailableVehicleModels
+ POST /api/tenant-web/vehicles -> addTenantVehicleWithModel
+ GET /api/tenant-web/vehicles -> listTenantVehicles
+ GET /api/tenant-web/vehicles/{id} -> getTenantVehicleById
+ PUT /api/tenant-web/vehicles/{id} -> updateTenantVehicle
+ DELETE /api/tenant-web/vehicles/{id} -> deleteTenantVehicle
+ GET /api/vehicle-models/autonomous-levels -> getAutonomousLevels
+ GET /api/vehicle-models/types -> getVehicleTypes
+ POST /api/settlement/process -> processSettlement
+ GET /api/settlement/orders/{order_id} -> getOrderSettlementDetails
+ POST /api/settlement/orders/{order_id}/confirm -> confirmOrderSettlement
+ GET /api/settlement/summary -> getSettlementSummary
+ POST /api/wallet/orders/{order_id}/confirm-addons -> confirmOrderAddonsFromWallet
+ GET /api/wallet/current -> getCurrentUserWallet
+ GET /api/wallet/{wallet_id}/transactions -> getWalletTransactions
+ GET /api/map/geocode -> undefined
+ GET /api/map/reverse-geocode -> undefined
+ GET /api/map/route -> undefined
+ GET /api/map/distance -> undefined
+ GET /api/map/poi -> undefined
+ GET /api/map/stop-points -> undefined
+ POST /api/av-route/calculate -> undefined
+ POST /api/av-route/multi-point -> undefined
+ GET /api/av-route/details/{routeId} -> undefined
+ POST /api/av-route/adjust -> undefined
+ POST /api/tracking/position-update -> undefined
+ GET /api/tracking/current-position/{vehicleId} -> undefined
+ GET /api/tracking/history/{vehicleId} -> undefined
+ GET /api/tracking/online-status/{vehicleId} -> undefined
+ GET /api/carrier/stop-points -> undefined
+ POST /api/carrier/stop-points -> undefined
+ GET /api/carrier/stop-points/{id} -> undefined
+ PUT /api/carrier/stop-points/{id} -> undefined
+ DELETE /api/carrier/stop-points/{id} -> undefined
+✅ OpenAPI 处理器已注册，所有 API 请求将通过统一处理器处理
+
+✅ 【沈阳战旗】数孪智运无人物流SaaS平台 API 启动成功
+🌐 服务地址: http://localhost:3000
+📊 健康检查: http://localhost:3000/health
+🌐 环境: development
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: aBAfGh_dNfGi69tKyBTVrY0YX28Yt7fG
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  'user-agent': 'curl/8.13.0',
+  accept: '*/*',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDczNzQzLCJleHAiOjE3NzE1NjAxNDN9._gniVc1NeT7dCfjFpNx3uW_yjNANQT8LAHZmzibCjtc'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:05.782Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:05.782Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: aBAfGh_dNfGi69tKyBTVrY0YX28Yt7fG
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: u2kalcqFF7bO8931OkoELgqzXZAdAzr5
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.014Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.014Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: u2kalcqFF7bO8931OkoELgqzXZAdAzr5
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles/available-models
+ → Session ID: JnP_aN5_KwmVUKgwXlH-_McfSgPK2oyk
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"bd-uVAzQlPuZUIaSRutV18a+iWWWB4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.019Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles/available-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles/available-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles/available-models
+ → Method: get
+ → Operation: getTenantVehicleById
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.019Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: JnP_aN5_KwmVUKgwXlH-_McfSgPK2oyk
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: QZ-sNxxeMt89-qUdZZ48HYDPuMJGJwcy
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.044Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.044Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: QZ-sNxxeMt89-qUdZZ48HYDPuMJGJwcy
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: bZQvFnQcERG2Qb76HR6jvYytmvHY4T39
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"ed-ZBsnzM/5/GOimH2pw9/UCOQDlWs"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.048Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.048Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: bZQvFnQcERG2Qb76HR6jvYytmvHY4T39
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: HMF1GCsMrDSYmywTU9ea01lGhcV0keQu
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.097Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.097Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: HMF1GCsMrDSYmywTU9ea01lGhcV0keQu
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: 9UlqTDQwsvF45oRyxcw2P8MaL-Fm5NjH
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:17.110Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: O-GzVTqsDGE0cZjxC_mFog3mHKPYH8e5
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.012Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.012Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: O-GzVTqsDGE0cZjxC_mFog3mHKPYH8e5
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles/available-models
+ → Session ID: 4gkS5szIa8-6cXteKeedeoiZ-pqHEjHt
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"bd-uVAzQlPuZUIaSRutV18a+iWWWB4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.015Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles/available-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles/available-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles/available-models
+ → Method: get
+ → Operation: getTenantVehicleById
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.015Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: 4gkS5szIa8-6cXteKeedeoiZ-pqHEjHt
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: 16a38AZI9QrSR6xKBs7Q4loZMtULJK7n
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.035Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.035Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: 16a38AZI9QrSR6xKBs7Q4loZMtULJK7n
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: 4rc4hVF5Lq6etv2kbwGf__8gTChOW9Sr
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"294-HmlbpBkcX6xaOT9B4ChUuwlstWg"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.039Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.039Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: 4rc4hVF5Lq6etv2kbwGf__8gTChOW9Sr
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: fgVZCo81AwpMow0gR7wOn-7YfvRg5Y8G
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.048Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.048Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: fgVZCo81AwpMow0gR7wOn-7YfvRg5Y8G
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: ZVwB0r8xPv-wKsBMk95YVDumNCqCpoZd
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.059Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: g3cViZH3TfpHUsNcgJVSqUwZcc7BO3im
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.714Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.714Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: g3cViZH3TfpHUsNcgJVSqUwZcc7BO3im
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles/available-models
+ → Session ID: 45x2FX-tJChlNVl-4Q0_eWgf3JNZnXbv
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"bd-uVAzQlPuZUIaSRutV18a+iWWWB4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.717Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles/available-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles/available-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles/available-models
+ → Method: get
+ → Operation: getTenantVehicleById
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.717Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: 45x2FX-tJChlNVl-4Q0_eWgf3JNZnXbv
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: j79Rmim_c98dz7auRUiKJM9c_Qr69BRT
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.730Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.730Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: j79Rmim_c98dz7auRUiKJM9c_Qr69BRT
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: oM7DD6bMkz1XuoWgRXleN04dImrmcyDF
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"294-HmlbpBkcX6xaOT9B4ChUuwlstWg"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.735Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.735Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: oM7DD6bMkz1XuoWgRXleN04dImrmcyDF
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: bXI1eaZzSPWvnzcP4ZDJIPs58zFeaDi-
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.746Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.746Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: bXI1eaZzSPWvnzcP4ZDJIPs58zFeaDi-
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: 7XkofmBOr9Yvf3TXn8B7CI0QPstXm5Z9
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:22.757Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: eyCb503hQWfceTvR8nhqdqI6BGFDvDWl
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.199Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.199Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: eyCb503hQWfceTvR8nhqdqI6BGFDvDWl
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles/available-models
+ → Session ID: oX3xUDLfRQC2kzUq_EWYVhU3B_F8vgZx
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"bd-uVAzQlPuZUIaSRutV18a+iWWWB4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.204Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles/available-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles/available-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles/available-models
+ → Method: get
+ → Operation: getTenantVehicleById
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.204Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: oX3xUDLfRQC2kzUq_EWYVhU3B_F8vgZx
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: aJq95UVXpDr7aY8cy4WTUN6u_ftDmrIJ
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.235Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.235Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: aJq95UVXpDr7aY8cy4WTUN6u_ftDmrIJ
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: H5ZPWvMQpSgshDSAJurVz-4plHzt3Ro3
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"294-HmlbpBkcX6xaOT9B4ChUuwlstWg"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.239Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.239Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: H5ZPWvMQpSgshDSAJurVz-4plHzt3Ro3
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: XJzRU2AhMjHDbMU3e7cyr76SXSYiX7J8
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.262Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.262Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: XJzRU2AhMjHDbMU3e7cyr76SXSYiX7J8
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: xWs1RVhYujnhmMuJifLVbeYKUSDRPM42
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:03:23.270Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: Ya7nVd4JcGJMMyx6JFS0v3f8VR1Rz2HH
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:09.492Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:09.492Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: Ya7nVd4JcGJMMyx6JFS0v3f8VR1Rz2HH
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: 7xioUsD_tZ61HXmHfScD8o7_57RIA_rL
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.375Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.375Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: 7xioUsD_tZ61HXmHfScD8o7_57RIA_rL
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: WpK0m2amW1JHedRatmnM_2T5NPTMfEM3
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.383Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.383Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: WpK0m2amW1JHedRatmnM_2T5NPTMfEM3
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: J5X_v0Y9p5iUiuYOyuOogH-ogAp5OuFK
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.395Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.395Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: J5X_v0Y9p5iUiuYOyuOogH-ogAp5OuFK
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: CDiYWJiqYS_cn9AXGSMtPyDkBYD6cvtY
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:11.413Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: nwEdc7JcP8MflRGykOr7F_fQGn3OtMN_
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:12.682Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:12.682Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: nwEdc7JcP8MflRGykOr7F_fQGn3OtMN_
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: Uy__rQ8qYNPK9R_tpOyVDIWp1lpIqPKB
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.224Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.224Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: Uy__rQ8qYNPK9R_tpOyVDIWp1lpIqPKB
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: -aNToQo4YrVFsX-AD9CRljWo2d2XVpOo
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.250Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.250Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: -aNToQo4YrVFsX-AD9CRljWo2d2XVpOo
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: Tc_B7RAAWXbIASQDKKjiJWWTkJ_rvjYW
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.259Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.259Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: Tc_B7RAAWXbIASQDKKjiJWWTkJ_rvjYW
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: RG3JdT1lMD7zqHoteCKeE0_ucz8FZuOl
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:16.267Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/profile
+ → Session ID: hv6rbPlgAvc0k-Vpw4MIyYfDscTJisLo
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"15e-gIoI5V3eh5T70VoaaJyUCDsprG4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.964Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/profile
+ ❌ No matching operation found for: GET /api/tenant-web/profile
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/profile
+ → Method: get
+ → Operation: getTenantProfile
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.964Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: hv6rbPlgAvc0k-Vpw4MIyYfDscTJisLo
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles/available-models
+ → Session ID: GCid0GypiIgN6AS0BnAWuu4yKxA8E7-V
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"bd-uVAzQlPuZUIaSRutV18a+iWWWB4"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.967Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles/available-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles/available-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles/available-models
+ → Method: get
+ → Operation: getTenantVehicleById
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.967Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: GCid0GypiIgN6AS0BnAWuu4yKxA8E7-V
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/orders
+ → Session ID: xCm6PN_21XMXENheDRQTPdec9SgOG6um
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"1202-x3ICcGMj0rwkMgPn3/TF+8dVsc8"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.979Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/orders
+ ❌ No matching operation found for: GET /api/carrier/orders
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/orders
+ → Method: get
+ → Operation: listCarrierOrders
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.979Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: xCm6PN_21XMXENheDRQTPdec9SgOG6um
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicles
+ → Session ID: ztWvBlt7x9NQJr31gTqsigGb5oh_focq
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'close',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  'sec-fetch-site': 'same-origin',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/vehicles.html',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  cookie: 'connect.sid=s%3AW29ctFjNKg94jbJmjT7oKWLKI0jo47li.5meuMV2GFyObKnwiuOxICroP%2BNK0UplM6VEOaRfDorg',
+  'if-none-match': 'W/"294-HmlbpBkcX6xaOT9B4ChUuwlstWg"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.983Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicles
+ ❌ No matching operation found for: GET /api/tenant-web/vehicles
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicles
+ → Method: get
+ → Operation: listTenantVehicles
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.983Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: ztWvBlt7x9NQJr31gTqsigGb5oh_focq
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+🔍 [listCarrierOrders] Handler function called
+   → Context roles: [ 'customer', 'carrier' ]
+   → Context tenantId: 1
+   → Query params: {}
+🔍 [listCarrierOrders] Checking permissions...
+   → Context available: true
+   → Context roles: [ 'customer', 'carrier' ]
+   → Has carrier role: true
+🔍 [listCarrierOrders] Executing SQL query...
+🔍 [listCarrierOrders] Using original query (no pagination)
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+✅ [listCarrierOrders] Original query completed. Found 11 orders
+📤 [listCarrierOrders] Returning response with 11 orders
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/carrier/quotes
+ → Session ID: BCPsTPS6vXJCu7U8Il44MXrJNC0syUGX
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"dcd-98ZoL8pKZP+fA96F0whXF9J8eNY"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.997Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/carrier/quotes
+ ❌ No matching operation found for: GET /api/carrier/quotes
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/carrier/quotes
+ → Method: get
+ → Operation: listCarrierQuotes
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:18.997Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: BCPsTPS6vXJCu7U8Il44MXrJNC0syUGX
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/admin/tenants/vehicles
+ → Session ID: _0PdqZi3v0tjG5DnaxT1yiXTSB4MzeJz
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  connection: 'keep-alive',
+  'sec-ch-ua-platform': '"Windows"',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDc3MDQyLCJleHAiOjE3NzE1NjM0NDJ9.GeopWslbd4SQIv7XFLdescAJW-vw39TM0PgGhhJe8Vk',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
+  'sec-ch-ua': '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+  'content-type': 'application/json',
+  'sec-ch-ua-mobile': '?0',
+  accept: '*/*',
+  origin: 'http://localhost:5174',
+  'sec-fetch-site': 'same-site',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-dest': 'empty',
+  referer: 'http://localhost:5174/',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'zh-CN,zh;q=0.9',
+  'if-none-match': 'W/"49-o2aRwd/CNshc3zygxqWtCDQtAX0"'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:04:19.033Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/admin/tenants/vehicles
+ ❌ No matching operation found for: GET /api/admin/tenants/vehicles
+
+🌐 [API REQUEST DETAIL]
+ → Method: GET
+ → Path: /api/tenant-web/vehicle-models
+ → Session ID: YaP3irEJJbxv7re9jbLKzcq2NdjsBhv7
+ → Session: { userId: undefined, tenantId: undefined, exists: true }
+ → Raw Request Headers (for Cookie): {
+  host: 'localhost:3000',
+  'user-agent': 'curl/8.13.0',
+  accept: '*/*',
+  authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiI2MjM0NTY3QDE2My5jb20iLCJyb2xlIjoiY2FycmllciIsInRlbmFudElkIjoxLCJ1c2VyVHlwZSI6InRlbmFudF91c2VyIiwiaWF0IjoxNzcxNDczNzQzLCJleHAiOjE3NzE1NjAxNDN9._gniVc1NeT7dCfjFpNx3uW_yjNANQT8LAHZmzibCjtc'
+}
+🔍 [DEBUG] Before api.handleRequest - req.session: Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:07:18.950Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+🔍 [DEBUG] Before api.handleRequest - req.session.userId: undefined
+🔍 [DEBUG] About to call handleRequest for: GET /api/tenant-web/vehicle-models
+ ❌ No matching operation found for: GET /api/tenant-web/vehicle-models
+
+🛡️ [SECURITY HANDLER CALLED]
+ → Path: /api/tenant-web/vehicle-models
+ → Method: get
+ → Operation: listAvailableVehicleModels
+ → Session Check (c.request.session): Session {
+  cookie: {
+    path: '/',
+    _expires: 2026-02-20T05:07:18.950Z,
+    originalMaxAge: 86400000,
+    httpOnly: true,
+    secure: false,
+    signed: true,
+    name: 'connect.sid'
+  }
+}
+ → Session User ID (c.request.session?.userId): undefined
+ → Session ID: YaP3irEJJbxv7re9jbLKzcq2NdjsBhv7
+ → Session exists? true
+ → Session.userId value: undefined
+ → 从 JWT Token 解析出 userId: 2
+ → ✅ 认证通过，userId: 2 roles: [ 'customer', 'carrier' ]

@@ -193,6 +193,51 @@ button:hover {
   background-color: #007bff;
 }
 
+/* 二级导航样式（承运商端） */
+.has-submenu > .submenu {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.has-submenu.open > .submenu {
+  display: block;
+}
+
+.has-submenu > .submenu .nav-item {
+  padding-left: 52px;
+  border-left: none;
+  font-size: 0.95rem;
+}
+
+.has-submenu > .submenu .nav-item:hover,
+.has-submenu > .submenu .nav-item.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-left: 55px;
+}
+
+.has-submenu > .submenu .nav-item.active {
+  border-left: 4px solid var(--primary-color);
+}
+
+.submenu-toggle {
+  cursor: pointer;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+
+.submenu-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.has-submenu.open .submenu-arrow {
+  transform: rotate(180deg);
+}
+
 /* 响应式优化 */
 @media (max-width: 768px) {
   .header {

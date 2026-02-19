@@ -305,7 +305,19 @@
       <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
       <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
       <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
-      <a href="./commissions.html" class="nav-item"><i class="fas fa-percent"></i> 抽佣信息</a>
+      
+      <div class="nav-item has-submenu">
+        <div class="submenu-toggle">
+          <span><i class="fas fa-yen-sign"></i> 财务管理</span>
+          <i class="fas fa-chevron-down submenu-arrow"></i>
+        </div>
+        <ul class="submenu">
+          <li><a href="./carrier-finance.html" class="nav-item">财务概览</a></li>
+          <li><a href="./carrier-wallet.html" class="nav-item">钱包管理</a></li>
+          <li><a href="./carrier-commissions.html" class="nav-item">抽佣管理</a></li>
+          <li><a href="./carrier-settlements.html" class="nav-item">结算管理</a></li>
+        </ul>
+      </div>
       <a href="./settings.html" class="nav-item active"><i class="fas fa-cog"></i> 内部设置</a>
       <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
     </nav>
@@ -484,6 +496,17 @@
 
     // 页面加载时检查登录状态
     document.addEventListener('DOMContentLoaded', function() {
+    // 二级导航菜单交互
+    document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const parentLi = this.closest('.has-submenu');
+        if (parentLi) {
+          parentLi.classList.toggle('open');
+        }
+      });
+    });
+
       if (!checkLoginStatus()) {
         return;
       }
