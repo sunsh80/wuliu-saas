@@ -256,7 +256,7 @@
                 <ul class="submenu">
                     <li><a href="/finance.html"><span>财务概览</span></a></li>
                     <li><a href="/wallet-management.html"><span>钱包管理</span></a></li>
-                    <li><a href="/commissions.html" class="active"><span>抽佣管理</span></a></li>
+                    <li><a href="/commission-management.html" class="active"><span>抽佣管理</span></a></li>
                     <li><a href="/settlement-management.html"><span>结算管理</span></a></li>
                 </ul>
             </li>
@@ -465,20 +465,20 @@
     <!-- 引用统一的 main.js -->
     <script src="/js/main.js"></script>
     <script>
-        // 页面加载时执行（使用 load 确保 main.js 已执行）
-        window.addEventListener('load', function() {
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
             // 检查登录状态
             checkLoginStatus();
-
+            
             // 加载抽佣配置
             loadCommissionConfig();
-
+            
             // 保存配置按钮事件
             document.getElementById('saveConfigBtn').addEventListener('click', function(e) {
                 e.preventDefault();
                 saveCommissionConfig();
             });
-
+            
             // 重置按钮事件
             document.getElementById('resetBtn').addEventListener('click', function(e) {
                 e.preventDefault();

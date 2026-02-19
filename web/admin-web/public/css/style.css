@@ -171,6 +171,55 @@ form button:hover {
     text-align: center;
 }
 
+/* 二级导航菜单样式 */
+.sidebar .has-submenu > .submenu {
+    display: none !important;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .has-submenu.open > .submenu {
+    display: block !important;
+}
+
+.sidebar .has-submenu > .submenu li {
+    margin-bottom: 0;
+}
+
+.sidebar .has-submenu > .submenu a {
+    padding: 12px 20px 12px 52px;
+    font-size: 0.95rem;
+    border-left: none;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar .has-submenu > .submenu a:hover,
+.sidebar .has-submenu > .submenu a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding-left: 55px;
+}
+
+.sidebar .has-submenu > .submenu a.active {
+    border-left: 3px solid #A5D6A7;
+}
+
+.sidebar .submenu-toggle {
+    cursor: pointer;
+    justify-content: space-between;
+}
+
+.sidebar .submenu-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.sidebar .has-submenu.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
 /* 主内容区域调整 */
 .main-content {
     padding: 24px;
