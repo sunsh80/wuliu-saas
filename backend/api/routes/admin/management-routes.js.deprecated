@@ -1,0 +1,75 @@
+// backend/api/routes/admin/management-routes.js
+/**
+ * 运营管理路由 - violations, commissions, settings, vehicle-tracking
+ */
+const express = require('express');
+const router = express.Router();
+
+// 导入 handlers
+const listViolations = require('../../handlers/admin/violations/listViolations');
+const getViolationById = require('../../handlers/admin/violations/getViolationById');
+const createViolation = require('../../handlers/admin/violations/createViolation');
+const updateViolation = require('../../handlers/admin/violations/updateViolation');
+const deleteViolation = require('../../handlers/admin/violations/deleteViolation');
+const getViolationStats = require('../../handlers/admin/violations/getViolationStats');
+
+const getCommissionConfig = require('../../handlers/admin/commissions/getCommissionConfig');
+const updateCommissionConfig = require('../../handlers/admin/commissions/updateCommissionConfig');
+const listCommissionRecords = require('../../handlers/admin/commissions/listCommissionRecords');
+const updateCommissionRecordStatus = require('../../handlers/admin/commissions/updateCommissionRecordStatus');
+
+const listSettings = require('../../handlers/admin/settings/listSettings');
+const updateSetting = require('../../handlers/admin/settings/updateSetting');
+
+const getVehiclePositions = require('../../handlers/admin/vehicle-tracking/getVehiclePositions');
+const getLatestPositions = require('../../handlers/admin/vehicle-tracking/getLatestPositions');
+
+// 辅助函数：将 OpenAPI 风格 handler 转换为 Express 中间件
+function wrapHandler(handler) {
+  return async (req, res, next) => {
+    try {
+      // 创建模拟的 OpenAPI context
+      const c = {
+        request: {
+          params: req.params,
+          query: req.query,
+          body: req.body
+        }
+      };
+      
+      const result = await handler(c);
+      
+      if (result && result.statusCode) {
+        res.status(result.statusCode).json(result.body);
+      } else {
+        res.json(result);
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+// ===== 违规管理路由 =====
+router.get('/violations', wrapHandler(listViolations));
+router.get('/violations/stats', wrapHandler(getViolationStats));
+router.get('/violations/:id', wrapHandler(getViolationById));
+router.post('/violations', wrapHandler(createViolation));
+router.put('/violations/:id', wrapHandler(updateViolation));
+router.delete('/violations/:id', wrapHandler(deleteViolation));
+
+// ===== 抽佣管理路由 =====
+router.get('/commissions/config', wrapHandler(getCommissionConfig));
+router.put('/commissions/config/:id', wrapHandler(updateCommissionConfig));
+router.get('/commissions/records', wrapHandler(listCommissionRecords));
+router.put('/commissions/records/:id/status', wrapHandler(updateCommissionRecordStatus));
+
+// ===== 系统设置路由 =====
+router.get('/settings', wrapHandler(listSettings));
+router.put('/settings/:id', wrapHandler(updateSetting));
+
+// ===== 车辆追踪路由 =====
+router.get('/vehicle-tracking/positions', wrapHandler(getVehiclePositions));
+router.get('/vehicle-tracking/latest-positions', wrapHandler(getLatestPositions));
+
+module.exports = router;

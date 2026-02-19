@@ -62,13 +62,9 @@ async function startServer() {
     }
 
     // ===== API 路由 =====
+    // 所有 API 请求都通过 OpenAPI 处理器处理
     app.use(openApiMiddleware.apiHandler());
-    console.log('✅ 配置加载成功:', config.server.name);
-
-    // ===== 额外API路由 =====
-    // 承运商车辆API路由（与车型库集成）
-    const tenantVehiclesRouter = require('./api/routes/tenant-web/vehicles');
-    app.use('/api/tenant-web/vehicles', tenantVehiclesRouter);
+    console.log('✅ OpenAPI 处理器已注册，所有 API 请求将通过统一处理器处理');
 
     // ===== 健康检查 =====
     app.get('/health', (req, res) => {

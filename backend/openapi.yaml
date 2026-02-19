@@ -45,10 +45,26 @@ tags:
     description: 智能匹配（新增，可选使用）
   - name: 地图服务
     description: 地图相关功能
+  - name: tenant-map-service
+    description: 承运商 - 地图服务（服务区域管理）
   - name: 无人车路径规划
     description: 无人车专用路径规划功能
   - name: 车辆追踪
     description: 车辆位置追踪功能
+  - name: wallet
+    description: 钱包与资金管理
+  - name: commission
+    description: 抽佣管理
+  - name: settlement
+    description: 结算管理
+  - name: admin-violation
+    description: 管理员 - 违规管理
+  - name: admin-commission
+    description: 管理员 - 抽佣管理
+  - name: admin-setting
+    description: 管理员 - 系统设置
+  - name: admin-vehicle-tracking
+    description: 管理员 - 车辆追踪
 components:
   securitySchemes:
     AdminSessionAuth:
@@ -70,6 +86,42 @@ components:
       in: header
       name: X-API-Key
   schemas:
+    ServiceArea:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        tenant_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 沈阳市浑南区
+        description:
+          type: string
+          example: 浑南区全境配送服务
+        polygon_coordinates:
+          type: string
+          description: 多边形坐标 JSON 字符串
+        center_lat:
+          type: number
+          example: 41.758
+        center_lng:
+          type: number
+          example: 123.456
+        radius_km:
+          type: number
+          example: 5.0
+        status:
+          type: string
+          example: active
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     CustomerWebRegistration:
       type: object
       required:
@@ -105,54 +157,6 @@ components:
       type: string
       pattern: ^[\u4e00-\u9fa5a-zA-Z0-9\s\S]{1,200}$
       example: 北京市朝阳区某某街道123号
-    TenantApplication:
-      type: object
-      required:
-        - name
-        - contact_person
-        - contact_phone
-        - email
-        - password
-        - roles
-      properties:
-        name:
-          $ref: '#/components/schemas/Name'
-        contact_person:
-          $ref: '#/components/schemas/Name'
-        contact_phone:
-          type: string
-          pattern: ^1[3-9][0-9]{9}$
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          minLength: 6
-        roles:
-          type: array
-          items:
-            type: string
-            enum:
-              - customer
-              - carrier
-          minItems: 1
-          example:
-            - customer
-            - carrier
-        address:
-          $ref: '#/components/schemas/Address'
-        service_radius_km:
-          type: integer
-          example: 200
-        capacity_kg:
-          type: number
-          example: 5000
-        capacity_m3:
-          type: number
-          example: 30
-        base_price_per_km:
-          type: number
-          example: 2.5
     TenantProfile:
       type: object
       properties:
@@ -183,6 +187,63 @@ components:
           type: number
           minimum: 0
           maximum: 5
+    TenantApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        tenant_id:
+          type: integer
+          example: 1
+        company_name:
+          type: string
+          example: XX 物流公司
+        contact_person:
+          type: string
+          example: 张三
+        contact_phone:
+          type: string
+          example: '13800138000'
+        email:
+          type: string
+          format: email
+          example: example@email.com
+        business_license:
+          type: string
+          example: '91110000XXXXXXXXXX'
+        service_area:
+          type: string
+          example: 北京市朝阳区
+        service_radius_km:
+          type: integer
+          example: 50
+        capacity_kg:
+          type: number
+          example: 10000
+        capacity_m3:
+          type: number
+          example: 50
+        base_price_per_km:
+          type: number
+          example: 5.5
+        license_file:
+          type: string
+          format: uri
+        other_files:
+          type: string
+        notes:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: pending
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     QuoteRequest:
       type: object
       required:
@@ -1641,6 +1702,166 @@ components:
         status:
           type: string
           description: 车辆状态
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 钱包 ID
+        owner_type:
+          type: string
+          enum: [platform, carrier, customer]
+          description: 钱包拥有者类型
+        owner_id:
+          type: integer
+          description: 钱包拥有者 ID
+        balance:
+          type: number
+          format: double
+          description: 余额
+        frozen_amount:
+          type: number
+          format: double
+          description: 冻结金额
+        available_balance:
+          type: number
+          format: double
+          description: 可用余额
+        currency:
+          type: string
+          description: 货币类型
+        status:
+          type: string
+          enum: [active, frozen, closed]
+          description: 钱包状态
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+    WalletTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 交易 ID
+        wallet_id:
+          type: integer
+          description: 钱包 ID
+        order_id:
+          type: integer
+          description: 订单 ID
+        transaction_type:
+          type: string
+          enum: [income, expense, freeze, unfreeze, transfer]
+          description: 交易类型
+        amount:
+          type: number
+          format: double
+          description: 交易金额
+        balance_change:
+          type: number
+          format: double
+          description: 余额变动
+        balance_before:
+          type: number
+          format: double
+          description: 交易前余额
+        balance_after:
+          type: number
+          format: double
+          description: 交易后余额
+        description:
+          type: string
+          description: 交易描述
+        reference_id:
+          type: string
+          description: 关联 ID
+        status:
+          type: string
+          enum: [pending, completed, failed, cancelled]
+          description: 交易状态
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        processed_at:
+          type: string
+          format: date-time
+          description: 处理时间
+    Settlement:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 结算 ID
+        order_id:
+          type: integer
+          description: 订单 ID
+        carrier_wallet_id:
+          type: integer
+          description: 承运商钱包 ID
+        platform_wallet_id:
+          type: integer
+          description: 平台钱包 ID
+        gross_amount:
+          type: number
+          format: double
+          description: 订单总金额
+        commission_amount:
+          type: number
+          format: double
+          description: 抽佣金额
+        net_amount:
+          type: number
+          format: double
+          description: 承运商净收入
+        settlement_status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          description: 结算状态
+        commission_transaction_id:
+          type: integer
+          description: 抽佣交易 ID
+        payment_transaction_id:
+          type: integer
+          description: 支付交易 ID
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        processed_at:
+          type: string
+          format: date-time
+          description: 处理时间
+    Commission:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 抽佣记录 ID
+        order_id:
+          type: integer
+          description: 订单 ID
+        rate:
+          type: number
+          format: double
+          description: 抽佣比例
+        amount:
+          type: number
+          format: double
+          description: 抽佣金额
+        status:
+          type: string
+          enum: [pending, completed, cancelled]
+          description: 抽佣状态
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
   responses:
     UnauthorizedError:
       description: 未认证
@@ -3530,6 +3751,257 @@ paths:
                   error:
                     type: string
                     example: Invalid credentials
+  /api/tenant-web/applications:
+    get:
+      tags:
+        - tenant-applications
+      summary: 获取承运商申请历史列表
+      operationId: listTenantApplications
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: 申请状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        '200':
+          description: 申请历史列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      applications:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TenantApplication'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - tenant-applications
+      summary: 承运商提交资质申请
+      operationId: createTenantApplication
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - company_name
+              properties:
+                company_name:
+                  type: string
+                  example: XX 物流公司
+                  description: 公司名称
+                contact_person:
+                  type: string
+                  example: 张三
+                  description: 联系人姓名
+                contact_phone:
+                  type: string
+                  example: '13800138000'
+                  description: 联系电话
+                email:
+                  type: string
+                  format: email
+                  example: example@email.com
+                  description: 电子邮箱
+                business_license:
+                  type: string
+                  example: '91110000XXXXXXXXXX'
+                  description: 统一社会信用代码/营业执照号
+                service_area:
+                  type: string
+                  example: 北京市朝阳区
+                  description: 服务区域
+                service_radius_km:
+                  type: integer
+                  example: 50
+                  description: 服务半径 (km)
+                capacity_kg:
+                  type: number
+                  example: 10000
+                  description: 载重能力 (kg)
+                capacity_m3:
+                  type: number
+                  example: 50
+                  description: 容积能力 (m³)
+                base_price_per_km:
+                  type: number
+                  example: 5.5
+                  description: 基础报价 (元/km)
+                license_file:
+                  type: string
+                  format: uri
+                  description: 营业执照扫描件 URL
+                other_files:
+                  type: string
+                  description: 其他资质文件 URL（JSON 数组）
+                notes:
+                  type: string
+                  description: 备注说明
+      responses:
+        '201':
+          description: 申请提交成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 申请提交成功，请等待审核
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: 已有待审核申请
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/tenant-web/applications/{id}:
+    get:
+      tags:
+        - tenant-applications
+      summary: 获取单个申请详情
+      operationId: getTenantApplicationById
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 申请详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/TenantApplication'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - tenant-applications
+      summary: 更新申请（仅待审核状态可修改）
+      operationId: updateTenantApplication
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name:
+                  type: string
+                  example: XX 物流公司
+                contact_person:
+                  type: string
+                  example: 张三
+                contact_phone:
+                  type: string
+                  example: '13800138000'
+                email:
+                  type: string
+                  format: email
+                business_license:
+                  type: string
+                service_area:
+                  type: string
+                service_radius_km:
+                  type: integer
+                capacity_kg:
+                  type: number
+                capacity_m3:
+                  type: number
+                base_price_per_km:
+                  type: number
+                license_file:
+                  type: string
+                  format: uri
+                other_files:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: 申请更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 申请更新成功
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/tenant-web/profile:
     get:
       tags:
@@ -3973,6 +4445,89 @@ paths:
                           $ref: '#/components/schemas/QuoteItem'
                       pagination:
                         $ref: '#/components/schemas/PaginationInfo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/carrier/orders:
+    get:
+      tags:
+        - carrier-order
+      summary: 获取承运商订单列表
+      operationId: listCarrierOrders
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: 订单状态过滤
+          required: false
+          schema:
+            type: string
+            enum:
+              - claimed
+              - quoted
+              - awarded
+              - dispatched
+              - in_transit
+              - delivered
+              - cancelled
+        - name: start_date
+          in: query
+          description: 开始日期过滤 (ISO 8601 格式)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: 结束日期过滤 (ISO 8601 格式)
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 承运商订单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 50
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 10
+                      orders:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrderItem'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /api/admin/pricing-rules:
@@ -4593,6 +5148,52 @@ paths:
       operationId: listAvailableVehicleModels
       security:
         - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: brand
+          in: query
+          description: 品牌筛选
+          required: false
+          schema:
+            type: string
+        - name: manufacturer
+          in: query
+          description: 制造商筛选
+          required: false
+          schema:
+            type: string
+        - name: model_name
+          in: query
+          description: 车型名称筛选
+          required: false
+          schema:
+            type: string
+        - name: vehicle_type
+          in: query
+          description: 车型类型筛选
+          required: false
+          schema:
+            type: string
+        - name: autonomous_level
+          in: query
+          description: 自动驾驶级别筛选
+          required: false
+          schema:
+            type: string
+            enum: [L0, L1, L2, L3, L4, L5]
       responses:
         '200':
           description: 可用车型库列表
@@ -4706,6 +5307,33 @@ paths:
       operationId: listTenantVehicles
       security:
         - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 车辆状态
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: 车辆列表
@@ -4856,6 +5484,150 @@ paths:
                   message:
                     type: string
                     example: 车辆删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/tenant-web/service-areas:
+    get:
+      tags:
+        - tenant-map-service
+      summary: 获取承运商服务区域列表
+      operationId: listServiceAreas
+      security:
+        - TenantSessionAuth: []
+      responses:
+        '200':
+          description: 服务区域列表获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 获取服务区域列表成功
+                  data:
+                    type: object
+                    properties:
+                      areas:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServiceArea'
+                      total:
+                        type: integer
+                        example: 5
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - tenant-map-service
+      summary: 添加服务区域
+      operationId: createServiceArea
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 沈阳市浑南区
+                  description: 区域名称
+                description:
+                  type: string
+                  example: 浑南区全境配送服务
+                  description: 区域描述
+                polygon_coordinates:
+                  type: array
+                  description: 多边形坐标（可选）
+                  items:
+                    type: object
+                    properties:
+                      lat:
+                        type: number
+                        example: 41.758
+                      lng:
+                        type: number
+                        example: 123.456
+                center_lat:
+                  type: number
+                  example: 41.758
+                  description: 中心点纬度
+                center_lng:
+                  type: number
+                  example: 123.456
+                  description: 中心点经度
+                radius_km:
+                  type: number
+                  example: 5.0
+                  description: 服务半径（公里）
+      responses:
+        '201':
+          description: 服务区域创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 服务区域创建成功
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/tenant-web/service-areas/{id}:
+    delete:
+      tags:
+        - tenant-map-service
+      summary: 删除服务区域
+      operationId: deleteServiceArea
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 服务区域删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 服务区域删除成功
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '404':
@@ -5497,6 +6269,7 @@ paths:
   # 新增的第三方地图服务API
   /api/map/geocode:
     get:
+      operationId: mapGeocode
       summary: 地理编码
       description: 将地址转换为坐标
       tags:
@@ -5546,6 +6319,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/reverse-geocode:
     get:
+      operationId: mapReverseGeocode
       summary: 逆地理编码
       description: 将坐标转换为地址
       tags:
@@ -5595,6 +6369,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/route:
     get:
+      operationId: mapRoute
       summary: 路径规划
       description: 获取两点间的路线规划（备用基础路线）
       tags:
@@ -5664,6 +6439,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/distance:
     get:
+      operationId: mapDistance
       summary: 距离计算
       description: 计算两点间的距离
       tags:
@@ -5731,6 +6507,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/poi:
     get:
+      operationId: mapPoi
       summary: POI搜索
       description: 搜索附近的兴趣点
       tags:
@@ -5810,6 +6587,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/stop-points:
     get:
+      operationId: mapStopPoints
       summary: 停靠点列表
       description: 获取停靠点列表
       tags:
@@ -5865,6 +6643,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/av-route/calculate:
     post:
+      operationId: avRouteCalculate
       summary: 无人车路径规划
       description: 获取无人车专用路径规划
       tags:
@@ -5938,6 +6717,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/av-route/multi-point:
     post:
+      operationId: avRouteMultiPoint
       summary: 多点路径规划
       description: 获取多点路径规划（支持中途停靠点）
       tags:
@@ -5995,6 +6775,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/av-route/details/{routeId}:
     get:
+      operationId: avRouteDetails
       summary: 路径详情
       description: 获取路径规划详情
       tags:
@@ -6035,6 +6816,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/av-route/adjust:
     post:
+      operationId: avRouteAdjust
       summary: 实时路径调整
       description: 实时路径调整（考虑交通状况、临时障碍等）
       tags:
@@ -6093,6 +6875,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/position-update:
     post:
+      operationId: trackingPositionUpdate
       summary: 车辆位置更新
       description: 接收车辆实时位置信息（供第三方回调）
       tags:
@@ -6164,6 +6947,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/current-position/{vehicleId}:
     get:
+      operationId: trackingCurrentPosition
       summary: 获取车辆当前位置
       description: 获取指定车辆的当前位置和状态
       tags:
@@ -6204,6 +6988,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/history/{vehicleId}:
     get:
+      operationId: trackingHistory
       summary: 获取车辆历史轨迹
       description: 获取指定车辆的历史轨迹
       tags:
@@ -6260,6 +7045,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/online-status/{vehicleId}:
     get:
+      operationId: trackingOnlineStatus
       summary: 获取车辆在线状态
       description: 获取指定车辆的在线状态
       tags:
@@ -6302,3 +7088,180 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  # 承运商停靠点管理 API
+  /api/carrier/stop-points:
+    get:
+      operationId: carrierListStopPoints
+      summary: 承运商停靠点列表
+      description: 获取当前承运商的停靠点列表
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: approvalStatus
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      list:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StopPoint'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: carrierCreateStopPoint
+      summary: 承运商创建停靠点
+      description: 承运商提交新的停靠点申请
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, address, lat, lng]
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                lat:
+                  type: number
+                lng:
+                  type: number
+                type:
+                  type: string
+                region:
+                  type: string
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StopPoint'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/carrier/stop-points/{id}:
+    get:
+      operationId: carrierGetStopPoint
+      summary: 承运商获取停靠点详情
+      description: 获取指定停靠点的详细信息
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StopPoint'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      operationId: carrierUpdateStopPoint
+      summary: 承运商更新停靠点
+      description: 更新指定停靠点的信息
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopPoint'
+      responses:
+        '200':
+          description: 更新成功
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 已批准的停靠点不能修改
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      operationId: carrierDeleteStopPoint
+      summary: 承运商删除停靠点
+      description: 删除指定停靠点（提交超过 3 天的停靠点不能删除）
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 提交超过 3 天的停靠点不能删除
+        '404':
+          $ref: '#/components/responses/NotFoundError'

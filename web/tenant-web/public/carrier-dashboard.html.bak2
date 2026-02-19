@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>承运商控制台 - 物流管理系统</title>
+  <title>承运商控制台 - 物流管理系统 [v2]</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -277,8 +277,7 @@
       <a href="./quotes.html" class="nav-item"><i class="fas fa-tags"></i> 报价管理</a>
       <a href="./vehicles.html" class="nav-item"><i class="fas fa-truck"></i> 车辆管理</a>
       <a href="./applications.html" class="nav-item"><i class="fas fa-file-alt"></i> 申请资料</a>
-      <a href="./carrier-stop-points.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> 停靠点管理</a>
-      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
+      <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
       <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
       <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
       <a href="./commissions.html" class="nav-item"><i class="fas fa-percent"></i> 抽佣信息</a>
@@ -429,7 +428,7 @@
     </div>
   </div>
 
-  <script src="/js/carrier-dashboard.js"></script>
+  <script src="/js/carrier-dashboard-v2.js"></script>
   <script>
     // 退出登录 - 从carrier-dashboard.js中获取函数
     document.getElementById('logout-btn').addEventListener('click', function(e) {

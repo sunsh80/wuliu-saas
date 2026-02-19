@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // 获取车辆数据
-      const vehiclesResponse = await fetch(`${API_BASE}/api/admin/tenants/vehicles`, {
+      const vehiclesResponse = await fetch(`${API_BASE}/api/admin/vehicles`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -200,8 +200,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               row.innerHTML = `
                 <td>${vehicle.plate_number || 'N/A'}</td>
                 <td>${vehicle.type || 'N/A'}</td>
-                <td>${vehicle.max_weight || 'N/A'}</td>
+                <td>${vehicle.max_weight !== null && vehicle.max_weight !== undefined ? vehicle.max_weight : 'N/A'}</td>
+                <td>${vehicle.volume !== null && vehicle.volume !== undefined ? vehicle.volume : 'N/A'}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td>${vehicle.created_at ? new Date(vehicle.created_at).toLocaleString('zh-CN') : 'N/A'}</td>
                 <td>
                   <button class="btn btn-primary" onclick="editVehicle('${vehicle.id}')">编辑</button>
                   <button class="btn btn-danger" onclick="deleteVehicle('${vehicle.id}')">删除</button>

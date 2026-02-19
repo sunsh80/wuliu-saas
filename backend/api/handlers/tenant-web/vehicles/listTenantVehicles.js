@@ -1,59 +1,54 @@
 /**
- * 承运商车辆API处理程序（与车型库集成）- 获取车辆列表
+ * 承运商车辆 API 处理程序（与车型库集成）- 获取车辆列表
  */
 
 const { getDb } = require('../../../../db');
 
 // 获取承运商车辆列表
-async function listTenantVehicles(req, res) {
-  const tenantId = req.session.userId; // 从会话中获取当前用户ID
+module.exports = async (c) => {
+  const tenantId = c.session?.tenantId || c.context?.tenantId; // 从会话中获取当前用户 ID
   if (!tenantId) {
-    return res.status(401).json({
-      success: false,
-      message: '未授权访问'
-    });
+    return {
+      statusCode: 401,
+      body: {
+        success: false,
+        message: '未授权访问'
+      }
+    };
   }
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(c.request.query.page) || 1;
+  const limit = parseInt(c.request.query.limit) || 10;
   const offset = (page - 1) * limit;
 
-  const db = getDb();
+  const db = await getDb();
 
   // 构建查询条件
   let whereClause = 'WHERE tv.tenant_id = ?';
   let params = [tenantId];
 
-  if (req.query.search) {
+  if (c.request.query.search) {
     whereClause += ' AND (tv.plate_number LIKE ? OR tv.type LIKE ? OR vm.brand LIKE ? OR vm.model_name LIKE ?)';
-    const searchParam = `%${req.query.search}%`;
+    const searchParam = `%${c.request.query.search}%`;
     params.push(searchParam, searchParam, searchParam, searchParam);
   }
 
-  if (req.query.status) {
+  if (c.request.query.status) {
     whereClause += ' AND tv.status = ?';
-    params.push(req.query.status);
+    params.push(c.request.query.status);
   }
 
-  // 查询总数
-  const countQuery = `
-    SELECT COUNT(*) as total
-    FROM tenant_vehicles tv
-    LEFT JOIN vehicle_models vm ON tv.vehicle_model_id = vm.id
-    ${whereClause}
-  `;
+  try {
+    // 查询总数
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM tenant_vehicles tv
+      LEFT JOIN vehicle_models vm ON tv.vehicle_model_id = vm.id
+      ${whereClause}
+    `;
 
-  db.get(countQuery, params, (err, countResult) => {
-    if (err) {
-      console.error('查询车辆总数失败:', err);
-      return res.status(500).json({
-        success: false,
-        message: '查询车辆列表失败',
-        error: err.message
-      });
-    }
-
-    const total = countResult.total;
+    const countResult = await db.get(countQuery, params);
+    const total = countResult?.total || 0;
 
     // 查询数据
     const query = `
@@ -87,17 +82,11 @@ async function listTenantVehicles(req, res) {
       LIMIT ? OFFSET ?
     `;
 
-    db.all(query, [...params, limit, offset], (err, vehicles) => {
-      if (err) {
-        console.error('查询车辆列表失败:', err);
-        return res.status(500).json({
-          success: false,
-          message: '查询车辆列表失败',
-          error: err.message
-        });
-      }
+    const vehicles = await db.all(query, [...params, limit, offset]);
 
-      res.json({
+    return {
+      statusCode: 200,
+      body: {
         success: true,
         message: '获取车辆列表成功',
         data: {
@@ -111,9 +100,17 @@ async function listTenantVehicles(req, res) {
             has_prev: page > 1
           }
         }
-      });
-    });
-  });
-}
-
-module.exports = listTenantVehicles;
+      }
+    };
+  } catch (error) {
+    console.error('查询车辆列表失败:', error);
+    return {
+      statusCode: 500,
+      body: {
+        success: false,
+        message: '查询车辆列表失败',
+        error: error.message
+      }
+    };
+  }
+};

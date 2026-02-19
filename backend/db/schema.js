@@ -72,6 +72,29 @@ const CORE_TABLES = {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `,
+  tenant_applications: `
+    CREATE TABLE IF NOT EXISTS tenant_applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tenant_id INTEGER NOT NULL,
+      company_name TEXT NOT NULL,
+      contact_person TEXT,
+      contact_phone TEXT,
+      email TEXT,
+      business_license TEXT,
+      service_area TEXT,
+      service_radius_km INTEGER,
+      capacity_kg REAL,
+      capacity_m3 REAL,
+      base_price_per_km REAL,
+      license_file TEXT,
+      other_files TEXT,
+      notes TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (tenant_id) REFERENCES tenants (id) ON DELETE CASCADE
+    );
+  `,
   orders: `
       CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
