@@ -65,12 +65,42 @@
       width: 250px;
       background-color: var(--sidebar-bg);
       color: white;
-      padding: 20px 0;
+      padding: 0;
       z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar .logo {
+      padding: 20px 24px;
+      background-color: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
     }
 
     .sidebar-nav {
-      margin-top: 60px;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      margin-top: 0;
+    }
+
+    /* 自定义滚动条样式 */
+    .sidebar-nav::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
     }
 
     .nav-item {
