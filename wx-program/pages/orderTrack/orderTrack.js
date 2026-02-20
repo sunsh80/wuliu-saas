@@ -33,7 +33,7 @@ Page({
 
   checkLoginAndLoadOrder(orderId) {
     const token = wx.getStorageSync('token');
-    const connectSid = wx.getStorageSync('connect.sid');
+    const connectSid = wx.getStorageSync('connect_sid');
 
     // 检查是否有任一认证凭据
     if (!token && !connectSid) {

@@ -6,8 +6,13 @@
     <title>地图服务管理 - 物流管理系统</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 🗺️ 新增：腾讯地图 JavaScript API -->
+    <script charset="utf-8" 
+            src="https://map.qq.com/api/gljs?v=1.exp&key=SRFBZ-3GHEW-ANLRG-YZODQ-LWDXQ-PXFS6">
+    </script>
     <style>
-        /* 主内容区�?*/
+    
+        /* 主内容区 */
         .main-content {
             padding: 24px;
             margin-top: 80px;
@@ -199,7 +204,7 @@
             background: #059669;
         }
 
-        /* 结果�?*/
+        /* 结果框 */
         .result-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -240,7 +245,7 @@
             background: #f8fafc;
         }
 
-        /* 状态提�?*/
+        /* 状态提示 */
         .error {
             color: #dc2626;
             padding: 12px;
@@ -259,7 +264,7 @@
     </style>
 </head>
 <body>
-    <!-- 侧边�?-->
+    <!-- 侧边栏 -->
     <aside class="sidebar">
         <div class="logo">
             <i class="fas fa-truck-moving logo-icon"></i>
@@ -269,13 +274,13 @@
             <li><a href="/index.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
             <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
             <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
-            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管�?/span></a></li>
+            <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
             <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
             <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
             <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
             <li><a href="/pricing-rules.html"><i class="fas fa-tags"></i> <span>配价管理</span></a></li>
             <li><a href="/violations.html"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
-            
+
             <li class="has-submenu">
                 <a href="javascript:void(0)" class="submenu-toggle">
                     <i class="fas fa-yen-sign"></i>
@@ -290,27 +295,27 @@
                 </ul>
             </li>
             <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
-            <li><a href="/vehicle-models.html"><i class="fas fa-car"></i> <span>车型库维�?/span></a></li>
+            <li><a href="/vehicle-models.html"><i class="fas fa-car"></i> <span>车型库维护</span></a></li>
             <li><a href="/map-management.html" class="active"><i class="fas fa-map-marked-alt"></i> <span>地图服务管理</span></a></li>
             <li><a href="/stop-points.html"><i class="fas fa-map-marker-alt"></i> <span>停靠点管理</span></a></li>
             <li><a href="/vehicle-tracking.html"><i class="fas fa-location-arrow"></i> <span>车辆位置追踪</span></a></li>
         </ul>
     </aside>
 
-    <!-- 顶部�?-->
+    <!-- 顶部栏 -->
     <header class="topbar">
         <div class="user-info">
-            <span>管理�?/span>
-            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登�?/a>
+            <span>管理员</span>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
         </div>
     </header>
 
-    <!-- 主内容区�?-->
+    <!-- 主内容区 -->
     <div class="main-content">
         <div class="page-header">
             <div>
                 <h1 class="page-title">地图服务管理</h1>
-                <p class="page-description">管理地图服务配置和地理信息功�?/p>
+                <p class="page-description">管理地图服务配置和地理信息功能</p>
             </div>
         </div>
 
@@ -346,24 +351,24 @@
 
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('geocode')">地理编码</button>
-                <button class="tab" onclick="switchTab('reverse')">逆地理编�?/button>
+                <button class="tab" onclick="switchTab('reverse')">逆地理编码</button>
                 <button class="tab" onclick="switchTab('route')">路径规划</button>
                 <button class="tab" onclick="switchTab('distance')">距离计算</button>
                 <button class="tab" onclick="switchTab('poi')">POI 搜索</button>
-                <button class="tab" onclick="switchTab('stoppoints')">停靠点管�?/button>
+                <button class="tab" onclick="switchTab('stoppoints')">停靠点管理</button>
             </div>
 
             <!-- 地理编码 -->
             <div id="geocode-tab" class="tab-content active">
                 <div class="form-group">
                     <label>地址</label>
-                    <input type="text" id="geocodeAddress" placeholder="请输入地址，如：北京市朝阳�?XX 大厦">
+                    <input type="text" id="geocodeAddress" placeholder="请输入地址，如：北京市朝阳区 XX 大厦">
                 </div>
                 <button class="btn btn-primary" onclick="doGeocode()">查询</button>
                 <div id="geocodeResult" class="result-box" style="display:none;"></div>
             </div>
 
-            <!-- 逆地理编�?-->
+            <!-- 逆地理编码 -->
             <div id="reverse-tab" class="tab-content">
                 <div class="form-row">
                     <div class="form-group">
@@ -435,7 +440,7 @@
             <div id="poi-tab" class="tab-content">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>关键�?/label>
+                        <label>关键词</label>
                         <input type="text" id="poiKeyword" placeholder="请输入搜索关键词，如：加油站">
                     </div>
                     <div class="form-group">
@@ -447,26 +452,26 @@
                 <div id="poiResult" class="result-box" style="display:none;"></div>
             </div>
 
-            <!-- 停靠点管�?-->
+            <!-- 停靠点管理 -->
             <div id="stoppoints-tab" class="tab-content">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>区域筛�?/label>
-                        <input type="text" id="stopRegion" placeholder="请输入区�?>
+                        <label>区域筛选</label>
+                        <input type="text" id="stopRegion" placeholder="请输入区域">
                     </div>
                     <div class="form-group">
-                        <label>类型筛�?/label>
+                        <label>类型筛选</label>
                         <select id="stopType">
                             <option value="">全部类型</option>
-                            <option value="residential">住宅�?/option>
-                            <option value="commercial">商业�?/option>
-                            <option value="industrial">工业�?/option>
+                            <option value="residential">住宅区</option>
+                            <option value="commercial">商业区</option>
+                            <option value="industrial">工业区</option>
                             <option value="other">其他</option>
                         </select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="loadStopPoints()">查询</button>
-                <button class="btn btn-success" onclick="location.href='/stop-points.html'" style="margin-left:10px;">管理停靠�?/button>
+                <button class="btn btn-success" onclick="location.href='/stop-points.html'" style="margin-left:10px;">管理停靠点</button>
                 <div id="stopPointsResult" class="result-box" style="display:none;"></div>
             </div>
         </div>
@@ -476,14 +481,16 @@
     <script>
         const API_BASE = 'http://192.168.2.250:3000/api';
 
-        // 检查登录状�?        function checkLoginStatus() {
+        // 检查登录状态
+        function checkLoginStatus() {
             const token = localStorage.getItem('adminToken');
             if (!token) {
                 window.location.href = '/login.html';
             }
         }
 
-        // 退出登�?        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminToken');
             window.location.href = '/login.html';
@@ -522,11 +529,12 @@
                 const data = await res.json();
                 showResult('geocodeResult', data);
             } catch (err) {
-                showResult('geocodeResult', '请求失败�? + err.message, true);
+                showResult('geocodeResult', '请求失败：' + err.message, true);
             }
         }
 
-        // 逆地理编�?        async function doReverseGeocode() {
+        // 逆地理编码
+        async function doReverseGeocode() {
             const lat = document.getElementById('reverseLat').value;
             const lng = document.getElementById('reverseLng').value;
 
@@ -544,7 +552,7 @@
                 const data = await res.json();
                 showResult('reverseResult', data);
             } catch (err) {
-                showResult('reverseResult', '请求失败�? + err.message, true);
+                showResult('reverseResult', '请求失败：' + err.message, true);
             }
         }
 
@@ -556,7 +564,7 @@
             const endLng = document.getElementById('routeEndLng').value;
 
             if (!startLat || !startLng || !endLat || !endLng) {
-                showResult('routeResult', '请输入完整的起点和终点坐�?, true);
+                showResult('routeResult', '请输入完整的起点和终点坐标', true);
                 return;
             }
 
@@ -572,7 +580,7 @@
                 const data = await res.json();
                 showResult('routeResult', data);
             } catch (err) {
-                showResult('routeResult', '请求失败�? + err.message, true);
+                showResult('routeResult', '请求失败：' + err.message, true);
             }
         }
 
@@ -584,7 +592,7 @@
             const endLng = document.getElementById('distEndLng').value;
 
             if (!startLat || !startLng || !endLat || !endLng) {
-                showResult('distanceResult', '请输入完整的起点和终点坐�?, true);
+                showResult('distanceResult', '请输入完整的起点和终点坐标', true);
                 return;
             }
 
@@ -600,7 +608,7 @@
                 const data = await res.json();
                 showResult('distanceResult', data);
             } catch (err) {
-                showResult('distanceResult', '请求失败�? + err.message, true);
+                showResult('distanceResult', '请求失败：' + err.message, true);
             }
         }
 
@@ -636,14 +644,15 @@
                     document.getElementById('poiResult').innerHTML = html;
                     document.getElementById('poiResult').style.display = 'block';
                 } else {
-                    showResult('poiResult', '未找到相关结�?);
+                    showResult('poiResult', '未找到相关结果');
                 }
             } catch (err) {
-                showResult('poiResult', '请求失败�? + err.message, true);
+                showResult('poiResult', '请求失败：' + err.message, true);
             }
         }
 
-        // 加载停靠�?        async function loadStopPoints() {
+        // 加载停靠点
+        async function loadStopPoints() {
             const region = document.getElementById('stopRegion').value;
             const type = document.getElementById('stopType').value;
 
@@ -672,7 +681,7 @@
                     showResult('stopPointsResult', '未找到停靠点');
                 }
             } catch (err) {
-                showResult('stopPointsResult', '请求失败�? + err.message, true);
+                showResult('stopPointsResult', '请求失败：' + err.message, true);
             }
         }
 
@@ -688,7 +697,8 @@
             }
         }
 
-        // 页面加载时执�?        document.addEventListener('DOMContentLoaded', function() {
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
             checkLoginStatus();
             loadStats();
         });

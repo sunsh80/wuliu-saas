@@ -18,8 +18,28 @@
     .sidebar {
       position: fixed; top: 0; left: 0; bottom: 0; width: 250px;
       background-color: var(--sidebar-bg); color: white; padding: 20px 0; z-index: 1001;
+      display: flex; flex-direction: column; overflow: hidden;
     }
-    .sidebar-nav { margin-top: 60px; }
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      margin-top: 60px;
+    }
+    /* 自定义滚动条样式 */
+    .sidebar-nav::-webkit-scrollbar {
+      width: 8px;
+    }
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 4px;
+    }
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
     .nav-item {
       padding: 12px 24px; color: #cbd5e1; text-decoration: none; display: block;
       transition: all 0.3s; cursor: pointer; border-left: 3px solid transparent;

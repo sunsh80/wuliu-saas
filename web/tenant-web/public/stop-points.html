@@ -336,20 +336,25 @@
             </select>
           </div>
         </div>
-        <div class="form-item">
+        <div class="form-item" style="position: relative;">
           <label>地址 *</label>
-          <input type="text" id="formAddress" required>
+          <input type="text" id="formAddress" required placeholder="输入关键词模糊搜索地址，如'朝阳大悦城'">
+          <div style="margin-top: 5px;">
+            <button type="button" onclick="getCoordsFromAddress()" style="padding: 4px 10px; font-size: 12px; margin-right: 5px;">根据地址获取坐标</button>
+            <button type="button" onclick="testApiKey()" style="padding: 4px 10px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">测试 API</button>
+          </div>
+          <div id="searchResults" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:9999; background:white; border:1px solid #d9d9d9; border-radius:4px; max-height:250px; overflow-y:auto; box-shadow:0 2px 8px rgba(0,0,0,0.15);"></div>
         </div>
         <div class="form-row">
           <div class="form-item">
             <label>纬度 *</label>
-            <input type="number" step="0.000001" id="formLat" required>
-            <div class="help-text">范围：-90 到 90</div>
+            <input type="number" step="0.001" id="formLat" required>
+            <div class="help-text">范围：-90 到 90（保留 3 位小数即可）</div>
           </div>
           <div class="form-item">
             <label>经度 *</label>
-            <input type="number" step="0.000001" id="formLng" required>
-            <div class="help-text">范围：-180 到 180</div>
+            <input type="number" step="0.001" id="formLng" required>
+            <div class="help-text">范围：-180 到 180（保留 3 位小数即可）</div>
           </div>
         </div>
         <div class="form-row">
@@ -662,9 +667,255 @@
       window.location.href = '/carrier-login.html';
     }
 
+    // ========== 地址模糊搜索函数 ==========
+    // 全局错误监听
+    window.addEventListener('error', function(e) {
+      console.log('[GLOBAL ERROR]', e.message, 'at', e.filename + ':' + e.lineno);
+    });
+    
+    // 测试脚本是否执行
+    console.log('[TEST] 脚本开始执行，时间:', new Date().toLocaleTimeString());
+
+    // 根据完整地址获取坐标
+    async function getCoordsFromAddress() {
+      const address = document.getElementById('formAddress').value.trim();
+      if (!address) {
+        alert('请先输入地址');
+        return;
+      }
+      const TENCENT_MAP_KEY = 'OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77';
+      try {
+        const url = `https://apis.map.qq.com/ws/geocoder/v1/?address=${encodeURIComponent(address)}&region=北京&key=${TENCENT_MAP_KEY}`;
+        console.log('[DEBUG] geocoder url:', url);
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log('[DEBUG] geocoder data:', data);
+        if (data.status === 0 && data.result?.location) {
+          document.getElementById('formLat').value = data.result.location.lat.toFixed(3);
+          document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
+          alert('坐标已自动填充！');
+        } else {
+          alert('未找到该地址，请检查后重试。');
+        }
+      } catch (error) {
+        console.error('地理编码请求失败:', error);
+        alert('请求失败，请检查网络。');
+      }
+    }
+
+    async function searchPlaces(keyword, panel, input) {
+      const KEY = 'OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77';
+      console.log('[DEBUG] searchPlaces called - keyword:', keyword, 'panel:', panel);
+      try {
+        const url = `https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=${encodeURIComponent(keyword)}&region=北京&key=${KEY}`;
+        console.log('[DEBUG] fetch url:', url);
+        const response = await fetch(url);
+        console.log('[DEBUG] response status:', response.status);
+        const data = await response.json();
+        console.log('[DEBUG] response data:', data);
+        if (data.status === 0 && data.data && data.data.length > 0) {
+          panel.innerHTML = data.data.map(item =>
+            `<div onclick="fillAddress('${(item.address || item.title).replace(/'/g, "\\'")}', ${item.location.lat}, ${item.location.lng})" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;">
+              <strong>${item.title}</strong><br><small style="color:#666;">${item.address || ''}</small>
+            </div>`
+          ).join('');
+          panel.style.display = 'block';
+          console.log('[DEBUG] panel display set to block, innerHTML length:', panel.innerHTML.length);
+        } else {
+          panel.style.display = 'none';
+          console.log('[DEBUG] no data or status not 0');
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        panel.style.display = 'none';
+      }
+    }
+
+    function fillAddress(address, lat, lng) {
+      console.log('[DEBUG] fillAddress called - address:', address, 'lat:', lat, 'lng:', lng);
+      document.getElementById('formAddress').value = address;
+      document.getElementById('formLat').value = lat.toFixed(3);
+      document.getElementById('formLng').value = lng.toFixed(3);
+      document.getElementById('searchResults').style.display = 'none';
+      console.log('[DEBUG] fillAddress completed');
+    }
+
     // 初始化
     loadMyStats();
     loadMyStopPoints();
+    initAddressSearch();
+
+    // ============================================
+    // 地址模糊搜索功能（腾讯地图 API）
+    // ============================================
+    // 功能说明：
+    // 1. 用户输入地址关键词，自动搜索并显示下拉列表
+    // 2. 点击搜索结果，自动填充地址和经纬度（保留 3 位小数）
+    // 3. 可手动点击"根据地址获取坐标"按钮获取精确坐标
+    //
+    // API 说明：
+    // - 地理编码 API：https://apis.map.qq.com/ws/geocoder/v1/
+    // - 地点建议 API：https://apis.map.qq.com/ws/place/v1/suggestion/
+    // - 使用 JSONP 方式调用（避免 CORS 限制）
+    // - API Key 配置：腾讯地图开放平台 → 控制台 → 应用管理
+    //
+    // 使用方法：
+    // 1. 在地址输入框输入关键词（如"朝阳大悦城"）
+    // 2. 等待 300ms，自动显示搜索结果下拉列表
+    // 3. 点击任意结果，自动填充地址和坐标
+    // 4. 或点击"根据地址获取坐标"按钮获取精确坐标
+    //
+    // 调试日志：
+    // - [INIT] 初始化日志
+    // - [INPUT] 用户输入日志
+    // - [SEARCH] 搜索日志
+    // - [JSONP] API 请求日志
+    // - [FILL] 填充日志
+    // ============================================
+
+    // 初始化地址搜索
+    function initAddressSearch() {
+      const input = document.getElementById('formAddress');
+      const panel = document.getElementById('searchResults');
+      console.log('[INIT] input:', input, 'panel:', panel);
+      if (!input || !panel) {
+        console.error('[INIT] 元素不存在!');
+        return;
+      }
+      console.log('[INIT] 地址搜索初始化成功');
+
+      let timer;
+      input.addEventListener('input', () => {
+        const keyword = input.value.trim();
+        console.log('[INPUT] 输入:', keyword);
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          console.log('[SEARCH] 开始搜索:', keyword);
+          if (keyword) searchPlaces(keyword, panel);
+          else panel.style.display = 'none';
+        }, 300);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#formAddress') && !e.target.closest('#searchResults')) {
+          panel.style.display = 'none';
+        }
+      });
+    }
+
+    // 根据地址获取坐标（JSONP 方式）
+    function getCoordsFromAddress() {
+      const address = document.getElementById('formAddress').value.trim();
+      console.log('[GEO] 地址:', address);
+      if (!address) { alert('请先输入地址'); return; }
+      jsonpRequest('geocoder', address);
+    }
+
+    // 模糊搜索地点（JSONP 方式）
+    function searchPlaces(keyword, panel) {
+      console.log('[SEARCH] searchPlaces 调用:', keyword);
+      jsonpRequest('search', keyword, panel);
+    }
+
+    // JSONP 请求通用函数
+    function jsonpRequest(type, keyword, panel) {
+      // ========== 配置区域 ==========
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ'; // 腾讯地图 API Key（需替换为自己的）
+      // =============================
+      
+      const callbackName = 'cb_' + Date.now();
+      const urls = {
+        geocoder: 'https://apis.map.qq.com/ws/geocoder/v1/',
+        search: 'https://apis.map.qq.com/ws/place/v1/suggestion/'
+      };
+      const fullUrl = `${urls[type]}?${type === 'geocoder' ? 'address=' : 'keyword='}${encodeURIComponent(keyword)}&key=${KEY}&callback=${callbackName}`;
+      console.log('[JSONP] URL:', fullUrl);
+
+      // JSONP 回调函数
+      window[callbackName] = function(data) {
+        console.log('[JSONP] 回调数据:', data);
+        delete window[callbackName];
+        const script = document.getElementById('s_' + callbackName);
+        if (script) script.remove();
+
+        if (type === 'geocoder') {
+          // 地理编码结果处理
+          if (data.status === 0 && data.result?.location) {
+            document.getElementById('formLat').value = data.result.location.lat.toFixed(3);
+            document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
+            alert('坐标已自动填充！');
+          } else {
+            alert('未找到该地址：' + (data.message || ''));
+          }
+        } else if (type === 'search' && panel) {
+          // 地点搜索结果处理
+          if (data.status === 0 && data.data && data.data.length > 0) {
+            let html = '';
+            data.data.forEach(item => {
+              const addr = (item.address || item.title).replace(/'/g, "\\'");
+              const title = item.title.replace(/'/g, "\\'");
+              const lat = item.location.lat;
+              const lng = item.location.lng;
+              html += `<div onclick="fillAddress('${addr}', ${lat}, ${lng})" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;">` +
+                `<strong>${title}</strong><br><small style="color:#666;">${item.address || ''}</small></div>`;
+            });
+            panel.innerHTML = html;
+            panel.style.display = 'block';
+            console.log('[SEARCH] 显示', data.data.length, '条结果');
+          } else {
+            panel.style.display = 'none';
+            console.log('[SEARCH] 无结果，status:', data.status);
+          }
+        }
+      };
+
+      // 创建 script 标签
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = fullUrl;
+      script.onerror = () => { 
+        console.error('[JSONP] 加载失败'); 
+        console.error('[JSONP] 可能原因：1.网络不通 2.API Key 配额用完 3.防火墙拦截');
+        console.error('[JSONP] 请在浏览器直接测试：https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=' + KEY);
+        delete window[callbackName]; 
+        script.remove(); 
+      };
+      script.onload = () => { console.log('[JSONP] 脚本加载成功'); };
+      document.body.appendChild(script);
+      console.log('[JSONP] 脚本已添加');
+    }
+
+    // 填充地址和坐标
+    function fillAddress(address, lat, lng) {
+      console.log('[FILL] 填充地址:', address, lat, lng);
+      document.getElementById('formAddress').value = address;
+      document.getElementById('formLat').value = lat.toFixed(3);
+      document.getElementById('formLng').value = lng.toFixed(3);
+      document.getElementById('searchResults').style.display = 'none';
+    }
+
+    // 测试 API Key（调试用）
+    function testApiKey() {
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const callbackName = 'testcb_' + Date.now();
+      console.log('[TEST] 开始测试 API Key');
+      window[callbackName] = function(data) {
+        console.log('[TEST] 返回:', data);
+        delete window[callbackName];
+        document.getElementById('s_' + callbackName)?.remove();
+        if (data.status === 0) {
+          alert('API Key 有效！返回 ' + (data.data?.length || 0) + ' 条结果');
+        } else {
+          alert('API Key 无效：' + data.message);
+        }
+      };
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = `https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=${KEY}&callback=${callbackName}`;
+      script.onerror = () => { delete window[callbackName]; script.remove(); alert('网络请求失败'); };
+      document.body.appendChild(script);
+      console.log('[TEST] 脚本已添加');
+    }
   </script>
 </body>
 </html>

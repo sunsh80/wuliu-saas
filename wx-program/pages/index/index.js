@@ -16,7 +16,7 @@ Page({
 
     // 可以保留其他初始化逻辑
     wx.setNavigationBarTitle({
-      title: '蚁到达无人物流'
+      title: '数孪智运物流'
     });
   },
 

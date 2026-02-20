@@ -66,10 +66,34 @@
       color: white;
       padding: 20px 0;
       z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
       margin-top: 60px;
+    }
+
+    /* 自定义滚动条样式 */
+    .sidebar-nav::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .nav-item {
@@ -305,8 +329,8 @@
       <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
       <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
       <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
-      
-      <div class="nav-item has-submenu">
+
+      <div class="nav-item has-submenu open">
         <div class="submenu-toggle">
           <span><i class="fas fa-yen-sign"></i> 财务管理</span>
           <i class="fas fa-chevron-down submenu-arrow"></i>

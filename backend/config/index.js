@@ -12,7 +12,7 @@ module.exports = {
     secret: process.env.SESSION_SECRET || 'wuliu-2026-secret-key',
     cookie: {
       secure: false,
-      httpOnly: true,
+      httpOnly: false,
       maxAge: 24 * 60 * 60 * 1000,
       signed: true,
       path: '/',

@@ -11,10 +11,22 @@ Page({
   },
 
   // 页面加载时执行
-  onLoad: function(options) {
-    console.log('[OrderList] 页面加载，开始获取订单数据');
-    this.fetchOrders();
-  },
+onLoad: function(options) {
+  console.log('[OrderList] 页面加载，开始获取订单数据');
+
+  // 🔍【关键诊断日志】检查认证凭证是否存在
+  const connect_sid = wx.getStorageSync('connect_sid');
+  const token = wx.getStorageSync('token');
+  const isLoggedIn = wx.getStorageSync('isLoggedIn');
+  
+  console.log('[OrderList] Storage 状态:', {
+    connect_sid: connect_sid || '❌ 未存储',
+    token: token || '❌ 未存储',
+    isLoggedIn: isLoggedIn || '❌ 未设置'
+  });
+
+  this.fetchOrders();
+},
 
   // 页面显示时执行（每次进入页面都会执行）
   onShow: function() {

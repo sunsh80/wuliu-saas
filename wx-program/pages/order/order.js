@@ -200,6 +200,10 @@ Page({
   },
   submitOrder() {
     console.log('=== submitOrder 函数被调用 ===');
+    console.log('=== 调试 Storage ===');
+console.log('所有 keys:', wx.getStorageInfoSync().keys);
+console.log('connect_sid 的值:', wx.getStorageSync('connect_sid'));
+console.log('connect.sid 的值:', wx.getStorageSync('connect.sid'));
 
     // 验证必填项
     const {
@@ -264,24 +268,20 @@ Page({
 
     console.log('准备提交订单数据:', orderData);
 
-    // 获取认证信息
-    const connectSid = wx.getStorageSync('connect.sid');
-    const token = wx.getStorageSync('token');
+// ✅ 从 Storage 读取 token（login.js 已存储）
+  const token = wx.getStorageSync('token');
+  
+  if (!token) {
+    wx.showToast({ title: '请先登录', icon: 'none' });
+    setTimeout(() => wx.redirectTo({ url: '/pages/login/login' }), 1500);
+    return;
+  }
 
-    // 构造请求头
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    // 添加 Cookie
-    if (connectSid) {
-      headers['Cookie'] = `connect.sid=${connectSid}`;
-    }
-
-    // 添加 Authorization
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+  // ✅ 使用 Authorization 头（不是 Cookie！）
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}` // ← 关键！
+  };
 
     console.log('准备发送订单请求，认证信息:', headers);
 

@@ -6,6 +6,10 @@
   <title>地图服务管理 - 承运商系统</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  🗺️ 新增：腾讯地图 JavaScript API -->
+    <script charset="utf-8" 
+            src="https://map.qq.com/api/gljs?v=1.exp&key=SRFBZ-3GHEW-ANLRG-YZODQ-LWDXQ-PXFS6">
+    </script>
   <style>
     :root {
       --primary-color: #f97316; /* 橙色主色调 */
@@ -66,10 +70,34 @@
       color: white;
       padding: 20px 0;
       z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
       margin-top: 60px;
+    }
+
+    /* 自定义滚动条样式 */
+    .sidebar-nav::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .nav-item {
@@ -342,8 +370,8 @@
       <a href="./map.html" class="nav-item active"><i class="fas fa-map-marked-alt"></i> 地图维护</a>
       <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
       <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
-      
-      <div class="nav-item has-submenu">
+
+      <div class="nav-item has-submenu open">
         <div class="submenu-toggle">
           <span><i class="fas fa-yen-sign"></i> 财务管理</span>
           <i class="fas fa-chevron-down submenu-arrow"></i>

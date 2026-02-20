@@ -15,7 +15,7 @@ function request(options) {
    }
 
    // 从本地缓存读取身份凭证
-   const connectSid = wx.getStorageSync('connect.sid');
+   const connectSid = wx.getStorageSync('connect_sid');
    // const authToken = wx.getStorageSync('authToken'); // ❌ 注释掉旧的读取方式
    const authToken = wx.getStorageSync('token'); // ✅ 修改为读取 'token'，与 app.js 保持一致
 
@@ -57,13 +57,14 @@ function request(options) {
    };
 
    // 正确格式化 Cookie
-   if (connectSid) {
-     // 确保 connectSid 是正确格式的 session ID
-     headers.Cookie = `connect.sid=${connectSid}`;
-     console.log('[Request Debug] Cookie being sent:', headers.Cookie);
-   } else {
-     headers.Cookie = '';
-   }
+if (connectSid) {
+  // ✅ 关键修复：解码 URL 编码的 Session ID
+  const decodedConnectSid = decodeURIComponent(connectSid);
+  headers.Cookie = `connect.sid=${decodedConnectSid}`;
+  console.log('[Request Debug] Cookie being sent:', headers.Cookie);
+} else {
+  headers.Cookie = '';
+}
 
    // 如果存在 token，则添加 Authorization 头部
    if (authToken) {

@@ -91,7 +91,7 @@ Page({
   },
 
   navigateToPoints() {
-    // 示例：跳转到积分管理页面
-    console.log("跳转到积分管理页面");
+    // 示例：跳转到地址管理页面
+    console.log("跳转到地址管理页面");
   }
 });

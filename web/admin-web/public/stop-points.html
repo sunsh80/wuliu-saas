@@ -4,35 +4,57 @@
   <meta charset="UTF-8" />
   <link rel="icon" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>停靠点管�?- 管理�?/title>
+  <title>停靠点管理 - 管理系统</title>
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f5f5; }
+    /* 主内容区域 */
+    .main-content {
+      padding: 24px;
+      margin-top: 60px;
+      margin-left: 250px;
+      margin-right: 20px;
+      width: calc(100% - 270px);
+      min-height: calc(100vh - 80px);
+    }
 
-    .header {
-      background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
-      color: white;
-      padding: 15px 30px;
+    /* 顶部栏 */
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 250px;
+      height: 60px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      justify-content: flex-end;
+      padding: 0 30px;
+      z-index: 999;
     }
-    .header h1 { font-size: 20px; }
-    .header-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 4px;
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info span {
+      color: #666;
+    }
+
+    .user-info a {
+      color: #ff4d4f;
+      text-decoration: none;
       cursor: pointer;
-      margin-left: 10px;
     }
-    .header-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .container { max-width: 1600px; margin: 20px auto; padding: 0 20px; }
+    .user-info a:hover {
+      text-decoration: underline;
+    }
 
+    /* 统计卡片 */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -201,21 +223,52 @@
     .success { color: #52c41a; padding: 12px; background: #f6ffed; border-radius: 6px; margin: 10px 0; }
 
     .checkbox { width: 16px; height: 16px; cursor: pointer; }
-    
+
     .reject-reason { color: #ff4d4f; font-size: 13px; margin-top: 6px; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>📍 停靠点管�?/h1>
-    <div>
-      <button class="header-btn" onclick="location.href='/map-management.html'">地图服务</button>
-      <button class="header-btn" onclick="location.href='/dashboard.html'">返回仪表�?/button>
-      <button class="header-btn" onclick="logout()">退出登�?/button>
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="logo">
+      <i class="fas fa-truck-moving"></i>
+      <span>物流管理系统</span>
     </div>
-  </div>
-  
-  <div class="container">
+    <ul>
+      <li><a href="/dashboard.html"><i class="fas fa-home"></i> <span>首页</span></a></li>
+      <li><a href="/orders.html"><i class="fas fa-tasks"></i> <span>订单管理</span></a></li>
+      <li><a href="/customers.html"><i class="fas fa-users"></i> <span>客户管理</span></a></li>
+      <li><a href="/carriers.html"><i class="fas fa-truck"></i> <span>承运商管理</span></a></li>
+      <li><a href="/tenants.html"><i class="fas fa-building"></i> <span>租户管理</span></a></li>
+      <li><a href="/reports.html"><i class="fas fa-chart-bar"></i> <span>报表统计</span></a></li>
+      <li><a href="/application-list.html"><i class="fas fa-file-alt"></i> <span>入驻申请</span></a></li>
+      <li><a href="/pricing-rules.html"><i class="fas fa-tags"></i> <span>配价管理</span></a></li>
+      <li><a href="/violations.html"><i class="fas fa-exclamation-triangle"></i> <span>违规处理</span></a></li>
+      <li><a href="/finance.html"><i class="fas fa-yen-sign"></i> <span>财务管理</span></a></li>
+      <li><a href="/settings.html"><i class="fas fa-cog"></i> <span>内部设置</span></a></li>
+      <li><a href="/vehicle-models.html"><i class="fas fa-car"></i> <span>车型库维护</span></a></li>
+      <li><a href="/map-management.html"><i class="fas fa-map-marked-alt"></i> <span>地图服务管理</span></a></li>
+      <li><a href="/stop-points.html" class="active"><i class="fas fa-map-marker-alt"></i> <span>停靠点管理</span></a></li>
+      <li><a href="/vehicle-tracking.html"><i class="fas fa-location-arrow"></i> <span>车辆位置追踪</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="user-info">
+      <span>管理员</span>
+      <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> 退出登录</a>
+    </div>
+  </header>
+
+  <!-- 主内容区域 -->
+  <div class="main-content">
+    <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0;">📍 停靠点管理</h1>
+        <p style="color: #64748b; margin-top: 4px;">管理所有用户上传的停靠点数据</p>
+      </div>
+    </div>
     <!-- 统计卡片 -->
     <div class="stats-row">
       <div class="stat-card total">
@@ -223,7 +276,7 @@
         <div class="num" id="statTotal">-</div>
       </div>
       <div class="stat-card pending">
-        <h3>待审�?/h3>
+        <h3>待审批</h3>
         <div class="num" id="statPending">-</div>
       </div>
       <div class="stat-card approved">
@@ -231,12 +284,12 @@
         <div class="num" id="statApproved">-</div>
       </div>
       <div class="stat-card rejected">
-        <h3>已驳�?/h3>
+        <h3>已驳回</h3>
         <div class="num" id="statRejected">-</div>
       </div>
     </div>
-    
-    <!-- 待审批列�?-->
+
+    <!-- 待审批列表 -->
     <div class="card">
       <div class="card-header">
         <div class="card-title">待审批停靠点</div>
@@ -250,15 +303,15 @@
         <input type="text" id="pendingTenantName" placeholder="租户名称">
         <button class="btn btn-primary" onclick="loadPending()">搜索</button>
       </div>
-      <div id="pendingList" class="loading">加载�?..</div>
+      <div id="pendingList" class="loading">加载中...</div>
     </div>
-    
-    <!-- 全部停靠点列�?-->
+
+    <!-- 全部停靠点列表 -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title">全部停靠�?/div>
+        <div class="card-title">全部停靠点</div>
         <div class="btn-group">
-          <button class="btn btn-primary" onclick="showCreateModal()">+ 新增停靠�?/button>
+          <button class="btn btn-primary" onclick="showCreateModal()">+ 新增停靠点</button>
           <button class="btn btn-secondary" onclick="showImportModal()">批量导入</button>
         </div>
       </div>
@@ -266,21 +319,21 @@
         <input type="text" id="search" placeholder="搜索名称/地址">
         <select id="typeFilter">
           <option value="">全部类型</option>
-          <option value="residential">住宅�?/option>
-          <option value="commercial">商业�?/option>
-          <option value="industrial">工业�?/option>
+          <option value="residential">住宅区</option>
+          <option value="commercial">商业区</option>
+          <option value="industrial">工业区</option>
           <option value="other">其他</option>
         </select>
         <select id="statusFilter">
-          <option value="">全部状�?/option>
+          <option value="">全部状态</option>
           <option value="active">启用</option>
           <option value="inactive">停用</option>
         </select>
         <select id="approvalFilter">
-          <option value="">全部审批状�?/option>
-          <option value="pending">待审�?/option>
+          <option value="">全部审批状态</option>
+          <option value="pending">待审批</option>
           <option value="approved">已通过</option>
-          <option value="rejected">已驳�?/option>
+          <option value="rejected">已驳回</option>
         </select>
         <button class="btn btn-primary" onclick="loadAll()">搜索</button>
       </div>
@@ -294,7 +347,7 @@
             <th>类型</th>
             <th>区域</th>
             <th>坐标</th>
-            <th>状�?/th>
+            <th>状态</th>
             <th>审批</th>
             <th>来源</th>
             <th>操作</th>
@@ -305,18 +358,18 @@
       <div class="pagination">
         <div class="pagination-info" id="paginationInfo"></div>
         <div class="pagination-btns">
-          <button class="btn btn-secondary" onclick="prevPage()">上一�?/button>
-          <button class="btn btn-secondary" onclick="nextPage()">下一�?/button>
+          <button class="btn btn-secondary" onclick="prevPage()">上一页</button>
+          <button class="btn btn-secondary" onclick="nextPage()">下一页</button>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- 新增/编辑弹窗 -->
   <div class="modal" id="createModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modalTitle">新增停靠�?/h3>
+        <h3 id="modalTitle">新增停靠点</h3>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
       <div class="modal-body">
@@ -329,26 +382,31 @@
             <label>类型</label>
             <select id="formType">
               <option value="other">其他</option>
-              <option value="residential">住宅�?/option>
-              <option value="commercial">商业�?/option>
-              <option value="industrial">工业�?/option>
+              <option value="residential">住宅区</option>
+              <option value="commercial">商业区</option>
+              <option value="industrial">工业区</option>
             </select>
           </div>
         </div>
-        <div class="form-item">
+        <div class="form-item" style="position: relative;">
           <label>地址 *</label>
-          <input type="text" id="formAddress" required>
+          <input type="text" id="formAddress" required placeholder="输入关键词模糊搜索地址">
+          <div style="margin-top: 5px;">
+            <button type="button" onclick="getCoordsFromAddress()" style="padding: 4px 10px; font-size: 12px; margin-right: 5px;">根据地址获取坐标</button>
+            <button type="button" onclick="testApiKey()" style="padding: 4px 10px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">测试 API</button>
+          </div>
+          <div id="searchResults" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:9999; background:white; border:1px solid #d9d9d9; border-radius:4px; max-height:250px; overflow-y:auto; box-shadow:0 2px 8px rgba(0,0,0,0.15);"></div>
         </div>
         <div class="form-row">
           <div class="form-item">
             <label>纬度 *</label>
-            <input type="number" step="0.000001" id="formLat" required>
-            <div class="help-text">范围�?90 �?90</div>
+            <input type="number" step="0.001" id="formLat" required>
+            <div class="help-text">范围：-90 ~ 90（保留 3 位小数即可）</div>
           </div>
           <div class="form-item">
             <label>经度 *</label>
-            <input type="number" step="0.000001" id="formLng" required>
-            <div class="help-text">范围�?180 �?180</div>
+            <input type="number" step="0.001" id="formLng" required>
+            <div class="help-text">范围：-180 ~ 180（保留 3 位小数即可）</div>
           </div>
         </div>
         <div class="form-row">
@@ -372,12 +430,12 @@
       </div>
     </div>
   </div>
-  
+
   <!-- 批量导入弹窗 -->
   <div class="modal" id="importModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>批量导入停靠�?/h3>
+        <h3>批量导入停靠点</h3>
         <button class="modal-close" onclick="closeImportModal()">&times;</button>
       </div>
       <div class="modal-body">
@@ -393,7 +451,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- 驳回原因弹窗 -->
   <div class="modal" id="rejectModal">
     <div class="modal-content">
@@ -404,7 +462,7 @@
       <div class="modal-body">
         <div class="form-item">
           <label>驳回原因 *</label>
-          <textarea id="rejectionReason" rows="4" required placeholder="请说明驳回原�?></textarea>
+          <textarea id="rejectionReason" rows="4" required placeholder="请说明驳回原因"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -422,7 +480,8 @@
     let editingId = null;
     let rejectCallback = null;
 
-    // 检查登录状�?    const adminToken = localStorage.getItem('adminToken');
+    // 检查登录状态
+    const adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
       window.location.href = '/login.html';
     }
@@ -499,7 +558,7 @@
             </table>
           `;
         } else {
-          container.innerHTML = '<div class="loading">暂无待审批数�?/div>';
+          container.innerHTML = '<div class="loading">暂无待审批数据</div>';
         }
       } catch (err) {
         document.getElementById('pendingList').innerHTML = '<div class="error">加载失败</div>';
@@ -511,7 +570,7 @@
       const type = document.getElementById('typeFilter').value;
       const status = document.getElementById('statusFilter').value;
       const approvalStatus = document.getElementById('approvalFilter').value;
-      
+
       const params = new URLSearchParams({
         page: currentPage,
         limit: currentLimit,
@@ -535,7 +594,7 @@
               <td>${sp.region || '-'}</td>
               <td>${sp.lat.toFixed(4)}, ${sp.lng.toFixed(4)}</td>
               <td><span class="status-badge ${sp.status === 'active' ? 'status-active' : 'status-inactive'}">${sp.status === 'active' ? '启用' : '停用'}</span></td>
-              <td><span class="status-badge ${sp.approval_status === 'approved' ? 'status-approved' : sp.approval_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${sp.approval_status === 'approved' ? '已通过' : sp.approval_status === 'rejected' ? '已驳�? : '待审�?}</span></td>
+              <td><span class="status-badge ${sp.approval_status === 'approved' ? 'status-approved' : sp.approval_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${sp.approval_status === 'approved' ? '已通过' : sp.approval_status === 'rejected' ? '已驳回' : '待审批'}</span></td>
               <td>${sp.upload_source === 'tenant' ? '租户上传' : '后台录入'}</td>
               <td>
                 <div class="btn-group">
@@ -545,9 +604,9 @@
               </td>
             </tr>
           `).join('');
-          
-          document.getElementById('paginationInfo').textContent = 
-            `�?${res.data.pagination.page} 页，�?${res.data.pagination.totalPages} 页，总计 ${res.data.pagination.total} 条`;
+
+          document.getElementById('paginationInfo').textContent =
+            `第${res.data.pagination.page} 页，共${res.data.pagination.totalPages} 页，总计 ${res.data.pagination.total} 条`;
         } else {
           container.innerHTML = '<tr><td colspan="11" class="loading">暂无数据</td></tr>';
         }
@@ -573,7 +632,7 @@
 
     function showCreateModal() {
       editingId = null;
-      document.getElementById('modalTitle').textContent = '新增停靠�?;
+      document.getElementById('modalTitle').textContent = '新增停靠点';
       document.getElementById('formName').value = '';
       document.getElementById('formAddress').value = '';
       document.getElementById('formLat').value = '';
@@ -603,7 +662,7 @@
         const res = await fetchApi(`${API_BASE}/admin/stop-points/${id}`);
         if (res.success) {
           const sp = res.data;
-          document.getElementById('modalTitle').textContent = '编辑停靠�?;
+          document.getElementById('modalTitle').textContent = '编辑停靠点';
           document.getElementById('formName').value = sp.name;
           document.getElementById('formAddress').value = sp.address;
           document.getElementById('formLat').value = sp.lat;
@@ -632,7 +691,7 @@
       };
 
       if (!data.name || !data.address || !data.lat || !data.lng) {
-        alert('请填写必填字�?);
+        alert('请填写必填字段');
         return;
       }
 
@@ -645,7 +704,7 @@
         const url = editingId ? `${API_BASE}/admin/stop-points/${editingId}` : `${API_BASE}/admin/stop-points`;
         const method = editingId ? 'PUT' : 'POST';
         const res = await fetchApi(url, { method, body: JSON.stringify(data) });
-        
+
         if (res.success) {
           alert(editingId ? '更新成功' : '创建成功');
           closeModal();
@@ -666,7 +725,7 @@
           method: 'POST',
           body: JSON.stringify({ stopPoints })
         });
-        
+
         if (res.success) {
           alert(res.message);
           closeImportModal();
@@ -681,7 +740,7 @@
     }
 
     async function deleteStopPoint(id) {
-      if (!confirm('确认删除该停靠点�?)) return;
+      if (!confirm('确认删除该停靠点？')) return;
       try {
         const res = await fetchApi(`${API_BASE}/admin/stop-points/${id}`, { method: 'DELETE' });
         if (res.success) {
@@ -711,7 +770,7 @@
       const checkboxes = document.querySelectorAll('.pending-select:checked');
       const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
       if (ids.length === 0) {
-        alert('请选择要驳回的停靠�?);
+        alert('请选择要驳回的停靠点');
         return;
       }
       rejectCallback = ids;
@@ -722,10 +781,10 @@
     async function confirmReject() {
       const reason = document.getElementById('rejectionReason').value;
       if (!reason) {
-        alert('请填写驳回原�?);
+        alert('请填写驳回原因');
         return;
       }
-      
+
       try {
         if (Array.isArray(rejectCallback)) {
           // 批量驳回
@@ -734,7 +793,7 @@
             body: JSON.stringify({ ids: rejectCallback, approved: false, rejectionReason: reason })
           });
           if (res.success) {
-            alert(`已驳�?${res.data.successIds.length} 条`);
+            alert(`已驳回${res.data.successIds.length} 条`);
             closeRejectModal();
             loadPending();
             loadStats();
@@ -748,7 +807,7 @@
             body: JSON.stringify({ approved: false, rejectionReason: reason })
           });
           if (res.success) {
-            alert('已驳�?);
+            alert('已驳回');
             closeRejectModal();
             loadPending();
             loadStats();
@@ -762,14 +821,14 @@
     }
 
     async function approveOne(id, approved) {
-      if (!approved && !confirm('确认驳回�?)) return;
+      if (!approved && !confirm('确认驳回？')) return;
       try {
         const res = await fetchApi(`${API_BASE}/admin/stop-points/${id}/approve`, {
           method: 'POST',
-          body: JSON.stringify({ approved, rejectionReason: approved ? null : '�? })
+          body: JSON.stringify({ approved, rejectionReason: approved ? null : '无' })
         });
         if (res.success) {
-          alert(approved ? '已通过' : '已驳�?);
+          alert(approved ? '已通过' : '已驳回');
           loadPending();
           loadStats();
         } else {
@@ -784,10 +843,10 @@
       const checkboxes = document.querySelectorAll('.pending-select:checked');
       const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
       if (ids.length === 0) {
-        alert('请选择要审批的停靠�?);
+        alert('请选择要审批的停靠点');
         return;
       }
-      if (!approved && !confirm('确认批量驳回�?)) return;
+      if (!approved && !confirm('确认批量驳回？')) return;
 
       try {
         const res = await fetchApi(`${API_BASE}/admin/stop-points/batch-approve`, {
@@ -795,7 +854,7 @@
           body: JSON.stringify({ ids, approved, rejectionReason: approved ? null : '批量驳回' })
         });
         if (res.success) {
-          alert(approved ? `已通过 ${res.data.successIds.length} 条` : `已驳�?${res.data.successIds.length} 条`);
+          alert(approved ? `已通过 ${res.data.successIds.length} 条` : `已驳回${res.data.successIds.length} 条`);
           loadPending();
           loadStats();
         } else {
@@ -823,9 +882,149 @@
       window.location.href = '/login.html';
     }
 
-    // 初始�?    loadStats();
+    // 初始化
+    loadStats();
     loadPending();
     loadAll();
+    initAddressSearch();
+
+    // 初始化地址搜索
+    function initAddressSearch() {
+      const input = document.getElementById('formAddress');
+      const panel = document.getElementById('searchResults');
+      console.log('[INIT] input:', input, 'panel:', panel);
+      if (!input || !panel) {
+        console.error('[INIT] 元素不存在!');
+        return;
+      }
+      console.log('[INIT] 地址搜索初始化成功');
+
+      let timer;
+      input.addEventListener('input', () => {
+        const keyword = input.value.trim();
+        console.log('[INPUT] 输入:', keyword);
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          console.log('[SEARCH] 开始搜索:', keyword);
+          if (keyword) searchPlaces(keyword, panel);
+          else panel.style.display = 'none';
+        }, 300);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#formAddress') && !e.target.closest('#searchResults')) {
+          panel.style.display = 'none';
+        }
+      });
+    }
+
+    // 根据地址获取坐标
+    function getCoordsFromAddress() {
+      const address = document.getElementById('formAddress').value.trim();
+      console.log('[GEO] 地址:', address);
+      if (!address) { alert('请先输入地址'); return; }
+      jsonpRequest('geocoder', address);
+    }
+
+    // 模糊搜索
+    function searchPlaces(keyword, panel) {
+      console.log('[SEARCH] searchPlaces 调用:', keyword);
+      jsonpRequest('search', keyword, panel);
+    }
+
+    // JSONP 请求
+    function jsonpRequest(type, keyword, panel) {
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const callbackName = 'cb_' + Date.now();
+      const urls = {
+        geocoder: 'https://apis.map.qq.com/ws/geocoder/v1/',
+        search: 'https://apis.map.qq.com/ws/place/v1/suggestion/'
+      };
+      const fullUrl = `${urls[type]}?${type === 'geocoder' ? 'address=' : 'keyword='}${encodeURIComponent(keyword)}&key=${KEY}&callback=${callbackName}`;
+      console.log('[JSONP] URL:', fullUrl);
+
+      window[callbackName] = function(data) {
+        console.log('[JSONP] 回调数据:', data);
+        delete window[callbackName];
+        const script = document.getElementById('s_' + callbackName);
+        if (script) script.remove();
+
+        if (type === 'geocoder') {
+          if (data.status === 0 && data.result?.location) {
+            document.getElementById('formLat').value = data.result.location.lat.toFixed(3);
+            document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
+            alert('坐标已自动填充！');
+          } else {
+            alert('未找到该地址：' + (data.message || ''));
+          }
+        } else if (type === 'search' && panel) {
+          if (data.status === 0 && data.data && data.data.length > 0) {
+            let html = '';
+            data.data.forEach(item => {
+              const addr = (item.address || item.title).replace(/'/g, "\\'");
+              const title = item.title.replace(/'/g, "\\'");
+              const lat = item.location.lat;
+              const lng = item.location.lng;
+              html += `<div onclick="fillAddress('${addr}', ${lat}, ${lng})" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;">` +
+                `<strong>${title}</strong><br><small style="color:#666;">${item.address || ''}</small></div>`;
+            });
+            panel.innerHTML = html;
+            panel.style.display = 'block';
+            console.log('[SEARCH] 显示', data.data.length, '条结果');
+          } else {
+            panel.style.display = 'none';
+            console.log('[SEARCH] 无结果，status:', data.status);
+          }
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = fullUrl;
+      script.onerror = () => { 
+        console.error('[JSONP] 加载失败'); 
+        console.error('[JSONP] 可能原因：1.网络不通 2.API Key 配额用完 3.防火墙拦截');
+        console.error('[JSONP] 请在浏览器直接测试：https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ');
+        delete window[callbackName]; 
+        script.remove(); 
+      };
+      script.onload = () => { console.log('[JSONP] 脚本加载成功'); };
+      document.body.appendChild(script);
+      console.log('[JSONP] 脚本已添加');
+    }
+
+    // 填充地址
+    function fillAddress(address, lat, lng) {
+      console.log('[FILL] 填充地址:', address, lat, lng);
+      document.getElementById('formAddress').value = address;
+      document.getElementById('formLat').value = lat.toFixed(3);
+      document.getElementById('formLng').value = lng.toFixed(3);
+      document.getElementById('searchResults').style.display = 'none';
+    }
+
+    // 测试 API Key
+    function testApiKey() {
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const callbackName = 'testcb_' + Date.now();
+      console.log('[TEST] 开始测试 API Key');
+      window[callbackName] = function(data) {
+        console.log('[TEST] 返回:', data);
+        delete window[callbackName];
+        document.getElementById('s_' + callbackName)?.remove();
+        if (data.status === 0) {
+          alert('API Key 有效！返回 ' + (data.data?.length || 0) + ' 条结果');
+        } else {
+          alert('API Key 无效：' + data.message);
+        }
+      };
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = `https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=${KEY}&callback=${callbackName}`;
+      script.onerror = () => { delete window[callbackName]; script.remove(); alert('网络请求失败'); };
+      document.body.appendChild(script);
+      console.log('[TEST] 脚本已添加');
+    }
   </script>
+  </div> <!-- 结束 main-content -->
 </body>
 </html>

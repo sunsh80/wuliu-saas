@@ -35,10 +35,34 @@
       color: white;
       padding: 20px 0;
       z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
       margin-top: 60px;
+    }
+
+    /* 自定义滚动条样式 */
+    .sidebar-nav::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .nav-item {
@@ -410,8 +434,8 @@
       <a href="./map.html" class="nav-item"><i class="fas fa-map-marked-alt"></i> 地图服务</a>
       <a href="./profile.html" class="nav-item"><i class="fas fa-user"></i> 个人资料</a>
       <a href="./violations.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> 违规处理</a>
-      
-      <div class="nav-item has-submenu">
+
+      <div class="nav-item has-submenu open">
         <div class="submenu-toggle">
           <span><i class="fas fa-yen-sign"></i> 财务管理</span>
           <i class="fas fa-chevron-down submenu-arrow"></i>
@@ -544,20 +568,25 @@
             </select>
           </div>
         </div>
-        <div class="form-item">
+        <div class="form-item" style="position: relative;">
           <label>地址 *</label>
-          <input type="text" id="formAddress" required>
+          <input type="text" id="formAddress" required placeholder="输入关键词模糊搜索地址">
+          <div style="margin-top: 5px;">
+            <button type="button" onclick="getCoordsFromAddress()" style="padding: 4px 10px; font-size: 12px; margin-right: 5px;">根据地址获取坐标</button>
+            <button type="button" onclick="testApiKey()" style="padding: 4px 10px; font-size: 12px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">测试 API</button>
+          </div>
+          <div id="searchResults" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:9999; background:white; border:1px solid #d9d9d9; border-radius:4px; max-height:250px; overflow-y:auto; box-shadow:0 2px 8px rgba(0,0,0,0.15);"></div>
         </div>
         <div class="form-row">
           <div class="form-item">
             <label>纬度 *</label>
-            <input type="number" step="0.000001" id="formLat" required>
-            <div class="help-text">范围：-90 ~ 90</div>
+            <input type="number" step="0.001" id="formLat" required>
+            <div class="help-text">范围：-90 ~ 90（保留 3 位小数即可）</div>
           </div>
           <div class="form-item">
             <label>经度 *</label>
-            <input type="number" step="0.000001" id="formLng" required>
-            <div class="help-text">范围：-180 ~ 180</div>
+            <input type="number" step="0.001" id="formLng" required>
+            <div class="help-text">范围：-180 ~ 180（保留 3 位小数即可）</div>
           </div>
         </div>
         <div class="form-row">
@@ -924,7 +953,145 @@
       checkLoginStatus();
       loadStats();
       loadStopPoints();
+      initAddressSearch();
     });
+
+    // 初始化地址搜索
+    function initAddressSearch() {
+      const input = document.getElementById('formAddress');
+      const panel = document.getElementById('searchResults');
+      console.log('[INIT] input:', input, 'panel:', panel);
+      if (!input || !panel) {
+        console.error('[INIT] 元素不存在!');
+        return;
+      }
+      console.log('[INIT] 地址搜索初始化成功');
+
+      let timer;
+      input.addEventListener('input', () => {
+        const keyword = input.value.trim();
+        console.log('[INPUT] 输入:', keyword);
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          console.log('[SEARCH] 开始搜索:', keyword);
+          if (keyword) searchPlaces(keyword, panel);
+          else panel.style.display = 'none';
+        }, 300);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#formAddress') && !e.target.closest('#searchResults')) {
+          panel.style.display = 'none';
+        }
+      });
+    }
+
+    // 根据地址获取坐标
+    function getCoordsFromAddress() {
+      const address = document.getElementById('formAddress').value.trim();
+      console.log('[GEO] 地址:', address);
+      if (!address) { alert('请先输入地址'); return; }
+      jsonpRequest('geocoder', address);
+    }
+
+    // 模糊搜索
+    function searchPlaces(keyword, panel) {
+      console.log('[SEARCH] searchPlaces 调用:', keyword);
+      jsonpRequest('search', keyword, panel);
+    }
+
+    // JSONP 请求
+    function jsonpRequest(type, keyword, panel) {
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const callbackName = 'cb_' + Date.now();
+      const urls = {
+        geocoder: 'https://apis.map.qq.com/ws/geocoder/v1/',
+        search: 'https://apis.map.qq.com/ws/place/v1/suggestion/'
+      };
+      const fullUrl = `${urls[type]}?${type === 'geocoder' ? 'address=' : 'keyword='}${encodeURIComponent(keyword)}&key=${KEY}&callback=${callbackName}`;
+      console.log('[JSONP] URL:', fullUrl);
+
+      window[callbackName] = function(data) {
+        console.log('[JSONP] 回调数据:', data);
+        delete window[callbackName];
+        const script = document.getElementById('s_' + callbackName);
+        if (script) script.remove();
+
+        if (type === 'geocoder') {
+          if (data.status === 0 && data.result?.location) {
+            document.getElementById('formLat').value = data.result.location.lat.toFixed(3);
+            document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
+            alert('坐标已自动填充！');
+          } else {
+            alert('未找到该地址：' + (data.message || ''));
+          }
+        } else if (type === 'search' && panel) {
+          if (data.status === 0 && data.data && data.data.length > 0) {
+            let html = '';
+            data.data.forEach(item => {
+              const addr = (item.address || item.title).replace(/'/g, "\\'");
+              const title = item.title.replace(/'/g, "\\'");
+              const lat = item.location.lat;
+              const lng = item.location.lng;
+              html += `<div onclick="fillAddress('${addr}', ${lat}, ${lng})" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;">` +
+                `<strong>${title}</strong><br><small style="color:#666;">${item.address || ''}</small></div>`;
+            });
+            panel.innerHTML = html;
+            panel.style.display = 'block';
+            console.log('[SEARCH] 显示', data.data.length, '条结果');
+          } else {
+            panel.style.display = 'none';
+            console.log('[SEARCH] 无结果，status:', data.status);
+          }
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = fullUrl;
+      script.onerror = () => { 
+        console.error('[JSONP] 加载失败'); 
+        console.error('[JSONP] 可能原因：1.网络不通 2.API Key 配额用完 3.防火墙拦截');
+        console.error('[JSONP] 请在浏览器直接测试：https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ');
+        delete window[callbackName]; 
+        script.remove(); 
+      };
+      script.onload = () => { console.log('[JSONP] 脚本加载成功'); };
+      document.body.appendChild(script);
+      console.log('[JSONP] 脚本已添加');
+    }
+
+    // 填充地址
+    function fillAddress(address, lat, lng) {
+      console.log('[FILL] 填充地址:', address, lat, lng);
+      document.getElementById('formAddress').value = address;
+      document.getElementById('formLat').value = lat.toFixed(3);
+      document.getElementById('formLng').value = lng.toFixed(3);
+      document.getElementById('searchResults').style.display = 'none';
+    }
+
+    // 测试 API Key
+    function testApiKey() {
+      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const callbackName = 'testcb_' + Date.now();
+      console.log('[TEST] 开始测试 API Key');
+      window[callbackName] = function(data) {
+        console.log('[TEST] 返回:', data);
+        delete window[callbackName];
+        document.getElementById('s_' + callbackName)?.remove();
+        if (data.status === 0) {
+          alert('API Key 有效！返回 ' + (data.data?.length || 0) + ' 条结果');
+        } else {
+          alert('API Key 无效：' + data.message);
+        }
+      };
+      const script = document.createElement('script');
+      script.id = 's_' + callbackName;
+      script.src = `https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=${KEY}&callback=${callbackName}`;
+      script.onerror = () => { delete window[callbackName]; script.remove(); alert('网络请求失败'); };
+      document.body.appendChild(script);
+      console.log('[TEST] 脚本已添加');
+    }
   </script>
 </body>
 </html>
