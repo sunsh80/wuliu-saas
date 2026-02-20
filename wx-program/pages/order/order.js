@@ -40,12 +40,9 @@ Page({
 
     // 其他
     remark: '',
-    
+
     // 新增：已审批停靠点列表
     approvedStopPoints: [],
-    
-    // 新增：地址选择模式提示
-    addressSelectionMode: '', // 'restricted' 限制模式 | 'free' 自由模式
   },
 
   onLoad() {
@@ -56,26 +53,24 @@ Page({
   },
 
   // 加载已审批停靠点
-  async loadApprovedStopPoints() {
-    try {
-      const token = wx.getStorageSync('token');
-      const res = await wx.request({
-        url: 'http://192.168.2.250:3000/api/map/stop-points?approval_status=approved&limit=100',
-        method: 'GET',
-        header: {
-          'Authorization': `Bearer ${token}`
+  loadApprovedStopPoints() {
+    const token = wx.getStorageSync('token');
+    wx.request({
+      url: 'http://192.168.2.250:3000/api/map/stop-points?limit=100',
+      method: 'GET',
+      header: {
+        'Authorization': `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data && res.data.success) {
+          this.setData({
+            approvedStopPoints: res.data.data || []
+          });
+          console.log('✅ 已加载停靠点数量:', this.data.approvedStopPoints.length);
         }
-      });
-      
-      if (res.statusCode === 200 && res.data.success) {
-        this.setData({
-          approvedStopPoints: res.data.data || []
-        });
-        console.log('已加载停靠点数量:', this.data.approvedStopPoints.length);
       }
-    } catch (err) {
-      console.error('加载停靠点失败:', err);
-    }
+    });
   },
 
   // 货物类型选择
@@ -224,16 +219,16 @@ Page({
 
   // 地图选点 - 发货
   selectDepartureLocation() {
+    console.log('🗺️ 点击发货选点按钮');
     const vehicleType = this.data.selectedVehicleType;
-    
+    console.log('🗺️ 当前车型:', vehicleType);
+    console.log('🗺️ 停靠点数量:', this.data.approvedStopPoints.length);
+
     if (vehicleType === '无人车') {
-      // 无人车：仅能从停靠点列表选择
       this.showStopPointSelector('departure');
     } else if (vehicleType === '有人车') {
-      // 有人车：自由选择
       this.openMapSelector('departure');
     } else {
-      // 混合车型：显示选择对话框
       wx.showActionSheet({
         itemList: ['从停靠点列表选择', '地图自由选点'],
         success: (res) => {
@@ -250,7 +245,7 @@ Page({
   // 地图选点 - 收货
   selectDestinationLocation() {
     const vehicleType = this.data.selectedVehicleType;
-    
+
     if (vehicleType === '无人车') {
       this.showStopPointSelector('destination');
     } else if (vehicleType === '有人车') {
@@ -269,11 +264,14 @@ Page({
     }
   },
 
-  // 显示停靠点选择器
+  // 显示停靠点选择器（使用 wx.showActionSheet，最多 6 个选项）
   showStopPointSelector(type) {
+    console.log('📍 showStopPointSelector 被调用，type:', type);
     const stopPoints = this.data.approvedStopPoints;
-    
+    console.log('📍 停靠点列表:', stopPoints);
+
     if (stopPoints.length === 0) {
+      console.warn('📍 无可用停靠点');
       wx.showToast({
         title: '暂无可用停靠点',
         icon: 'none'
@@ -281,21 +279,61 @@ Page({
       return;
     }
 
-    const itemList = stopPoints.map(point => point.name || point.address);
+    // wx.showActionSheet 最多支持 6 个选项，需要分批显示
+    const MAX_ITEMS = 6;
+    const total = stopPoints.length;
     
-    wx.showActionSheet({
-      itemList: itemList,
-      success: (res) => {
-        const selectedPoint = stopPoints[res.tapIndex];
-        this.setData({
-          [`${type}Address`]: selectedPoint.address,
-          [`${type}Lat`]: selectedPoint.lat,
-          [`${type}Lng`]: selectedPoint.lng
-        });
-        
-        console.log(`选择${type}停靠点:`, selectedPoint);
+    // 如果超过 6 个，显示分组选择
+    if (total > MAX_ITEMS) {
+      const groups = Math.ceil(total / MAX_ITEMS);
+      const groupItems = [];
+      for (let i = 0; i < groups; i++) {
+        const start = i * MAX_ITEMS;
+        const end = Math.min(start + MAX_ITEMS, total);
+        const firstPoint = stopPoints[start];
+        const lastPoint = stopPoints[end - 1];
+        groupItems.push(`第${i + 1}组 (${start + 1}-${end}): ${firstPoint.name}...${lastPoint.name}`);
       }
+      
+      wx.showActionSheet({
+        itemList: groupItems,
+        success: (res) => {
+          const groupIndex = res.tapIndex;
+          const start = groupIndex * MAX_ITEMS;
+          const end = Math.min(start + MAX_ITEMS, total);
+          const subList = stopPoints.slice(start, end).map(p => p.name || p.address);
+          
+          wx.showActionSheet({
+            itemList: subList,
+            success: (res2) => {
+              const selectedPoint = stopPoints[start + res2.tapIndex];
+              this.selectStopPoint(type, selectedPoint);
+            }
+          });
+        }
+      });
+    } else {
+      // 不超过 6 个，直接显示
+      const itemList = stopPoints.map(point => point.name || point.address);
+      wx.showActionSheet({
+        itemList: itemList,
+        success: (res) => {
+          const selectedPoint = stopPoints[res.tapIndex];
+          this.selectStopPoint(type, selectedPoint);
+        }
+      });
+    }
+  },
+
+  // 选择停靠点
+  selectStopPoint(type, point) {
+    console.log('📍 用户选择了停靠点:', point.name);
+    this.setData({
+      [`${type}Address`]: point.address,
+      [`${type}Lat`]: point.lat,
+      [`${type}Lng`]: point.lng
     });
+    console.log('📍 已设置地址:', point.address);
   },
 
   // 打开地图选点器
@@ -539,6 +577,7 @@ Page({
     wx.request({
       url: 'http://192.168.2.250:3000/api/customer/orders',
       method: 'POST',
+      withCredentials: true, // 这会让请求自动带上之前保存的 Cookie (connect.sid)
       header: headers,
       data: orderData,
       success: (res) => {

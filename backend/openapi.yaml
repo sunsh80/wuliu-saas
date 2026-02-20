@@ -6269,7 +6269,7 @@ paths:
   # 新增的第三方地图服务API
   /api/map/geocode:
     get:
-      operationId: mapGeocode
+      operationId: geocode
       summary: 地理编码
       description: 将地址转换为坐标
       tags:
@@ -6319,7 +6319,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/reverse-geocode:
     get:
-      operationId: mapReverseGeocode
+      operationId: reverseGeocode
       summary: 逆地理编码
       description: 将坐标转换为地址
       tags:
@@ -6369,7 +6369,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/route:
     get:
-      operationId: mapRoute
+      operationId: route
       summary: 路径规划
       description: 获取两点间的路线规划（备用基础路线）
       tags:
@@ -6439,7 +6439,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/distance:
     get:
-      operationId: mapDistance
+      operationId: distance
       summary: 距离计算
       description: 计算两点间的距离
       tags:
@@ -6507,7 +6507,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/poi:
     get:
-      operationId: mapPoi
+      operationId: poi
       summary: POI搜索
       description: 搜索附近的兴趣点
       tags:
@@ -6587,7 +6587,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/map/stop-points:
     get:
-      operationId: mapStopPoints
+      operationId: stopPoints
       summary: 停靠点列表
       description: 获取停靠点列表
       tags:
@@ -6875,7 +6875,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/position-update:
     post:
-      operationId: trackingPositionUpdate
+      operationId: positionUpdate
       summary: 车辆位置更新
       description: 接收车辆实时位置信息（供第三方回调）
       tags:
@@ -6947,7 +6947,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/current-position/{vehicleId}:
     get:
-      operationId: trackingCurrentPosition
+      operationId: currentPosition
       summary: 获取车辆当前位置
       description: 获取指定车辆的当前位置和状态
       tags:
@@ -6988,7 +6988,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/history/{vehicleId}:
     get:
-      operationId: trackingHistory
+      operationId: history
       summary: 获取车辆历史轨迹
       description: 获取指定车辆的历史轨迹
       tags:
@@ -7045,7 +7045,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /api/tracking/online-status/{vehicleId}:
     get:
-      operationId: trackingOnlineStatus
+      operationId: onlineStatus
       summary: 获取车辆在线状态
       description: 获取指定车辆的在线状态
       tags:

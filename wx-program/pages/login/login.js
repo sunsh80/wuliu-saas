@@ -71,10 +71,13 @@ console.log('【Debug】Response Cookies:', res.cookies);
           // === 1. 存储通用登录状态 ===
           wx.setStorageSync('isLoggedIn', true);
 
-          // === 2. 存储 Token（如果后端返回）===
-          if (res.data.token) {
-            wx.setStorageSync('token', res.data.token);
-            console.log('res.data.token:', res.data.token);
+          // === 2. 存储 Token（后端返回结构：res.data.data.token）===
+          const token = res.data.data?.token || res.data.token;
+          if (token) {
+            wx.setStorageSync('token', token);
+            console.log('✅ token 已保存:', token.substring(0, 20) + '...');
+          } else {
+            console.error('❌ 未找到 token！res.data:', res.data);
           }
 
           // === 3. 存储用户信息 ===

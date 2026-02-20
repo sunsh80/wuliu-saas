@@ -3,9 +3,9 @@ const { getDb } = require('../../../db/index');
 
 module.exports = async (c) => {
   console.log('🔍 [Map API] Stop Points handler called');
-  
+
   try {
-    const { region, type, limit = 50 } = c.request.query;
+    const { region, type, approval_status, limit = 50 } = c.request.query;
 
     let query = 'SELECT * FROM stop_points WHERE 1=1';
     const params = [];
@@ -18,29 +18,35 @@ module.exports = async (c) => {
       query += ' AND type = ?';
       params.push(type);
     }
+    if (approval_status) {
+      query += ' AND approval_status = ?';
+      params.push(approval_status);
+    }
 
     query += ' AND status = \'active\' ORDER BY id LIMIT ?';
     params.push(parseInt(limit));
 
     const db = getDb();
     const stopPoints = await db.all(query, params);
-    
-    return { 
-      status: 200, 
-      body: { 
-        success: true, 
-        data: stopPoints 
-      } 
+
+    console.log('🔍 [Map API] Stop Points query:', query, 'params:', params, 'result count:', stopPoints.length);
+
+    return {
+      status: 200,
+      body: {
+        success: true,
+        data: stopPoints
+      }
     };
   } catch (error) {
     console.error('❌ [Map API] Stop Points error:', error);
-    return { 
-      status: 500, 
-      body: { 
-        success: false, 
+    return {
+      status: 500,
+      body: {
+        success: false,
         error: 'STOP_POINTS_FETCH_FAILED',
-        message: error.message 
-      } 
+        message: error.message
+      }
     };
   }
 };
