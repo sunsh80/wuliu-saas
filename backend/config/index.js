@@ -33,7 +33,7 @@ module.exports = {
 
   openapi: {
     definition: './openapi.yaml',
-    strict: false,  // 禁用严格模式，允许未定义的 handler
+    strict: true,  // 启用严格模式，要求所有端点必须在 openapi.yaml 中定义
     validate: true,
   },
 
