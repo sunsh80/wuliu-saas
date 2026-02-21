@@ -3469,7 +3469,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
   /api/admin/stop-points/{id}/approve:
-    put:
+    post:
       operationId: adminApproveStopPoint
       summary: 审批停靠点
       description: 管理员审批停靠点申请
@@ -3482,17 +3482,20 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [approve]
+              required: [approved]
               properties:
-                approve:
+                approved:
                   type: boolean
+                rejectionReason:
+                  type: string
+                  nullable: true
       responses:
         '200':
           description: 审批成功

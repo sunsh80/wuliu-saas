@@ -24,7 +24,13 @@ class OpenApiMiddleware {
 
   async initialize(securityHandler) {
     this.api.register('notFound', (c) => ({ status: 404, body: { message: 'API_NOT_FOUND' } }));
-    this.api.register('validationFail', (c) => ({ status: 400, body: { message: 'Bad Request', errors: c.validation.errors } }));
+    this.api.register('validationFail', (c) => {
+      console.error('❌ [OpenAPI 验证失败]:', c.operation?.operationId);
+      console.error('  → Path:', c.request.path);
+      console.error('  → Method:', c.request.method);
+      console.error('  → Errors:', JSON.stringify(c.validation.errors, null, 2));
+      return { status: 400, body: { message: 'Bad Request', errors: c.validation.errors } };
+    });
 
     autoRegisterHandlers(this.api);
     await this.api.init();
@@ -40,6 +46,7 @@ class OpenApiMiddleware {
     }
 
     this.api.registerSecurityHandler('TenantSessionAuth', securityHandler);
+    this.api.registerSecurityHandler('AdminSessionAuth', securityHandler);
 
     console.log('🔧 OpenAPI 中间件初始化完成');
     return this.api;
