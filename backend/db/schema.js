@@ -196,7 +196,37 @@ const CORE_TABLES = {
 
 // 扩展表定义
 const EXTENDED_TABLES = {
-user_sessions: `CREATE TABLE IF NOT EXISTS user_sessions (
+  // --- 系统配置表 ---
+  system_settings: `CREATE TABLE IF NOT EXISTS system_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category TEXT NOT NULL DEFAULT 'general', -- 配置分类：general, map, route, tracking, payment, etc.
+    config_key TEXT NOT NULL UNIQUE, -- 配置键
+    config_value TEXT, -- 配置值（统一存储为文本）
+    config_type TEXT DEFAULT 'string', -- 数据类型：string, number, boolean, json
+    description TEXT, -- 配置描述
+    is_public BOOLEAN DEFAULT 0, -- 是否公开（1=公开，0=私密）
+    is_enabled BOOLEAN DEFAULT 1, -- 是否启用
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`,
+  
+  // --- 服务提供商配置表 ---
+  service_providers: `CREATE TABLE IF NOT EXISTS service_providers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    provider_name TEXT NOT NULL, -- 提供商名称：TencentMap, BaiduMap, AutoXAVRoute, etc.
+    provider_type TEXT NOT NULL, -- 服务类型：map, route, tracking
+    api_endpoint TEXT, -- API 端点
+    api_key TEXT, -- API 密钥
+    auth_token TEXT, -- 认证令牌
+    is_enabled BOOLEAN DEFAULT 1, -- 是否启用
+    config_json TEXT, -- 额外配置（JSON 格式）
+    priority INTEGER DEFAULT 0, -- 优先级（数字越小优先级越高）
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(provider_name, provider_type)
+  )`,
+  
+  user_sessions: `CREATE TABLE IF NOT EXISTS user_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     session_token TEXT NOT NULL UNIQUE,
@@ -537,6 +567,194 @@ async ensureColumnsExist(db) {
 
       console.log('✅ 默认车型库数据已创建');
     }
+
+    // 初始化系统配置和服务提供商配置
+    await this.initializeDefaultConfig(db);
+  }
+
+  async initializeDefaultConfig(db) {
+    // 检查是否已初始化配置
+    const configCount = await db.get('SELECT COUNT(*) as total FROM system_settings');
+    if (configCount.total > 0) {
+      return; // 已初始化，跳过
+    }
+
+    console.log('🔧 开始初始化默认配置...');
+
+    // 系统配置
+    const defaultSettings = [
+      // 地图服务配置
+      {
+        category: 'map',
+        config_key: 'map.defaultProvider',
+        config_value: 'TencentMap',
+        config_type: 'string',
+        description: '默认地图服务提供商',
+        is_public: 1,
+        is_enabled: 1
+      },
+      {
+        category: 'map',
+        config_key: 'map.geocodeCacheEnabled',
+        config_value: 'true',
+        config_type: 'boolean',
+        description: '地理编码缓存开关',
+        is_public: 0,
+        is_enabled: 1
+      },
+      {
+        category: 'map',
+        config_key: 'map.geocodeCacheTTL',
+        config_value: '86400',
+        config_type: 'number',
+        description: '地理编码缓存时间（秒）',
+        is_public: 0,
+        is_enabled: 1
+      },
+      // 路径规划配置
+      {
+        category: 'route',
+        config_key: 'route.defaultProvider',
+        config_value: 'AutoXAVRoute',
+        config_type: 'string',
+        description: '默认路径规划服务提供商',
+        is_public: 1,
+        is_enabled: 1
+      },
+      {
+        category: 'route',
+        config_key: 'route.cacheEnabled',
+        config_value: 'true',
+        config_type: 'boolean',
+        description: '路径规划缓存开关',
+        is_public: 0,
+        is_enabled: 1
+      },
+      // 车辆跟踪配置
+      {
+        category: 'tracking',
+        config_key: 'tracking.defaultProvider',
+        config_value: 'VehicleCompanyTracking',
+        config_type: 'string',
+        description: '默认车辆跟踪服务提供商',
+        is_public: 1,
+        is_enabled: 1
+      },
+      {
+        category: 'tracking',
+        config_key: 'tracking.retentionDays',
+        config_value: '30',
+        config_type: 'number',
+        description: '位置数据保留天数',
+        is_public: 0,
+        is_enabled: 1
+      },
+      // 系统配置
+      {
+        category: 'system',
+        config_key: 'system.name',
+        config_value: '数孪智运无人物流 SaaS 平台',
+        config_type: 'string',
+        description: '系统名称',
+        is_public: 1,
+        is_enabled: 1
+      },
+      {
+        category: 'system',
+        config_key: 'system.version',
+        config_value: '1.0.0',
+        config_type: 'string',
+        description: '系统版本',
+        is_public: 1,
+        is_enabled: 1
+      }
+    ];
+
+    // 插入系统配置
+    for (const setting of defaultSettings) {
+      await db.run(
+        `INSERT INTO system_settings (
+          category, config_key, config_value, config_type, description, is_public, is_enabled,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+        [
+          setting.category,
+          setting.config_key,
+          setting.config_value,
+          setting.config_type,
+          setting.description,
+          setting.is_public ? 1 : 0,
+          setting.is_enabled ? 1 : 0
+        ]
+      );
+    }
+
+    // 服务提供商配置
+    const defaultProviders = [
+      {
+        provider_name: 'TencentMap',
+        provider_type: 'map',
+        api_endpoint: 'https://apis.map.qq.com/ws',
+        api_key: '', // 留空，需要手动配置
+        auth_token: null,
+        is_enabled: 1,
+        config_json: null,
+        priority: 1
+      },
+      {
+        provider_name: 'BaiduMap',
+        provider_type: 'map',
+        api_endpoint: 'https://api.map.baidu.com',
+        api_key: '', // 留空，需要手动配置
+        auth_token: null,
+        is_enabled: 0, // 默认禁用
+        config_json: null,
+        priority: 2
+      },
+      {
+        provider_name: 'AutoXAVRoute',
+        provider_type: 'route',
+        api_endpoint: 'https://api.autox.com',
+        api_key: '', // 留空，需要手动配置
+        auth_token: null,
+        is_enabled: 1,
+        config_json: null,
+        priority: 1
+      },
+      {
+        provider_name: 'VehicleCompanyTracking',
+        provider_type: 'tracking',
+        api_endpoint: 'https://api.vehicle-company.com',
+        api_key: null,
+        auth_token: '', // 留空，需要手动配置
+        is_enabled: 1,
+        config_json: null,
+        priority: 1
+      }
+    ];
+
+    // 插入服务提供商配置
+    for (const provider of defaultProviders) {
+      await db.run(
+        `INSERT INTO service_providers (
+          provider_name, provider_type, api_endpoint, api_key, auth_token,
+          is_enabled, config_json, priority,
+          created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+        [
+          provider.provider_name,
+          provider.provider_type,
+          provider.api_endpoint,
+          provider.api_key,
+          provider.auth_token,
+          provider.is_enabled ? 1 : 0,
+          provider.config_json ? JSON.stringify(provider.config_json) : null,
+          provider.priority
+        ]
+      );
+    }
+
+    console.log('✅ 默认配置已初始化');
   }
 
   getTableDefinition(tableName) {
