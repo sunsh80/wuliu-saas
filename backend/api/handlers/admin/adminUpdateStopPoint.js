@@ -4,8 +4,8 @@ const { getDb } = require('../../../db/index');
 module.exports = async (c) => {
   try {
     const { id } = c.request.params;
-    const body = await c.request.json();
-    const { name, address, lat, lng, type, region, capacity, description, status } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type, region, capacity, description, status } = body || {};
     const db = getDb();
     const existing = await db.get('SELECT * FROM stop_points WHERE id = ?', [id]);
     if (!existing) {

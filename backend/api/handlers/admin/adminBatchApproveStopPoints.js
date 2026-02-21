@@ -4,8 +4,8 @@ const { getDb } = require('../../../db/index');
 module.exports = async (c) => {
   try {
     const userId = c.context?.id;
-    const body = await c.request.json();
-    const { ids, approved, rejectionReason } = body;
+    const body = c.request.body;
+    const { ids, approved, rejectionReason } = body || {};
     if (!userId) { return { status: 401, body: { success: false, error: 'UNAUTHORIZED' } }; }
     if (!Array.isArray(ids) || ids.length === 0) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR' } }; }
     if (!approved && !rejectionReason) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: '驳回原因必填' } }; }

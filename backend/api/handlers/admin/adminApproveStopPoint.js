@@ -5,8 +5,8 @@ module.exports = async (c) => {
   try {
     const { id } = c.request.params;
     const userId = c.context?.id;
-    const body = await c.request.json();
-    const { approved, rejectionReason } = body;
+    const body = c.request.body;
+    const { approved, rejectionReason } = body || {};
     if (!userId) { return { status: 401, body: { success: false, error: 'UNAUTHORIZED' } }; }
     const db = getDb();
     const stopPoint = await db.get('SELECT * FROM stop_points WHERE id = ?', [id]);

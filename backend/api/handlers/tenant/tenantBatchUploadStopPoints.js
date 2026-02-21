@@ -6,8 +6,8 @@ module.exports = async (c) => {
     const tenantId = c.context?.tenantId;
     const userId = c.context?.id;
     if (!tenantId || !userId) { return { status: 401, body: { success: false, error: 'UNAUTHORIZED' } }; }
-    const body = await c.request.json();
-    const { stopPoints } = body;
+    const body = c.request.body;
+    const { stopPoints } = body || {};
     if (!Array.isArray(stopPoints) || stopPoints.length === 0) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR' } }; }
     if (stopPoints.length > 100) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: '单次最多 100 条' } }; }
     const db = getDb();

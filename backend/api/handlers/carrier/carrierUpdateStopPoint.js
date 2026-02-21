@@ -5,11 +5,12 @@ module.exports = async (c) => {
   console.log('🔍 [Carrier API] Update StopPoint handler called');
 
   try {
-    const tenantId = c.session?.tenantId;
-    const userId = c.session?.userId;
+    const tenantId = c.request.session?.tenantId;
+    const userId = c.request.session?.userId;
+    const session = c.session || c.request.session;
     const { id } = c.request.params;
-    const body = await c.request.json();
-    const { name, address, lat, lng, type, region, capacity, description } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type, region, capacity, description } = body || {};
 
     if (!tenantId) {
       return {

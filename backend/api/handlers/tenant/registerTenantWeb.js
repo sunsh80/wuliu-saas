@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 // const jwt = require('jsonwebtoken'); // 如果需要返回 JWT Token
 const { getDb } = require('../../../db/index.js'); // 使用项目提供的数据库获取方法
-const { validatePhone, validateEmail, validatePassword } = require('../../../../validation-rules.js'); // 引入共享验证规则
+const { validatePhone, validateEmail, validatePassword } = require('../../../validation-rules.js'); // 引入共享验证规则
 
 // --- 添加这行调试日志 ---
 console.log("### DEBUG: Loading CORRECTED registerTenantWeb.js - Handling customer vs carrier registration ###");

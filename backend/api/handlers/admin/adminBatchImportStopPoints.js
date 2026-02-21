@@ -3,8 +3,8 @@ const { getDb } = require('../../../db/index');
 
 module.exports = async (c) => {
   try {
-    const body = await c.request.json();
-    const { stopPoints } = body;
+    const body = c.request.body;
+    const { stopPoints } = body || {};
     if (!Array.isArray(stopPoints) || stopPoints.length === 0) {
       return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: 'stopPoints 必须是非空数组' } };
     }

@@ -5,8 +5,8 @@ module.exports = async (c) => {
   try {
     const tenantId = c.context?.tenantId;
     const { id } = c.request.params;
-    const body = await c.request.json();
-    const { name, address, lat, lng, type, region, capacity, description } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type, region, capacity, description } = body || {};
     if (!tenantId) { return { status: 401, body: { success: false, error: 'UNAUTHORIZED' } }; }
     const db = getDb();
     const stopPoint = await db.get('SELECT * FROM stop_points WHERE id = ? AND tenant_id = ?', [id, tenantId]);

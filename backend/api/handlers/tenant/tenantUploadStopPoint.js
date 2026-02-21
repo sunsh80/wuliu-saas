@@ -6,8 +6,8 @@ module.exports = async (c) => {
     const tenantId = c.context?.tenantId;
     const userId = c.context?.id;
     if (!tenantId || !userId) { return { status: 401, body: { success: false, error: 'UNAUTHORIZED' } }; }
-    const body = await c.request.json();
-    const { name, address, lat, lng, type = 'other', region, capacity, description } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type = 'other', region, capacity, description } = body || {};
     if (!name || !address || lat === undefined || lng === undefined) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: '缺少必填字段' } }; }
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) { return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: '坐标超出范围' } }; }
     const db = getDb();

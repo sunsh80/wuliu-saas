@@ -5,7 +5,8 @@ module.exports = async (c) => {
   console.log('🔍 [Carrier API] List StopPoints handler called');
 
   try {
-    const tenantId = c.session?.tenantId;
+    const tenantId = c.request.session?.tenantId;
+    const session = c.session || c.request.session;
 
     if (!tenantId) {
       return {
@@ -22,26 +23,26 @@ module.exports = async (c) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let query = 'SELECT * FROM stop_points WHERE tenant_id = ?';
-    const countQuery = 'SELECT COUNT(*) as total FROM stop_points WHERE tenant_id = ?';
-    const params = [tenantId];
-    const countParams = [tenantId];
+    let countQuery = 'SELECT COUNT(*) as total FROM stop_points WHERE tenant_id = ?';
+    let params = [tenantId];
+    let countParams = [tenantId];
 
     if (status) {
       query += ' AND status = ?';
       countQuery += ' AND status = ?';
-      params.push(status);
-      countParams.push(status);
+      params = params.concat([status]);
+      countParams = countParams.concat([status]);
     }
 
     if (approvalStatus) {
       query += ' AND approval_status = ?';
       countQuery += ' AND approval_status = ?';
-      params.push(approvalStatus);
-      countParams.push(approvalStatus);
+      params = params.concat([approvalStatus]);
+      countParams = countParams.concat([approvalStatus]);
     }
 
     query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), offset);
+    params = params.concat([parseInt(limit), offset]);
 
     const db = getDb();
     const countResult = await db.get(countQuery, countParams);

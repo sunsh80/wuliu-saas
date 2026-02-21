@@ -62,6 +62,15 @@ module.exports = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_for_testing');
             userId = decoded.id;
             console.log(' → 从 JWT Token 解析出 userId:', userId);
+            
+            // ✅ 关键修复：将解析出的用户信息设置到 session 中
+            if (c.request.session) {
+              c.request.session.userId = decoded.id;
+              c.request.session.tenantId = decoded.tenantId;
+              // 同时设置 c.session 别名（兼容现有 handler）
+              c.session = c.request.session;
+              console.log(' → ✅ 已将 userId 和 tenantId 设置到 session');
+            }
           } catch (err) {
             console.log(' → ❌ JWT Token 验证失败:', err.message);
             return [401, { success: false, error: 'UNAUTHORIZED' }];

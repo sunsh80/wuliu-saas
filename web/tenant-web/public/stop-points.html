@@ -418,6 +418,7 @@
         ...options,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tenantToken}`,
           ...options.headers
         }
       });

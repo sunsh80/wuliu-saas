@@ -3,7 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, '..','data', 'mydatabase.db');
+// 使用绝对路径，避免工作目录问题
+const DB_PATH = process.env.DATABASE_PATH || path.resolve(__dirname, '..', 'data', 'mydatabase.db');
 
 // 确保数据库目录存在
 const dbDir = path.dirname(DB_PATH);

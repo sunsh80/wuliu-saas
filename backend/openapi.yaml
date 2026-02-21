@@ -6585,6 +6585,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/map/proxy:
+    get:
+      operationId: mapProxy
+      summary: 腾讯地图 API 代理
+      description: 代理请求到腾讯地图 API，解决前端 CORS/JSONP 问题
+      tags:
+        - 地图服务
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [geocoder, search]
+          description: 代理类型：geocoder(地址解析) 或 search(地点搜索)
+        - name: keyword
+          in: query
+          schema:
+            type: string
+          description: 搜索关键词（search 类型需要）
+        - name: address
+          in: query
+          schema:
+            type: string
+          description: 地址（geocoder 类型需要）
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 腾讯地图 API Key
+      responses:
+        '200':
+          description: 成功返回腾讯地图 API 响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 0
+                  message:
+                    type: string
+                  result:
+                    type: object
+                  data:
+                    type: array
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/map/stop-points:
     get:
       operationId: stopPoints

@@ -3,8 +3,8 @@ const { getDb } = require('../../../db/index');
 
 module.exports = async (c) => {
   try {
-    const body = await c.request.json();
-    const { name, address, lat, lng, type = 'other', region, capacity, description } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type = 'other', region, capacity, description } = body || {};
 
     if (!name || !address || lat === undefined || lng === undefined) {
       return { status: 400, body: { success: false, error: 'VALIDATION_ERROR', message: '缺少必填字段' } };

@@ -3,12 +3,21 @@ const { getDb } = require('../../../db/index');
 
 module.exports = async (c) => {
   console.log('🔍 [Carrier API] Create StopPoint handler called');
+  console.log('   → c.session:', c.session);
+  console.log('   → c.session?.userId:', c.session?.userId);
+  console.log('   → c.session?.tenantId:', c.session?.tenantId);
+  console.log('   → c.request.session:', c.request.session);
+  console.log('   → c.request.session?.userId:', c.request.session?.userId);
+  console.log('   → c.request.session?.tenantId:', c.request.session?.tenantId);
 
   try {
-    const tenantId = c.session?.tenantId;
-    const userId = c.session?.userId;
+    const tenantId = c.request.session?.tenantId;
+    const userId = c.request.session?.userId;
+    const session = c.session || c.request.session;
 
     if (!tenantId) {
+      console.log('   ❌ tenantId 为空，拒绝请求');
+      console.log('   → session.tenantId:', session?.tenantId);
       return {
         status: 401,
         body: {
@@ -19,8 +28,8 @@ module.exports = async (c) => {
       };
     }
 
-    const body = await c.request.json();
-    const { name, address, lat, lng, type = 'other', region, capacity, description } = body;
+    const body = c.request.body;
+    const { name, address, lat, lng, type = 'other', region, capacity, description } = body || {};
 
     if (!name || !address || lat === undefined || lng === undefined) {
       return {
@@ -45,13 +54,18 @@ module.exports = async (c) => {
     }
 
     const db = getDb();
+    console.log('   📝 准备插入数据:', { name, address, lat, lng, tenantId: session.tenantId, userId: session.userId });
+    
     const result = await db.run(
-      `INSERT INTO stop_points (name, address, lat, lng, type, region, capacity, description, status, tenant_id, uploaded_by, upload_source, approval_status) 
+      `INSERT INTO stop_points (name, address, lat, lng, type, region, capacity, description, status, tenant_id, uploaded_by, upload_source, approval_status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inactive', ?, ?, 'carrier', 'pending')`,
-      [name, address, parseFloat(lat), parseFloat(lng), type || 'other', region || '', capacity || 1, description || '', tenantId, userId]
+      [name, address, parseFloat(lat), parseFloat(lng), type || 'other', region || '', capacity || 1, description || '', session.tenantId, session.userId]
     );
+    
+    console.log('   ✅ 插入成功，lastID:', result.lastID);
 
     const newStopPoint = await db.get('SELECT * FROM stop_points WHERE id = ?', [result.lastID]);
+    console.log('   📦 插入的数据:', newStopPoint);
 
     return {
       status: 201,

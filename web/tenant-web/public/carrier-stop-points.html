@@ -1000,17 +1000,20 @@
       jsonpRequest('search', keyword, panel);
     }
 
-    // JSONP 请求
+    // JSONP 请求（带 fetch 备用方案）
     function jsonpRequest(type, keyword, panel) {
-      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const KEY = 'SRFBZ-3GHEW-ANLRG-YZODQ-LWDXQ-PXFS6';
       const callbackName = 'cb_' + Date.now();
       const urls = {
         geocoder: 'https://apis.map.qq.com/ws/geocoder/v1/',
         search: 'https://apis.map.qq.com/ws/place/v1/suggestion/'
       };
-      const fullUrl = `${urls[type]}?${type === 'geocoder' ? 'address=' : 'keyword='}${encodeURIComponent(keyword)}&key=${KEY}&callback=${callbackName}`;
+      const baseUrl = urls[type];
+      const param = type === 'geocoder' ? 'address=' : 'keyword=';
+      const fullUrl = `${baseUrl}?${param}${encodeURIComponent(keyword)}&key=${KEY}&callback=${callbackName}`;
       console.log('[JSONP] URL:', fullUrl);
 
+      // 回调函数
       window[callbackName] = function(data) {
         console.log('[JSONP] 回调数据:', data);
         delete window[callbackName];
@@ -1023,7 +1026,7 @@
             document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
             alert('坐标已自动填充！');
           } else {
-            alert('未找到该地址：' + (data.message || ''));
+            alert('未找到该地址：' + (data.message || '未知错误'));
           }
         } else if (type === 'search' && panel) {
           if (data.status === 0 && data.data && data.data.length > 0) {
@@ -1046,19 +1049,153 @@
         }
       };
 
+      // 尝试 JSONP 方式
       const script = document.createElement('script');
       script.id = 's_' + callbackName;
       script.src = fullUrl;
-      script.onerror = () => { 
-        console.error('[JSONP] 加载失败'); 
-        console.error('[JSONP] 可能原因：1.网络不通 2.API Key 配额用完 3.防火墙拦截');
-        console.error('[JSONP] 请在浏览器直接测试：https://apis.map.qq.com/ws/place/v1/suggestion/?keyword=北京&key=C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ');
-        delete window[callbackName]; 
-        script.remove(); 
+      script.onerror = () => {
+        console.error('[JSONP] 加载失败，尝试使用 fetch 备用方案...');
+        delete window[callbackName];
+        script.remove();
+        // 备用方案：使用后端代理
+        fetchWithProxy(type, keyword, panel, baseUrl, param, KEY);
       };
       script.onload = () => { console.log('[JSONP] 脚本加载成功'); };
       document.body.appendChild(script);
       console.log('[JSONP] 脚本已添加');
+    }
+
+    // 备用方案：通过后端代理请求（避免 CORS 问题）+ 请求节流和缓存
+    let lastRequestTime = 0;
+    const MIN_REQUEST_INTERVAL = 200; // 最小请求间隔 200ms
+    
+    // 前端缓存：存储最近请求的结果（5 分钟内）
+    const frontendCache = new Map();
+    const CACHE_TTL = 5 * 60 * 1000; // 5 分钟
+    
+    // 进行中的请求队列，避免重复请求相同关键词
+    const pendingRequests = new Map();
+
+    function getCacheKey(type, keyword) {
+      return `${type}:${keyword}`;
+    }
+
+    function isValidCache(cached) {
+      if (!cached) return false;
+      return Date.now() - cached.timestamp < CACHE_TTL;
+    }
+
+    function fetchWithProxy(type, keyword, panel, baseUrl, param, key) {
+      const cacheKey = getCacheKey(type, keyword);
+      
+      // 检查前端缓存
+      const cached = frontendCache.get(cacheKey);
+      if (isValidCache(cached)) {
+        console.log('[PROXY] ✅ 使用前端缓存:', cacheKey);
+        handleProxyResponse(type, cached.data, panel);
+        return;
+      }
+      
+      // 检查是否有进行中的相同请求
+      if (pendingRequests.has(cacheKey)) {
+        console.log('[PROXY] ⏳ 等待进行中的请求:', cacheKey);
+        pendingRequests.get(cacheKey).then(data => {
+          handleProxyResponse(type, data, panel);
+        }).catch(err => {
+          console.error('[PROXY] 等待的请求失败:', err);
+          alert('地图服务请求失败，请重试');
+        });
+        return;
+      }
+      
+      // 节流检查
+      const now = Date.now();
+      const timeSinceLastRequest = now - lastRequestTime;
+
+      if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+        console.log('[PROXY] 请求过于频繁，延迟发送...');
+        setTimeout(() => {
+          fetchWithProxy(type, keyword, panel, baseUrl, param, key);
+        }, MIN_REQUEST_INTERVAL - timeSinceLastRequest);
+        return;
+      }
+      lastRequestTime = now;
+
+      // 创建请求 Promise
+      const requestPromise = fetch(`${API_BASE}/map/proxy?type=${type}&${param}${encodeURIComponent(keyword)}&key=${key}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log('[PROXY] 返回数据:', data);
+          
+          // 检查腾讯地图返回的错误
+          if (data.status === 120) {
+            console.warn('[PROXY] QPS 超限，等待后重试...');
+            // QPS 超限不缓存错误结果
+            throw new Error('QPS_LIMIT_EXCEEDED');
+          }
+          
+          // 成功响应才缓存
+          if (data.status === 0) {
+            frontendCache.set(cacheKey, { data, timestamp: Date.now() });
+            console.log('[PROXY] 💾 已缓存结果:', cacheKey);
+          }
+          
+          return data;
+        })
+        .catch(err => {
+          console.error('[PROXY] 请求失败:', err);
+          throw err;
+        })
+        .finally(() => {
+          // 请求完成后移除 pending 状态
+          pendingRequests.delete(cacheKey);
+        });
+      
+      // 存储进行中的请求
+      pendingRequests.set(cacheKey, requestPromise);
+      
+      requestPromise
+        .then(data => handleProxyResponse(type, data, panel))
+        .catch(err => {
+          if (err.message !== 'QPS_LIMIT_EXCEEDED') {
+            alert('地图服务请求失败，请检查网络连接或稍后重试');
+          } else {
+            // QPS 超限时显示友好提示
+            panel.innerHTML = '<div style="padding:8px;color:#f59e0b;">请求过于频繁，请稍后重试</div>';
+            panel.style.display = 'block';
+          }
+        });
+    }
+    
+    // 处理代理响应的统一函数
+    function handleProxyResponse(type, data, panel) {
+      if (type === 'geocoder') {
+        if (data.status === 0 && data.result?.location) {
+          document.getElementById('formLat').value = data.result.location.lat.toFixed(3);
+          document.getElementById('formLng').value = data.result.location.lng.toFixed(3);
+          alert('坐标已自动填充！');
+        } else {
+          alert('未找到该地址：' + (data.message || '未知错误'));
+        }
+      } else if (type === 'search' && panel) {
+        if (data.status === 0 && data.data && data.data.length > 0) {
+          let html = '';
+          data.data.forEach(item => {
+            const addr = (item.address || item.title).replace(/'/g, "\\'");
+            const title = item.title.replace(/'/g, "\\'");
+            const lat = item.location.lat;
+            const lng = item.location.lng;
+            html += `<div onclick="fillAddress('${addr}', ${lat}, ${lng})" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;">` +
+              `<strong>${title}</strong><br><small style="color:#666;">${item.address || ''}</small></div>`;
+          });
+          panel.innerHTML = html;
+          panel.style.display = 'block';
+          console.log('[PROXY] 显示', data.data.length, '条结果');
+        } else {
+          panel.style.display = 'none';
+          console.log('[PROXY] 无结果，status:', data.status);
+        }
+      }
     }
 
     // 填充地址
@@ -1072,7 +1209,7 @@
 
     // 测试 API Key
     function testApiKey() {
-      const KEY = 'C66BZ-TKWWW-MWJR2-Y4BT5-5IQXJ-2EBBJ';
+      const KEY = 'SRFBZ-3GHEW-ANLRG-YZODQ-LWDXQ-PXFS6';
       const callbackName = 'testcb_' + Date.now();
       console.log('[TEST] 开始测试 API Key');
       window[callbackName] = function(data) {
