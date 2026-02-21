@@ -3,12 +3,11 @@ node_modules/
 package-lock.json
 
 # 数据库
-database.db
+# database.db
 
 # 私有配置
 project.private.config.json
 
 # 开发工具
 .vscode/
-*.log"backend/data/mydatabase.db" 
-backend/data/mydatabase.db 
+*.log
