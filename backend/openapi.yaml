@@ -3241,6 +3241,381 @@ paths:
                     example: 租户申请已拒绝
         '404':
           $ref: '#/components/responses/NotFoundError'
+  # 管理员停靠点管理 API
+  /api/admin/stop-points/pending:
+    get:
+      operationId: adminListPendingStopPoints
+      summary: 待审批停靠点列表
+      description: 获取所有待审批的停靠点申请
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: tenantName
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      list:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StopPoint'
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          page:
+                            type: integer
+                          limit:
+                            type: integer
+                          totalPages:
+                            type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/admin/stop-points:
+    get:
+      operationId: adminListStopPoints
+      summary: 管理员停靠点列表
+      description: 获取所有停靠点列表
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      list:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StopPoint'
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          page:
+                            type: integer
+                          limit:
+                            type: integer
+                          totalPages:
+                            type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: adminCreateStopPoint
+      summary: 管理员创建停靠点
+      description: 管理员直接创建停靠点
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, address, lat, lng]
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                lat:
+                  type: number
+                lng:
+                  type: number
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StopPoint'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/stop-points/{id}:
+    put:
+      operationId: adminUpdateStopPoint
+      summary: 管理员更新停靠点
+      description: 管理员修改停靠点信息
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+                lat:
+                  type: number
+                lng:
+                  type: number
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      operationId: adminDeleteStopPoint
+      summary: 管理员删除停靠点
+      description: 管理员删除停靠点
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/admin/stop-points/{id}/approve:
+    put:
+      operationId: adminApproveStopPoint
+      summary: 审批停靠点
+      description: 管理员审批停靠点申请
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [approve]
+              properties:
+                approve:
+                  type: boolean
+      responses:
+        '200':
+          description: 审批成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/admin/stop-points/batch-approve:
+    post:
+      operationId: adminBatchApproveStopPoints
+      summary: 批量审批停靠点
+      description: 管理员批量审批停靠点申请
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids, approve]
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                approve:
+                  type: boolean
+      responses:
+        '200':
+          description: 批量审批成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/stop-points/batch-import:
+    post:
+      operationId: adminBatchImportStopPoints
+      summary: 批量导入停靠点
+      description: 管理员批量导入停靠点
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required: [name, address, lat, lng]
+      responses:
+        '201':
+          description: 批量导入成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StopPoint'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/stop-points/stats:
+    get:
+      operationId: adminStopPointsStats
+      summary: 停靠点统计
+      description: 获取停靠点统计数据
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      pending:
+                        type: integer
+                      approved:
+                        type: integer
+                      rejected:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/admin/orders:
     get:
       tags:
