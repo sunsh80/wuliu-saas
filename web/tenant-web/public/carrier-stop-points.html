@@ -611,6 +611,81 @@
     </div>
   </div>
 
+  <!-- 查看详情弹窗 -->
+  <div class="modal" id="viewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>停靠点详情</h3>
+        <button class="modal-close" onclick="closeViewModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-item">
+            <label>名称</label>
+            <p id="viewName" style="margin: 5px 0; font-weight: 500;">-</p>
+          </div>
+          <div class="form-item">
+            <label>类型</label>
+            <p id="viewType" style="margin: 5px 0;">-</p>
+          </div>
+        </div>
+        <div class="form-item">
+          <label>地址</label>
+          <p id="viewAddress" style="margin: 5px 0;">-</p>
+        </div>
+        <div class="form-row">
+          <div class="form-item">
+            <label>纬度</label>
+            <p id="viewLat" style="margin: 5px 0;">-</p>
+          </div>
+          <div class="form-item">
+            <label>经度</label>
+            <p id="viewLng" style="margin: 5px 0;">-</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-item">
+            <label>区域</label>
+            <p id="viewRegion" style="margin: 5px 0;">-</p>
+          </div>
+          <div class="form-item">
+            <label>容量</label>
+            <p id="viewCapacity" style="margin: 5px 0;">-</p>
+          </div>
+        </div>
+        <div class="form-item">
+          <label>描述</label>
+          <p id="viewDescription" style="margin: 5px 0; white-space: pre-wrap;">-</p>
+        </div>
+        <div class="form-item">
+          <label>状态</label>
+          <p id="viewStatus" style="margin: 5px 0;">-</p>
+        </div>
+        <div class="form-item">
+          <label>审批状态</label>
+          <p id="viewApprovalStatus" style="margin: 5px 0;">-</p>
+        </div>
+        <div class="form-item" id="viewRejectionReasonBox" style="display: none;">
+          <label>驳回原因</label>
+          <p id="viewRejectionReason" style="margin: 5px 0; color: #ff4d4f;">-</p>
+        </div>
+        <div class="form-row">
+          <div class="form-item">
+            <label>创建时间</label>
+            <p id="viewCreatedAt" style="margin: 5px 0;">-</p>
+          </div>
+          <div class="form-item">
+            <label>更新时间</label>
+            <p id="viewUpdatedAt" style="margin: 5px 0;">-</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeViewModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = 'http://localhost:3000/api';
     let currentPage = 1;
@@ -870,9 +945,63 @@
     }
 
     // 查看停靠点
-    function viewStopPoint(id) {
-      alert(`查看停靠点 ${id}`);
-      // 可以实现查看详情逻辑
+    async function viewStopPoint(id) {
+      const token = localStorage.getItem('tenantToken');
+      try {
+        const response = await fetch(`${API_BASE}/carrier/stop-points/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (data.success) {
+          const sp = data.data;
+          document.getElementById('viewName').textContent = sp.name || '-';
+          document.getElementById('viewType').textContent = {
+            'other': '其他',
+            'residential': '住宅区',
+            'commercial': '商业区',
+            'industrial': '工业区'
+          }[sp.type] || '-';
+          document.getElementById('viewAddress').textContent = sp.address || '-';
+          document.getElementById('viewLat').textContent = sp.lat || '-';
+          document.getElementById('viewLng').textContent = sp.lng || '-';
+          document.getElementById('viewRegion').textContent = sp.region || '-';
+          document.getElementById('viewCapacity').textContent = sp.capacity || '-';
+          document.getElementById('viewDescription').textContent = sp.description || '-';
+          document.getElementById('viewStatus').textContent = sp.status === 'active' ? '启用' : '停用';
+          
+          const approvalStatusText = {
+            'pending': '待审批',
+            'approved': '已通过',
+            'rejected': '已驳回'
+          }[sp.approval_status] || '-';
+          document.getElementById('viewApprovalStatus').textContent = approvalStatusText;
+          
+          if (sp.approval_status === 'rejected' && sp.rejection_reason) {
+            document.getElementById('viewRejectionReasonBox').style.display = 'block';
+            document.getElementById('viewRejectionReason').textContent = sp.rejection_reason;
+          } else {
+            document.getElementById('viewRejectionReasonBox').style.display = 'none';
+          }
+          
+          document.getElementById('viewCreatedAt').textContent = sp.created_at || '-';
+          document.getElementById('viewUpdatedAt').textContent = sp.updated_at || '-';
+          
+          document.getElementById('viewModal').classList.add('show');
+        } else {
+          alert('获取停靠点详情失败：' + (data.message || '未知错误'));
+        }
+      } catch (err) {
+        console.error('获取停靠点详情失败:', err);
+        alert('获取失败，请重试');
+      }
+    }
+
+    // 关闭查看弹窗
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.remove('show');
     }
 
     // 编辑停靠点
