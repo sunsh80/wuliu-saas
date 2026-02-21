@@ -3395,6 +3395,36 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
   /api/admin/stop-points/{id}:
+    get:
+      operationId: adminGetStopPoint
+      summary: 管理员获取停靠点详情
+      description: 获取指定停靠点的详细信息
+      tags:
+        - admin-stop-point
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StopPoint'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
     put:
       operationId: adminUpdateStopPoint
       summary: 管理员更新停靠点
