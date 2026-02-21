@@ -513,6 +513,7 @@
         </select>
         <select id="approvalFilter">
           <option value="">全部审批状态</option>
+          <option value="draft">草稿</option>
           <option value="pending">待审批</option>
           <option value="approved">已通过</option>
           <option value="rejected">已驳回</option>
@@ -606,7 +607,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-warning" onclick="closeModal()">取消</button>
-        <button class="btn btn-primary" onclick="submitForm()">保存</button>
+        <button class="btn btn-secondary" onclick="submitForm(false)">保存草稿</button>
+        <button class="btn btn-primary" onclick="submitForm(true)">提交审批</button>
       </div>
     </div>
   </div>
@@ -843,7 +845,11 @@
               <td>${new Date(sp.created_at).toLocaleString('zh-CN')}</td>
               <td>
                 <button class="btn btn-primary btn-sm" onclick="viewStopPoint(${sp.id})">查看</button>
-                ${sp.approval_status === 'pending' || sp.approval_status === 'rejected' ? `
+                ${sp.approval_status === 'draft' ? `
+                  <button class="btn btn-success btn-sm" onclick="submitDraft(${sp.id})">提交审批</button>
+                  <button class="btn btn-warning btn-sm" onclick="editStopPoint(${sp.id})">编辑</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteStopPoint(${sp.id})">删除</button>
+                ` : sp.approval_status === 'pending' || sp.approval_status === 'rejected' ? `
                   <button class="btn btn-warning btn-sm" onclick="editStopPoint(${sp.id})">编辑</button>
                   <button class="btn btn-danger btn-sm" onclick="deleteStopPoint(${sp.id})">删除</button>
                 ` : '-'}
@@ -868,6 +874,7 @@
 
     function getApprovalStatusText(status) {
       const statusMap = {
+        'draft': '草稿',
         'pending': '待审批',
         'approved': '已通过',
         'rejected': '已驳回'
@@ -896,7 +903,8 @@
     }
 
     // 提交表单
-    async function submitForm() {
+    // submitForApproval: true=提交审批，false=保存草稿
+    async function submitForm(submitForApproval = true) {
       const name = document.getElementById('formName').value;
       const address = document.getElementById('formAddress').value;
       const type = document.getElementById('formType').value;
@@ -917,7 +925,17 @@
       }
 
       const token = localStorage.getItem('tenantToken');
-      const body = { name, address, lat: parseFloat(lat), lng: parseFloat(lng), type, region, capacity: parseInt(capacity), description };
+      const body = { 
+        name, 
+        address, 
+        lat: parseFloat(lat), 
+        lng: parseFloat(lng), 
+        type, 
+        region, 
+        capacity: parseInt(capacity), 
+        description,
+        submitForApproval  // 传递给后端
+      };
 
       try {
         const response = await fetch(`${API_BASE}/carrier/stop-points`, {
@@ -931,16 +949,20 @@
 
         const data = await response.json();
         if (data.success) {
-          alert('停靠点已提交，等待审批');
+          if (submitForApproval) {
+            alert('停靠点已提交，等待审批');
+          } else {
+            alert('已保存为草稿，可在草稿箱中查看');
+          }
           closeModal();
           loadStopPoints();
           loadStats();
         } else {
-          alert(`提交失败：${data.message || data.error}`);
+          alert(`保存失败：${data.message || data.error}`);
         }
       } catch (err) {
-        console.error('提交失败:', err);
-        alert('提交失败，请稍后重试');
+        console.error('保存失败:', err);
+        alert('保存失败，请稍后重试');
       }
     }
 
@@ -1002,6 +1024,34 @@
     // 关闭查看弹窗
     function closeViewModal() {
       document.getElementById('viewModal').classList.remove('show');
+    }
+
+    // 提交草稿审批
+    async function submitDraft(id) {
+      const token = localStorage.getItem('tenantToken');
+      if (!confirm('确认提交该草稿进行审批？')) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/carrier/stop-points/${id}/submit`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          alert('已提交审批');
+          loadStopPoints();
+          loadStats();
+        } else {
+          alert(`提交失败：${data.message || data.error}`);
+        }
+      } catch (err) {
+        console.error('提交失败:', err);
+        alert('提交失败，请稍后重试');
+      }
     }
 
     // 编辑停靠点

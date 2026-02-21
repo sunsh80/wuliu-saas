@@ -29,7 +29,7 @@ module.exports = async (c) => {
     }
 
     const body = c.request.body;
-    const { name, address, lat, lng, type = 'other', region, capacity, description } = body || {};
+    const { name, address, lat, lng, type = 'other', region, capacity, description, submitForApproval = true } = body || {};
 
     if (!name || !address || lat === undefined || lng === undefined) {
       return {
@@ -54,14 +54,18 @@ module.exports = async (c) => {
     }
 
     const db = getDb();
-    console.log('   📝 准备插入数据:', { name, address, lat, lng, tenantId: session.tenantId, userId: session.userId });
+    // 根据 submitForApproval 决定审批状态：true=pending, false=draft
+    const approvalStatus = submitForApproval ? 'pending' : 'draft';
+    const message = submitForApproval ? '停靠点已提交，等待审批' : '已保存为草稿';
     
+    console.log('   📝 准备插入数据:', { name, address, lat, lng, tenantId: session.tenantId, userId: session.userId, submitForApproval, approvalStatus });
+
     const result = await db.run(
       `INSERT INTO stop_points (name, address, lat, lng, type, region, capacity, description, status, tenant_id, uploaded_by, upload_source, approval_status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inactive', ?, ?, 'carrier', 'pending')`,
-      [name, address, parseFloat(lat), parseFloat(lng), type || 'other', region || '', capacity || 1, description || '', session.tenantId, session.userId]
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'inactive', ?, ?, 'carrier', ?)`,
+      [name, address, parseFloat(lat), parseFloat(lng), type || 'other', region || '', capacity || 1, description || '', session.tenantId, session.userId, approvalStatus]
     );
-    
+
     console.log('   ✅ 插入成功，lastID:', result.lastID);
 
     const newStopPoint = await db.get('SELECT * FROM stop_points WHERE id = ?', [result.lastID]);
@@ -71,7 +75,7 @@ module.exports = async (c) => {
       status: 201,
       body: {
         success: true,
-        message: '停靠点已提交，等待审批',
+        message: message,
         data: newStopPoint
       }
     };

@@ -7649,6 +7649,39 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+  /api/carrier/stop-points/{id}/submit:
+    post:
+      operationId: carrierSubmitStopPoint
+      summary: 承运商提交草稿审批
+      description: 将草稿状态的停靠点提交审批
+      tags:
+        - carrier-stop-point
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 提交成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StopPoint'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
     put:
       operationId: carrierUpdateStopPoint
       summary: 承运商更新停靠点
