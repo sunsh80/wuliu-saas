@@ -7,7 +7,7 @@ Page({
     totalPrice: 0, // 预估总价
     totalDuration: '30分钟', // 预估总时长
     isAllInStopPoint: true, // 是否全部卸货点都在停靠点范围内
-    showVoiceInput: false // 显示语音输入界面
+    showVoiceInput: false // 显示语音输入界面approvedStopPoints: []
   },
 
   onLoad() {
@@ -76,19 +76,15 @@ Page({
     return false;
   },
 
-  calculateDistance(lat1, lon1, lat/XMLSchemaInstance, lon2) {
+  calculateDistance(lat1, lon1, lat2, lon2) {
     // Haversine公式计算两点之间的距离
     const R = 6371e3; // 地球半径，单位为米
     const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
     const φ2 = lat2 * Math.PI / 180;
     const Δφ = (lat2 - lat1) * Math.PI / 180;
     const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
     return R * c; // in meters
   },
 
