@@ -1,0 +1,503 @@
+
+  /api/admin/commissions/config:
+    get:
+      tags: [admin-commission]
+      summary: 获取抽佣配置
+      operationId: getCommissionConfig
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [admin-commission]
+      summary: 更新抽佣配置
+      operationId: updateCommissionConfig
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/commissions/records:
+    get:
+      tags: [admin-commission]
+      summary: 佣金记录列表
+      operationId: listCommissionRecords
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/commissions/records/{id}/status:
+    put:
+      tags: [admin-commission]
+      summary: 更新佣金记录状态
+      operationId: updateCommissionRecordStatus
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/settings:
+    get:
+      tags: [admin-setting]
+      summary: 获取系统设置列表
+      operationId: listSettings
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/settings/{id}:
+    put:
+      tags: [admin-setting]
+      summary: 更新设置
+      operationId: updateSetting
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/system-settings:
+    get:
+      tags: [admin-setting]
+      summary: 获取系统配置列表
+      operationId: listSystemSettings
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: grouped
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/system-settings/{id}:
+    put:
+      tags: [admin-setting]
+      summary: 更新系统设置
+      operationId: updateSystemSetting
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/system-settings/config/{key}:
+    put:
+      tags: [admin-setting]
+      summary: 设置配置值
+      operationId: setConfigValue
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 设置成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/service-providers:
+    get:
+      tags: [admin-setting]
+      summary: 获取服务提供商列表
+      operationId: listServiceProviders
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/service-providers/{id}:
+    put:
+      tags: [admin-setting]
+      summary: 更新服务提供商
+      operationId: updateServiceProvider
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/vehicle-tracking/latest-positions:
+    get:
+      tags: [admin-vehicle-tracking]
+      summary: 获取最新位置
+      operationId: getLatestPositions
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/vehicle-tracking/positions:
+    get:
+      tags: [admin-vehicle-tracking]
+      summary: 获取车辆位置
+      operationId: getVehiclePositions
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: vehicle_id
+          in: query
+          schema:
+            type: integer
+        - name: plate_number
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/violations:
+    get:
+      tags: [admin-violation]
+      summary: 违规列表
+      operationId: listViolations
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags: [admin-violation]
+      summary: 创建违规记录
+      operationId: createViolation
+      security:
+        - AdminSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: 创建成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/violations/{id}:
+    get:
+      tags: [admin-violation]
+      summary: 根据 ID 获取违规
+      operationId: getViolationById
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [admin-violation]
+      summary: 更新违规记录
+      operationId: updateViolation
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags: [admin-violation]
+      summary: 删除违规记录
+      operationId: deleteViolation
+      security:
+        - AdminSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/admin/violations/stats:
+    get:
+      tags: [admin-violation]
+      summary: 获取违规统计
+      operationId: getViolationStats
+      security:
+        - AdminSessionAuth: []
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/carrier/orders/{order_id}/claim:
+    post:
+      tags: [carrier-order]
+      summary: 认领承运商订单
+      operationId: claimCarrierOrder
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 认领成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/tenant/stop-points:
+    get:
+      tags: [tenant-stop-point]
+      summary: 我的停靠点列表
+      operationId: tenantListMyStopPoints
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags: [tenant-stop-point]
+      summary: 上传停靠点
+      operationId: tenantUploadStopPoint
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: 上传成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/tenant/stop-points/batch:
+    post:
+      tags: [tenant-stop-point]
+      summary: 批量上传停靠点
+      operationId: tenantBatchUploadStopPoints
+      security:
+        - TenantSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 上传成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /api/tenant/stop-points/{id}:
+    get:
+      tags: [tenant-stop-point]
+      summary: 获取我的停靠点
+      operationId: tenantGetMyStopPoint
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags: [tenant-stop-point]
+      summary: 更新我的停靠点
+      operationId: tenantUpdateMyStopPoint
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 更新成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags: [tenant-stop-point]
+      summary: 删除我的停靠点
+      operationId: tenantDeleteMyStopPoint
+      security:
+        - TenantSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'

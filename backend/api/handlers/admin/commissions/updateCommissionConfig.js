@@ -1,7 +1,8 @@
 // backend/api/handlers/admin/commissions/updateCommissionConfig.js
 const CommissionModel = require('../../../../db/models/Commission');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   const commissionModel = new CommissionModel();
   
   try {
@@ -47,4 +48,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

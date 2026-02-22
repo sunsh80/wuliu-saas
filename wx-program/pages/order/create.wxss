@@ -1,5 +1,7 @@
-/* pages/order/order.wxss */
+/* pages/order/create.wxss */
+/* 完全继承原 order.wxss 样式，仅新增按钮 */
 
+/* 复用原 order.wxss 中的所有样式 */
 .container {
   padding: 20rpx;
   box-sizing: border-box;
@@ -104,7 +106,6 @@
   border: none;
 }
 
-/* 新增：横向排列长宽高的样式 */
 .dimensions-row {
   display: flex;
   flex-direction: row;
@@ -113,7 +114,6 @@
   margin-bottom: 15rpx;
 }
 
-/* 新增：每个长宽高项目的样式 */
 .dimension-item {
   flex: 1;
   min-width: 150rpx;
@@ -122,19 +122,17 @@
   gap: 8rpx;
 }
 
-/* 新增：体积和车型同一行的样式 */
-.volume-vehicle-row {
-  display: flex;
-  flex-direction: row;
-  gap: 15rpx;
-  margin-bottom: 15rpx;
+.dimension-item text {
+  font-size: 24rpx;
+  color: #666;
 }
 
-.volume-item {
+.address-input {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  padding: 8rpx;
+  font-size: 26rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 4rpx;
 }
 
 .volume-input {
@@ -145,57 +143,19 @@
   font-size: 26rpx;
 }
 
-.vehicle-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.vehicle-picker {
-  padding: 10rpx 0;
-  font-size: 26rpx;
-  color: #333;
-}
-
-/* 新增：地址选择模式提示 */
-.address-mode-tip {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: #fffbe6;
-  border: 1rpx solid #ffe58f;
-  border-radius: 6rpx;
-  padding: 10rpx 15rpx;
-  margin-top: 10rpx;
-  gap: 8rpx;
-}
-
-.tip-icon {
-  font-size: 28rpx;
-}
-
-.tip-text {
-  font-size: 24rpx;
-  color: #b7791f;
-  flex: 1;
-}
-
-/* 货物备注输入框样式 */
-.cargo-remark-input {
+/* 新增：下一步按钮 */
+.next-btn {
   width: 100%;
-  padding: 8rpx;
-  border: 1rpx solid #ddd;
-  border-radius: 4rpx;
-  font-size: 24rpx;
-  margin-top: 8rpx;
-  box-sizing: border-box;
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 8rpx;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+  margin-top: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.2);
 }
 
-.address-input {
-  flex: 1;
-  padding: 8rpx;
-  font-size: 26rpx;
-  border: 1rpx solid #ddd;
-  border-radius: 4rpx;
+.next-btn::after {
+  border: none;
 }

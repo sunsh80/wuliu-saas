@@ -39,7 +39,7 @@ Page({
 
     // 如果已登录，则跳转到订单页
     wx.navigateTo({
-      url: '/pages/order/order'
+      url: '/pages/order/create'
     });
   },
 

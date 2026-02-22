@@ -1,7 +1,8 @@
 // backend/api/handlers/carrier/order/claimCarrierOrder.js
 const { getDb } = require('../../../../db/index.js');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   console.log("--- Claim Order Handler Start (Simple Status Check) ---");
   const userId = c.context?.id;
   console.log("Received request to claim order for user ID:", userId);
@@ -66,4 +67,4 @@ module.exports = async (c) => {
     }
     return { status: 500, body: { success: false, error: 'INTERNAL_SERVER_ERROR', message: process.env.NODE_ENV === 'development' ? error.message : undefined } };
   }
-};
+});

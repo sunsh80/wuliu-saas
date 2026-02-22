@@ -1,10 +1,11 @@
 // backend/api/handlers/admin/settings/listServiceProviders.js
 const ConfigService = require('../../../../services/ConfigService');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
 /**
  * 获取服务提供商配置列表
  */
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const { type } = c.request.query;
 
@@ -43,4 +44,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

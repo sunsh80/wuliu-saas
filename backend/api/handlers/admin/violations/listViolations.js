@@ -1,8 +1,9 @@
 // backend/api/handlers/admin/violations/listViolations.js
 const { getDb } = require('../../../../db/index.js');
+const { requireAuth } = require('../../../../utils/requireAuth');
 const ViolationModel = require('../../../../db/models/Violation');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   const db = getDb();
   const violationModel = new ViolationModel();
   
@@ -38,4 +39,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

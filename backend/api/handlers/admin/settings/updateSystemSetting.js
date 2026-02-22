@@ -1,10 +1,11 @@
 // backend/api/handlers/admin/settings/updateSystemSetting.js
 const ConfigService = require('../../../../services/ConfigService');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
 /**
  * 更新系统配置
  */
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const { id } = c.request.params;
     const { config_value, description, is_public, is_enabled } = c.request.body;
@@ -51,4 +52,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

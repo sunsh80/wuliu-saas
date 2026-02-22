@@ -1,7 +1,8 @@
 // backend/api/handlers/admin/violations/updateViolation.js
 const ViolationModel = require('../../../../db/models/Violation');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   const violationModel = new ViolationModel();
   
   try {
@@ -50,4 +51,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

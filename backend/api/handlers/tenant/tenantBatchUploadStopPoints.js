@@ -1,7 +1,8 @@
 // backend/api/handlers/tenant/tenantBatchUploadStopPoints.js
 const { getDb } = require('../../../db/index');
+const { requireAuth } = require('../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const tenantId = c.context?.tenantId;
     const userId = c.context?.id;
@@ -30,4 +31,4 @@ module.exports = async (c) => {
     console.error('❌ [Tenant] Batch upload error:', error);
     return { status: 500, body: { success: false, error: 'BATCH_UPLOAD_FAILED', message: error.message } };
   }
-};
+});

@@ -1,0 +1,78 @@
+<!-- pages/order/create.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">创建订单</text>
+  </view>
+
+  <view class="content">
+    <!-- 货物信息 -->
+    <view class="section">
+      <view class="section-title">货物信息</view>
+      
+      <view class="form-item">
+        <view class="label">货物类型</view>
+        <picker mode="selector" range="{{cargoTypes}}" value="{{cargoTypeIndex}}" bindchange="onCargoTypeChange">
+          <view class="picker-view">
+            <text>{{selectedCargoType}}</text>
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="label">货物备注</view>
+        <input class="input-wrapper" placeholder="如：易碎品" value="{{cargoRemark}}" bindinput="onCargoRemarkInput" />
+      </view>
+
+      <view class="dimensions-row">
+        <view class="dimension-item">
+          <text>重量(kg)</text>
+          <input class="address-input" type="digit" value="{{goodsWeight}}" bindinput="onGoodsWeightInput" />
+        </view>
+        <view class="dimension-item">
+          <text>长(m)</text>
+          <input class="address-input" type="digit" value="{{length}}" bindinput="onLengthInput" />
+        </view>
+        <view class="dimension-item">
+          <text>宽(m)</text>
+          <input class="address-input" type="digit" value="{{width}}" bindinput="onWidthInput" />
+        </view>
+        <view class="dimension-item">
+          <text>高(m)</text>
+          <input class="address-input" type="digit" value="{{height}}" bindinput="onHeightInput" />
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">体积(m³)</view>
+        <view class="volume-input">{{volume || '--'}}</view>
+      </view>
+    </view>
+
+    <!-- 装货信息 -->
+    <view class="section">
+      <view class="section-title">装货信息</view>
+      
+      <view class="form-item">
+        <view class="label">装货地址</view>
+        <view class="address-input-container">
+          <input class="address-input" placeholder="请选择装货地址" value="{{pickupAddress}}" disabled />
+          <button class="map-btn" bindtap="selectPickupLocation">地图选点</button>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">联系人</view>
+        <input class="input-wrapper" placeholder="姓名" value="{{shipperName}}" bindinput="onShipperNameInput" />
+      </view>
+
+      <view class="form-item">
+        <view class="label">手机号</view>
+        <input class="input-wrapper" type="number" placeholder="联系电话" value="{{shipperPhone}}" bindinput="onShipperPhoneInput" />
+      </view>
+    </view>
+
+    <!-- 底部按钮 -->
+    <button class="next-btn" bindtap="onNext">下一步：添加卸货点</button>
+  </view>
+</view>

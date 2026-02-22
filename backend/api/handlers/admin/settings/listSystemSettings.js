@@ -1,11 +1,12 @@
 // backend/api/handlers/admin/settings/listSystemSettings.js
 const ConfigService = require('../../../../services/ConfigService');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
 /**
  * 获取系统配置列表
  * 支持按分类查询，支持获取所有配置（分组）
  */
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const { category, grouped } = c.request.query;
 
@@ -39,4 +40,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

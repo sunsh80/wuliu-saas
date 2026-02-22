@@ -1,11 +1,12 @@
 // backend/api/handlers/admin/settings/setConfigValue.js
 const ConfigService = require('../../../../services/ConfigService');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
 /**
  * 设置配置值（快捷方式）
  * 直接通过 key 设置配置值，如果不存在则创建
  */
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const { key } = c.request.params;
     const { value, type, description, category } = c.request.body;
@@ -63,4 +64,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

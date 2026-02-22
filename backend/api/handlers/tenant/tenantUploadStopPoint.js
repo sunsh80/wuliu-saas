@@ -1,7 +1,8 @@
 // backend/api/handlers/tenant/tenantUploadStopPoint.js
 const { getDb } = require('../../../db/index');
+const { requireAuth } = require('../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const tenantId = c.context?.tenantId;
     const userId = c.context?.id;
@@ -21,4 +22,4 @@ module.exports = async (c) => {
     console.error('❌ [Tenant] Upload error:', error);
     return { status: 500, body: { success: false, error: 'UPLOAD_FAILED', message: error.message } };
   }
-};
+});

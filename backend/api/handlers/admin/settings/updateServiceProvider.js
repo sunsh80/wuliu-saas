@@ -1,10 +1,11 @@
 // backend/api/handlers/admin/settings/updateServiceProvider.js
 const ConfigService = require('../../../../services/ConfigService');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
 /**
  * 更新服务提供商配置
  */
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const { id } = c.request.params;
     const {
@@ -60,4 +61,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

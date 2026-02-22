@@ -1,7 +1,8 @@
 // backend/api/handlers/tenant/tenantGetMyStopPoint.js
 const { getDb } = require('../../../db/index');
+const { requireAuth } = require('../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const tenantId = c.context?.tenantId;
     const { id } = c.request.params;
@@ -17,4 +18,4 @@ module.exports = async (c) => {
     console.error('❌ [Tenant] Get error:', error);
     return { status: 500, body: { success: false, error: 'FETCH_FAILED', message: error.message } };
   }
-};
+});

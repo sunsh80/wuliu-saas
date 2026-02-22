@@ -1,7 +1,8 @@
 // backend/api/handlers/admin/settings/updateSetting.js
 const SystemSettingModel = require('../../../../db/models/SystemSetting');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   const settingModel = new SystemSettingModel();
   
   try {
@@ -44,4 +45,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

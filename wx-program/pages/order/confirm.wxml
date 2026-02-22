@@ -1,0 +1,68 @@
+<!-- pages/order/confirm.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">确认订单</text>
+  </view>
+
+  <view class="content">
+    <!-- 装货信息概览 -->
+    <view class="section">
+      <view class="section-title">装货信息</view>
+      
+      <view class="form-item">
+        <view class="label">货物类型</view>
+        <view>{{orderTemp.selectedCargoType}}</view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">重量(kg)</view>
+        <view>{{orderTemp.goodsWeight}}</view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">体积(m³)</view>
+        <view>{{orderTemp.volume}}</view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">装货地址</view>
+        <view>{{orderTemp.pickupAddress}}</view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">联系人</view>
+        <view>{{orderTemp.shipperName}} {{orderTemp.shipperPhone}}</view>
+      </view>
+    </view>
+
+    <!-- 卸货点管理 -->
+    <view class="section">
+      <view class="section-title">卸货点管理</view>
+      
+      <block wx:for="{{deliveryPoints}}" wx:key="index" wx:for-index="index">
+        <view class="delivery-point-card">
+          <view class="dp-address">{{item.address}}</view>
+          <view class="dp-contact">联系人：{{item.contactName}} {{item.contactPhone}}</view>
+          <button class="edit-btn" bindtap="editDeliveryPoint" data-index="{{index}}">编辑</button>
+          <button class="delete-btn" bindtap="deleteDeliveryPoint" data-index="{{index}}">删除</button>
+        </view>
+      </block>
+
+      <button class="add-btn" bindtap="addDeliveryPoint">+ 添加卸货点</button>
+    </view>
+
+    <!-- 推荐车型与价格 -->
+    <view class="section">
+      <view class="section-title">推荐服务</view>
+      
+      <view class="recommendation">
+        <view>推荐车型：{{recommendedVehicleType}}</view>
+        <view>预估价格：￥{{totalPrice}}</view>
+        <view>预计时效：{{totalDuration}}</view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" bindtap="submitOrder">创建订单</button>
+  </view>
+</view>

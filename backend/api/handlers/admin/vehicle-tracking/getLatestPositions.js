@@ -1,7 +1,8 @@
 // backend/api/handlers/admin/vehicle-tracking/getLatestPositions.js
 const VehicleTrackingModel = require('../../../../db/models/VehicleTracking');
+const { requireAuth } = require('../../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   const trackingModel = new VehicleTrackingModel();
   
   try {
@@ -31,4 +32,4 @@ module.exports = async (c) => {
       }
     };
   }
-};
+});

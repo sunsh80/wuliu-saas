@@ -1,7 +1,8 @@
 // backend/api/handlers/tenant/tenantDeleteMyStopPoint.js
 const { getDb } = require('../../../db/index');
+const { requireAuth } = require('../../../utils/requireAuth');
 
-module.exports = async (c) => {
+module.exports = requireAuth(async (c) => {
   try {
     const tenantId = c.context?.tenantId;
     const { id } = c.request.params;
@@ -20,4 +21,4 @@ module.exports = async (c) => {
     console.error('❌ [Tenant] Delete error:', error);
     return { status: 500, body: { success: false, error: 'DELETE_FAILED', message: error.message } };
   }
-};
+});
